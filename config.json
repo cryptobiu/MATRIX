@@ -1,0 +1,17 @@
+{
+  "ExecRequestTime": "7.9.17 12:20",
+  "Protocol":"MPCHonestMajority",
+  "Number Of Parties": 2,
+  "AWS Instance Type": "c3.large",
+  "AWS Pricing Bidding": "0.20",
+  "Network": "LAN",
+  "List of configurations":
+  {
+    "HMAC": "SHA1"
+  },
+  "Number of Repetitions":2,
+  "Git Branch": "CommOpt",
+  "Git commit id": "aed770e446b2d110a3996141e3bb2ba1c21dd49f",
+  "IsPublished": "private"
+}
+
