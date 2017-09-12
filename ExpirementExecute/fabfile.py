@@ -2,7 +2,7 @@ from fabric.api import *
 from fabric.contrib.files import exists
 from os.path import expanduser, exists
 
-env.hosts = ['54.144.43.65', '54.165.223.57']
+env.hosts = open('public_ips', 'r').readlines()
 env.user = 'ubuntu'
 env.key_filename = [expanduser('~/Keys/matrix.pem')]
 
@@ -18,7 +18,6 @@ def install_git_project(experiment_name, git_branch):
         run('cmake .')
         run('git pull')
         run('make')
-
 
 
 @task
