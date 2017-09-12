@@ -14,7 +14,7 @@ with open('config.json') as data_file:
     is_published = data['IsPublished']
     network_type = data['Network']
     number_of_parties = data['Number Of Parties']
-    number_of_reptions = data['Number of Repetitions']
+    number_of_repetitions = data['Number of Repetitions']
     protocol = data['Protocol']
     commit_id = data['Git commit id']
     git_branch = data['Git Branch']
