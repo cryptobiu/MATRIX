@@ -15,7 +15,7 @@ def create_security_group():
     print(response['GroupId'])
 
 
-def create_instances():
+def deploy_instances():
     with open('config.json') as data_file:
         data = json.load(data_file)
         machine_type = data['AWS Instance Type']
@@ -24,8 +24,6 @@ def create_instances():
         number_of_parties = data['Number Of Parties']
         conf = list(data['List of configurations'].values())
         regions = list(data['Regions'].values())
-        print(conf)
-        print(regions)
 
     if len(regions) > 1:
         number_of_instances = number_of_parties // len(regions)
@@ -53,26 +51,48 @@ def create_instances():
                 },
         )
 
-    response = client.describe_spot_instance_requests()
-    # wait until the request fulfilled
     time.sleep(120)
+    get_network_details()
+
+
+def get_network_details():
+    client = boto3.client('ec2')
+    response = client.describe_spot_instance_requests()
 
     instances_ids = list()
     for req_idx in range(len(response['SpotInstanceRequests'])):
         instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
-
-    ec2 = boto3.resource('ec2')
-    instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
 
     # save instance_ids for experiment termination
     with open('instances_ids', 'w+') as ids_file:
         for idx in range(len(instances_ids)):
             ids_file.write('%s\n' % instances_ids[idx])
 
+    ec2 = boto3.resource('ec2')
+    instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
+
+    public_ip_address = list()
+    private_ip_address = list()
+
     for inst in instances:
-        print(inst.public_ip_address)
+        public_ip_address.append(inst.public_ip_address)
+        private_ip_address.append(inst.private_ip_address)
+
+    # write public ips to file for fabric
+    with open('public_ips', 'w+') as public_ip_file:
+        for public_idx in range(len(public_ip_address)):
+            public_ip_file.write('%s\n' % public_ip_address[public_idx])
+
+    with open('parties.conf', 'w+') as private_ip_file:
+        for private_idx in range(len(private_ip_address)):
+            private_ip_file.write('party_%s_ip = %s\n' % (private_idx, private_ip_address[private_idx]))
+
+        port_number = 8000
+
+        for private_idx in range(len(private_ip_address)):
+            private_ip_file.write('party_%s_port = %s\n' % (private_idx, port_number))
 
 
-create_instances()
+deploy_instances()
 
 # create_security_group()

@@ -6,3 +6,5 @@ __pycache__/
 .idea/
 *.jar
 instances_ids
+parties.conf
+public_ips
