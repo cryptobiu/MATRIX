@@ -1,4 +1,5 @@
 from fabric.api import *
+from fabric.contrib.files import exists
 from os.path import expanduser, exists
 
 env.hosts = ['54.144.43.65', '54.165.223.57']
@@ -17,3 +18,11 @@ def install_git_project(experiment_name, git_branch):
         run('cmake .')
         run('git pull')
         run('make')
+
+
+
+@task
+def pre_process(experiment_name):
+    with cd('/home/ubuntu/%s' % experiment_name):
+        if exists('pre_process.py'):
+            run('python 3 pre_process.py')
