@@ -11,7 +11,7 @@ env.key_filename = [expanduser('~/Keys/matrix.pem')]
 def install_git_project(experiment_name, git_branch):
 
     if not exists('/home/ubuntu/%s' % experiment_name):
-        run('git clone https://github.com/cryptobiu/%s.git' % experiment_name)
+        run('git clone https://liorbiu:4aRotdy0vOhfvVgaUaSk@github.com/cryptobiu/%s.git' % experiment_name)
     #
     with cd('%s' % experiment_name):
         run('git checkout %s ' % git_branch)

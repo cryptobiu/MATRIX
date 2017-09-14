@@ -1,5 +1,3 @@
-import os
-
 import boto3
 import json
 import time
@@ -20,9 +18,7 @@ def deploy_instances():
         data = json.load(data_file)
         machine_type = data['AWS Instance Type']
         price_bids = data['AWS Pricing Bidding']
-        network_type = data['Network']
         number_of_parties = data['Number Of Parties']
-        conf = list(data['List of configurations'].values())
         regions = list(data['Regions'].values())
 
     if len(regions) > 1:

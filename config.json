@@ -1,6 +1,6 @@
 {
   "ExecRequestTime": "7.9.17 12:20",
-  "Protocol":"MPCHonestMajority",
+  "Protocol":"BCastComm",
   "Number Of Parties": 2,
   "AWS Instance Type": "c3.large",
   "AWS Pricing Bidding": "0.05",
