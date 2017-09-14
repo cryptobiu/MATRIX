@@ -1,3 +1,4 @@
+import os
 import boto3
 import json
 import time
@@ -52,6 +53,11 @@ def deploy_instances():
 
 
 def get_network_details():
+    with open('config.json') as data_file:
+        data = json.load(data_file)
+        protocol_name = data['Protocol']
+        os.system('mkdir -p ../%s' % protocol_name)
+
     client = boto3.client('ec2')
     response = client.describe_spot_instance_requests()
 
@@ -75,11 +81,11 @@ def get_network_details():
         private_ip_address.append(inst.private_ip_address)
 
     # write public ips to file for fabric
-    with open('public_ips', 'w+') as public_ip_file:
+    with open('../%s/public_ips', 'w+' % protocol_name) as public_ip_file:
         for public_idx in range(len(public_ip_address)):
             public_ip_file.write('%s\n' % public_ip_address[public_idx])
 
-    with open('parties.conf', 'w+') as private_ip_file:
+    with open('../%s/parties.conf', 'w+' % protocol_name) as private_ip_file:
         for private_idx in range(len(private_ip_address)):
             private_ip_file.write('party_%s_ip = %s\n' % (private_idx, private_ip_address[private_idx]))
 

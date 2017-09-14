@@ -9,7 +9,7 @@ def install_experiment(experiment_name, git_branch):
 
 with open('config.json') as data_file:
     data = json.load(data_file)
-    protocol = data['Protocol']
+    protocol_name = data['Protocol']
     git_branch = data['Git Branch']
 
-install_experiment(protocol, git_branch)
+install_experiment(protocol_name, git_branch)
