@@ -1,19 +1,20 @@
 {
-  "ExecRequestTime": "7.9.17 12:20",
-  "Protocol":"BCastComm",
-  "Number Of Parties": 2,
-  "AWS Instance Type": "c3.large",
-  "AWS Pricing Bidding": "0.05",
-  "Network": "LAN",
-  "List of configurations":
+  "execRequestTime": "7.9.17 12:20",
+  "protocol":"BCastComm",
+  "numOfParties": 2,
+  "aWSInstType": "c3.large",
+  "aWWSBidPrice": "0.05",
+  "network": "LAN",
+  "executableName": "BCastComm",
+  "configurations":
   {
-    "HMAC": "SHA1"
+    "conf_0": "4 Parties"
   },
-  "Number of Repetitions":2,
-  "Git Branch": "CommOpt",
-  "Git commit id": "aed770e446b2d110a3996141e3bb2ba1c21dd49f",
+  "numOfRepetitions":2,
+  "gitBranch": "CommOpt",
+  "gitCommitId": "aed770e446b2d110a3996141e3bb2ba1c21dd49f",
   "IsPublished": "private",
-  "Regions":
+  "regions":
   {
     "region_0":"us-east-1b"
   }
