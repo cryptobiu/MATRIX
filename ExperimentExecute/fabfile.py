@@ -35,6 +35,14 @@ def update_git_project(experiment_name, git_branch):
 
 
 @task
+def update_libscapi():
+    with cd('libscapi/'):
+        run('git pull')
+        run('cmake .')
+        sudo('make')
+
+
+@task
 def pre_process(experiment_name):
     with cd('/home/ubuntu/%s' % experiment_name):
         if exists('pre_process.py'):

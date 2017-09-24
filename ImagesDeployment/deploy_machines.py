@@ -17,10 +17,11 @@ def create_security_group():
 def deploy_instances():
     with open('config.json') as data_file:
         data = json.load(data_file)
-        machine_type = data['AWS Instance Type']
-        price_bids = data['AWS Pricing Bidding']
-        number_of_parties = data['Number Of Parties']
-        regions = list(data['Regions'].values())
+        machine_type = data['aWSInstType']
+        price_bids = data['aWWSBidPrice']
+        number_of_parties = data['numOfParties']
+        ami_id = data['ami']
+        regions = list(data['regions'].values())
 
     if len(regions) > 1:
         number_of_instances = number_of_parties // len(regions)
@@ -36,7 +37,7 @@ def deploy_instances():
                 InstanceCount=number_of_instances,
                 LaunchSpecification=
                 {
-                    'ImageId': 'ami-888f9df3',
+                    'ImageId': ami_id,
                     'KeyName': 'matrix',
                     'SecurityGroupIds': ['sg-5f07f52c'],
                     'SecurityGroups': ['MatrixSG'],
@@ -55,7 +56,7 @@ def deploy_instances():
 def get_network_details():
     with open('config.json') as data_file:
         data = json.load(data_file)
-        protocol_name = data['Protocol']
+        protocol_name = data['protocol']
         os.system('mkdir -p ../%s' % protocol_name)
 
     client = boto3.client('ec2')
@@ -96,5 +97,3 @@ def get_network_details():
 
 
 deploy_instances()
-
-# create_security_group()
