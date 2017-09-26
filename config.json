@@ -1,22 +1,31 @@
 {
   "execRequestTime": "7.9.17 12:20",
-  "protocol":"BCastComm",
-  "numOfParties": 2,
-  "aWSInstType": "c3.large",
-  "aWWSBidPrice": "0.05",
+  "amis":
+  {
+    "region_0": "ami-888f9df3",
+    "region_1": "ami-aeb1a2ca",
+    "region_2": "ami-1f22517c"
+  },
+  "protocol":"LowCostConstantRoundMPC",
+  "numOfParties": 3,
+  "aWSInstType": "c4.large",
+  "aWWSBidPrice": "0.50",
   "network": "LAN",
-  "executableName": "BCastComm",
+  "executableName": "run_protocol_aes.sh",
+  "preProcess":"True",
   "configurations":
   {
-    "conf_0": "4 Parties"
+    "conf_0": "NigelAes3Parties.txt parties.conf 2 3"
   },
-  "numOfRepetitions":2,
-  "gitBranch": "CommOpt",
+  "numOfRepetitions":1,
+  "gitBranch": "master",
   "gitCommitId": "aed770e446b2d110a3996141e3bb2ba1c21dd49f",
   "IsPublished": "private",
   "regions":
   {
-    "region_0":"us-east-1b"
+    "region_0":"us-east-1b",
+    "region_1":"eu-west-2b",
+    "region_2":"ap-southeast-1b"
   }
 }
 
