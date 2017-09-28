@@ -79,3 +79,6 @@ def run_protocol():
                 run('./%s %s %s %s' % (executable_name, party_id, party_id, lconf[idx]))
 
 
+@task
+def collect_results(results_local_directory, results_remote_directory):
+    get('%s/*.csv' % results_local_directory, results_remote_directory)
