@@ -6,10 +6,12 @@
     "region_1": "ami-aeb1a2ca",
     "region_2": "ami-1f22517c"
   },
-  "protocol":"LowCostConstantRoundMPC",
-  "numOfParties": 3,
+  "protocol":"GMW",
+  "minNumOfParties": 3,
+  "maxNumOfParties": 5,
+  "partiesQuanta": 5,
   "aWSInstType": "c4.large",
-  "aWWSBidPrice": "0.50",
+  "aWWSBidPrice": "0.07",
   "network": "LAN",
   "executableName": "run_protocol_aes.sh",
   "preProcess":"True",
@@ -26,6 +28,8 @@
     "region_0":"us-east-1b",
     "region_1":"eu-west-2b",
     "region_2":"ap-southeast-1b"
-  }
+  },
+  "resultsDirectory": "~/libscapi/protocols/GMW"
+
 }
 
