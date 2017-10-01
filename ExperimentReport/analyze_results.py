@@ -1,8 +1,12 @@
+import sys
 import glob
 import json
 from os.path import expanduser
 import xlsxwriter.styles
 from collections import OrderedDict
+
+
+config_file_path = sys.argv[1]
 
 
 with open('config.json') as conf_file:

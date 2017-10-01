@@ -1,5 +1,9 @@
 import json
 import os
+import sys
+
+
+config_file_path = sys.argv[1]
 
 
 def install_experiment(experiment_name, git_branch):
@@ -9,7 +13,7 @@ def install_experiment(experiment_name, git_branch):
 
 def execute_experiment(repetitions):
     for i in range(repetitions):
-        os.system('fab -f ExperimentExecute/fabfile.py run_protocol --parallel --no-pty')
+        os.system('fab -f ExperimentExecute/fabfile.py run_protocol:%s --parallel --no-pty' % config_file_path)
 
 
 def collect_results(results_remote_directory, results_local_directory):
@@ -17,7 +21,7 @@ def collect_results(results_remote_directory, results_local_directory):
               %(results_remote_directory, results_local_directory))
 
 
-with open('config.json') as data_file:
+with open(config_file_path) as data_file:
     data = json.load(data_file)
     protocol_name = data['protocol']
     git_branch = data['gitBranch']

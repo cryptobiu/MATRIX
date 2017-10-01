@@ -1,4 +1,5 @@
 import json
+import git
 
 from fabric.api import *
 from fabric.contrib.files import exists
@@ -58,13 +59,12 @@ def pre_process(experiment_name):
 
 
 @task
-def run_protocol():
-    with open('config.json') as data_file:
+def run_protocol(config_file):
+    with open(config_file) as data_file:
         data = json.load(data_file)
         protocol_name = data['protocol']
         executable_name = data['executableName']
         configurations = data['configurations']
-        # number_of_parties = data['numOfParties']
 
         # list of all configurations after parse
         lconf = list()

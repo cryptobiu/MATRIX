@@ -1,14 +1,18 @@
 import os
+import sys
 import boto3
 import json
 import time
+from datetime import datetime
+from collections import OrderedDict
+
+
+config_file_path = sys.argv[1]
 
 
 def create_key_pair():
-    with open('ImagesDeployment/regions', 'r') as regions_file:
-        regions = regions_file.readlines()
-
-    regions = [r.strip() for r in regions]
+    with open(config_file_path) as regions_file:
+        regions = list(regions_file['regions'].values())
 
     for region in regions:
         ec2 = boto3.resource('ec2', region_name=region)
@@ -17,10 +21,8 @@ def create_key_pair():
 
 
 def create_security_group():
-    with open('ImagesDeployment/regions', 'r') as regions_file:
-        regions = regions_file.readlines()
-
-    regions = [r.strip() for r in regions]
+    with open(config_file_path) as regions_file:
+        regions = list(regions_file['regions'].values())
 
     for region in regions:
         client = boto3.client('ec2', region_name=region)
@@ -36,18 +38,21 @@ def create_security_group():
 
 
 def deploy_instances():
-    with open('config.json') as data_file:
-        data = json.load(data_file)
+    with open(config_file_path) as data_file:
+        data = json.load(data_file, object_pairs_hook=OrderedDict)
         machine_type = data['aWSInstType']
         price_bids = data['aWWSBidPrice']
-        number_of_parties = data['numOfParties']
+        number_of_parties = list(data['numOfParties'].values())
         amis_id = list(data['amis'].values())
         regions = list(data['regions'].values())
 
     if len(regions) > 1:
-        number_of_instances = number_of_parties // len(regions)
+        number_of_instances = max(number_of_parties) // len(regions)
     else:
-        number_of_instances = number_of_parties
+        number_of_instances = max(number_of_parties)
+
+    date = datetime.now().replace(hour=datetime.now().hour - 3)
+    new_date = date.replace(hour=date.hour + 6)
 
     for idx in range(len(regions)):
         client = boto3.client('ec2', region_name=regions[idx][:-1])
@@ -60,13 +65,13 @@ def deploy_instances():
                     'ImageId': amis_id[idx],
                     'KeyName': 'Matrix%s' % regions[idx].replace('-', '')[:-1],
                     'SecurityGroups': ['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
-                    # 'SecurityGroupIds': ['sg-fa504d93'],
                     'InstanceType': machine_type,
                     'Placement':
                         {
                             'AvailabilityZone': regions[idx],
                         },
                 },
+                ValidUntil=new_date
         )
 
     time.sleep(120)
@@ -75,7 +80,7 @@ def deploy_instances():
 
 
 def get_network_details(regions):
-    with open('config.json') as data_file:
+    with open(config_file_path) as data_file:
         data = json.load(data_file)
         protocol_name = data['protocol']
         os.system('mkdir -p ../%s' % protocol_name)
