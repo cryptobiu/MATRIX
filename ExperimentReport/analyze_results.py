@@ -36,7 +36,6 @@ for party in parties:
                 files_headers.append(file)
         headers_files_list.append(files_headers)
 
-print(headers_files_list)
 
 with open(files_list[0]) as data_file:
     data = json.load(data_file, object_pairs_hook=OrderedDict)
@@ -56,10 +55,8 @@ for party_idx in range(len(parties)):
     ws.write(0, party_idx + 1, parties[party_idx])
     for header_idx in range(len(results_headers)):
         header_data = 0
-        print(header_idx + 2 * party_idx)
         ws.write(header_idx + 1, 0, results_headers[header_idx])
-        # print(headers_files_list[header_idx])
-        for data_file in headers_files_list[header_idx + 2 * party_idx]:
+        for data_file in headers_files_list[header_idx + len(results_headers) * party_idx]:
             with open(data_file, 'r') as f:
                 data = json.load(f)
             header_data += int(data[results_headers[header_idx]]['duration'])
