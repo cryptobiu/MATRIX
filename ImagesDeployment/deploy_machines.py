@@ -74,7 +74,7 @@ def deploy_instances():
                 ValidUntil=new_date
         )
 
-    time.sleep(120)
+    time.sleep(240)
 
     get_network_details(regions)
 
