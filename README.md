@@ -10,6 +10,6 @@ In order to install this three modules use pip: `pip3 install --user xlsxwriter 
 
 ### MATRIX Modules
 
-1.  [__ImagesDeployment__](https://github.com/cryptobiu/MATRIX/tree/master/ImagesDeployment): Deploy spot instances according to configuration[file](https://github.com/cryptobiu/MATRIX/blob/master/config.json).
+1.  [__ImagesDeployment__](https://github.com/cryptobiu/MATRIX/tree/master/ImagesDeployment): Deploy spot instances according to configuration [file](https://github.com/cryptobiu/MATRIX/blob/master/config.json).
 2.  [__ExperimentExecute__](https://github.com/cryptobiu/MATRIX/tree/master/ExperimentExecute): Executes the protocol
 3. [__ExperimentReport__](https://github.com/cryptobiu/MATRIX/tree/master/ExperimentReport): Produce Excel report with the average time of each phase of the protocol.
