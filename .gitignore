@@ -9,3 +9,4 @@ instances_ids
 parties.conf
 public_ips
 Results.xlsx
+NodeApp/public/*.json
