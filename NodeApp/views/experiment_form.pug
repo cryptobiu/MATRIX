@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1 #{title}
+
+  form(method='POST' action='' enctype="multipart/form-data")
+    div.form-group
+      label(for='file_upload') Config File:
+      input#name.form-control(type='file', placeholder='Config file path' name='file_upload')
+    button.btn.btn-primary(type='submit') Run Experiment
+
+  if errors
+    ul
+      for error in errors
+        li!= error.msg

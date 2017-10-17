@@ -1,0 +1,43 @@
+<template>
+    <form @submit.prevent="postForm()">
+        <slot></slot>
+    </form>
+</template>
+
+<script>
+export default {
+  name: 'simple_vue_form',
+  data () {
+    return {
+      trueTags: ['input', 'textarea', 'select'],
+      notInputTypes: ['submit', 'reset', 'button'],
+      data: []
+    }
+  },
+  props: ['action'],
+  methods: {
+    postForm () {
+      var form = document.querySelector('form').childNodes
+      form.forEach(param => {
+        if (this.trueTags.indexOf(param.tag) && this.notInputTypes.indexOf(param.type) === -1 && param.value !== undefined) {
+          this.data[param.name] = param.value
+        }
+      })
+      this.ajaxPost()
+    },
+    ajaxPost () {
+      let self = this
+      let xhr = new XMLHttpRequest()
+      xhr.open('POST', this.action, true)
+      xhr.onload = function () {
+        self.$emit('ajaxSuccess', xhr.response)
+      }
+      xhr.onerror = function () {
+        self.$emit('ajaxError', xhr.response)
+      }
+      xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
+      xhr.send(this.data)
+    }
+  }
+}
+</script>
