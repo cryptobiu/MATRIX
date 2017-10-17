@@ -1,5 +1,5 @@
 import json
-import git
+import sys
 
 from fabric.api import *
 from fabric.contrib.files import exists
@@ -11,7 +11,7 @@ env.key_filename = [expanduser('~/Keys/matrix.pem')]
 
 
 @task
-def install_git_project(experiment_name, git_branch):
+def install_git_project(experiment_name, git_branch, working_directory):
 
     if not exists('%s' % experiment_name):
         run('git clone https://liorbiu:4aRotdy0vOhfvVgaUaSk@github.com/cryptobiu/%s.git' % experiment_name)
@@ -24,20 +24,17 @@ def install_git_project(experiment_name, git_branch):
             run('cmake .')
             run('make')
 
-    with cd('%s' % experiment_name):
+    with cd('%s' % working_directory):
         run('git checkout %s ' % git_branch)
         run('cmake .')
         run('make')
 
 
 @task
-def update_git_project(experiment_name, git_branch):
+def update_git_project(experiment_name, git_branch, working_directory):
 
-    if not exists('/home/ubuntu/%s' % experiment_name):
-        run('git update https://liorbiu:4aRotdy0vOhfvVgaUaSk@github.com/cryptobiu/%s.git' % experiment_name)
-    #
-    with cd('%s' % experiment_name):
-        run('git checkout %s ' % git_branch)
+    with cd('%s' % working_directory):
+        run('git pull')
         run('rm -rf CMakeFiles CMakeCahche.txt')
         run('cmake .')
         run('make')
@@ -65,20 +62,23 @@ def run_protocol(config_file):
         protocol_name = data['protocol']
         executable_name = data['executableName']
         configurations = data['configurations']
+        working_directory = data['workingDirectory']
 
         # list of all configurations after parse
         lconf = list()
-
+        print('running ')
         for i in range(len(configurations)):
             lconf.append(configurations.values()[i])
 
         party_id = env.hosts.index(env.host)
-        with cd('/home/ubuntu/%s/' % protocol_name):
+        with cd(working_directory):
             put('parties.conf', run('pwd'))
             for idx in range(len(lconf)):
                 run('./%s %s %s %s' % (executable_name, party_id, party_id, lconf[idx]))
 
+    sys.stdout.flush()
+
 
 @task
 def collect_results(results_local_directory, results_remote_directory):
-    get('%s/*.csv' % results_local_directory, results_remote_directory)
+    get('%s/*.csv' % results_local_directory, '%s/' % results_remote_directory)
