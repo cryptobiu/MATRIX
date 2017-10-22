@@ -75,6 +75,6 @@ for party_idx in range(len(parties)):
 wb.close()
 
 os.system('git add Results/Results_%s_%s.xlsx' % (protocol_name, protocol_time))
-os.system('git commit -m "Add results file for Experiment: %s' % protocol_name)
+os.system('git commit -m \"Add results file for Experiment: %s\"' % protocol_name)
 os.system('git push https://liorbiu:4aRotdy0vOhfvVgaUaSk@github.com/cryptobiu/MATRIX')
 
