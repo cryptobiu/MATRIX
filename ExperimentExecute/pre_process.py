@@ -1,11 +1,7 @@
-import subprocess
+import os
 
-
-class PreProcess:
-
-    def create_circuits(self):
-        phandles = list()
-        phandles.append(subprocess.Popen(['ExperimentExecute/GenerateArythmeticCircuitForDepthAndGates.jar', '100',
-                                          '100', '10', '10', '50', '0', 'true'], shell=False))
-        exit_codes = [p.wait() for p in phandles]
-        return exit_codes[0]
+os.system('wget http://www.shoup.net/ntl/ntl-9.10.0.tar.gz')
+os.system('tar -xf ntl-9.10.0.tar.gz')
+os.chdir('ntl-9.10.0/src')
+os.system('./configure')
+os.system('make')

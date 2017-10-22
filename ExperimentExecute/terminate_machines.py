@@ -5,7 +5,7 @@ with open('instances_ids', 'r+') as ids_file:
     instances_ids = ids_file.readlines()
 
 
-with open('config.json') as data_file:
+with open('Config_MPCHonestMajorityNoTriples.json') as data_file:
         data = json.load(data_file)
         regions = list(data['regions'].values())
 

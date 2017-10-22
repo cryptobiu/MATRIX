@@ -1,28 +1,35 @@
+import os
 import sys
 import glob
 import json
+import time
 from os.path import expanduser
 import xlsxwriter.styles
 from collections import OrderedDict
 
 
 config_file_path = sys.argv[1]
+results_path = sys.argv[2]
 
 
-with open('config.json') as conf_file:
+with open(config_file_path) as conf_file:
     conf_data = json.load(conf_file)
 
-results_directory = conf_data['resultsDirectory']
+results_directory = results_path
+# results_directory = conf_data['resultsDirectory']
+print('***********************')
+print(results_path)
 files_list = glob.glob(expanduser('%s/*.json' % results_directory))
+
 number_of_parties = list(conf_data['numOfParties'].values())
 
 parties = set()
 for file in files_list:
-    parties.add(int(file.split('_')[4].split('.')[0].split('=')[1]))
+    parties.add(int(file.split('_')[5].split('.')[0].split('=')[1]))
 
 results_headers = set()
 for file in files_list:
-    results_headers.add(file.split('_')[2])
+    results_headers.add(file.split('_')[3])
 
 parties = list(parties)
 results_headers = list(results_headers)
@@ -41,14 +48,11 @@ for party in parties:
         headers_files_list.append(files_headers)
 
 
-with open(files_list[0]) as data_file:
-    data = json.load(data_file, object_pairs_hook=OrderedDict)
-
-
 results_directory = conf_data['resultsDirectory']
 protocol_name = conf_data['protocol']
 
-wb = xlsxwriter.Workbook('Results.xlsx')
+protocol_time = str(time.time())
+wb = xlsxwriter.Workbook('Results/Results_%s_%s.xlsx' % (protocol_name, protocol_time))
 style1 = wb.add_format({'num_format': '#.##'})
 
 ws = wb.add_worksheet(protocol_name)
@@ -69,3 +73,8 @@ for party_idx in range(len(parties)):
 
 
 wb.close()
+
+os.system('git add Results/Results_%s_%s.xlsx' % (protocol_name, protocol_time))
+os.system('git commit -m "Add results file for Experiment: %s' % protocol_name)
+os.system('git push https://liorbiu:4aRotdy0vOhfvVgaUaSk@github.com/cryptobiu/MATRIX')
+
