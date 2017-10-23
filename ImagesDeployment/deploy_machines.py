@@ -61,27 +61,32 @@ def deploy_instances():
         print('Deploying instances :\n region : %s\n number of instances : %s\n  ami_id : %s\n instance_type : %s\n '
               'valid until : %s' % (regions[idx], number_of_instances, amis_id[idx], machine_type, str(new_date)))
 
-        # client.request_spot_instances(
-        #         DryRun=False,
-        #         SpotPrice=price_bids,
-        #         InstanceCount=number_of_instances,
-        #         LaunchSpecification=
-        #         {
-        #             'ImageId': amis_id[idx],
-        #             'KeyName': 'Matrix%s' % regions[idx].replace('-', '')[:-1],
-        #             'SecurityGroups': ['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
-        #             'InstanceType': machine_type,
-        #             'Placement':
-        #                 {
-        #                     'AvailabilityZone': regions[idx],
-        #                 },
-        #         },
-        #         ValidUntil=new_date
-        # )
+        number_of_instances_to_deploy = check_running_instances()
 
-    # time.sleep(240)
+        number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
 
-    get_network_details(regions)
+        if number_of_instances_to_deploy > 0:
+            client.request_spot_instances(
+                    DryRun=False,
+                    SpotPrice=price_bids,
+                    InstanceCount=number_of_instances_to_deploy,
+                    LaunchSpecification=
+                    {
+                        'ImageId': amis_id[idx],
+                        'KeyName': 'Matrix%s' % regions[idx].replace('-', '')[:-1],
+                        'SecurityGroups': ['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
+                        'InstanceType': machine_type,
+                        'Placement':
+                            {
+                                'AvailabilityZone': regions[idx],
+                            },
+                    },
+                    ValidUntil=new_date
+            )
+
+            time.sleep(240)
+            get_network_details(regions)
+
     print('Finished to deploy machines')
     sys.stdout.flush()
 
@@ -140,6 +145,35 @@ def get_network_details(regions):
             for private_idx in range(len(public_ip_address)):
                 print('party_%s_port = %s' % (private_idx, port_number))
                 private_ip_file.write('party_%s_port = %s\n' % (private_idx, port_number))
+
+
+def check_running_instances():
+    with open(config_file_path) as data_file:
+        data = json.load(data_file, object_pairs_hook=OrderedDict)
+        regions = list(data['regions'].values())
+
+        instances_ids = list()
+
+        for idx in range(len(regions)):
+            client = boto3.client('ec2', region_name=regions[idx][:-1])
+            response = client.describe_spot_instance_requests()
+            for req_idx in range(len(response['SpotInstanceRequests'])):
+                instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
+
+            # save instance_ids for experiment termination
+            with open('instances_ids', 'w+') as ids_file:
+                for instance_idx in range(len(instances_ids)):
+                    ids_file.write('%s\n' % instances_ids[instance_idx])
+
+                ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
+                instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
+
+                instances_count = 0
+                for inst in instances:
+                    if inst.id in instances_ids:
+                        instances_count += 1
+
+        return instances_count
 
 
 deploy_instances()
