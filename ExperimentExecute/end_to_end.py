@@ -64,8 +64,8 @@ print(pre_process_state)
 
 sys.stdout.flush()
 
-# if pre_process_state:
-#     pre_process()
+if pre_process_state == 'True':
+    pre_process()
 
 
 install_experiment(protocol_name, git_branch, working_directory)

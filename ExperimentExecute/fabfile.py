@@ -38,6 +38,7 @@ def install_git_project(experiment_name, git_branch, working_directory):
 
     with cd('%s' % working_directory):
         run('git checkout %s ' % git_branch)
+        sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
         run('cmake .')
         run('make')
 
