@@ -7,8 +7,7 @@
   "protocol":"GMW",
   "numOfParties":
   {
-    "size_0":3,
-    "size_1":10
+    "size_0":3
   },
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
@@ -17,8 +16,7 @@
   "preProcess": "False",
   "configurations":
   {
-    "conf_0": "-circuitFileName NigelAes3Parties.txt -partiesFileName parties.conf -inputFileName AesInputs0.txt -numThreads 2 -repetitionId 1",
-    "conf_1": "-circuitFileName NigelAes10Parties.txt -partiesFileName parties.conf -inputFileName AesInputs0.txt -numThreads 2 -repetitionId 1"
+    "conf_0": "-circuitFileName NigelAes3Parties.txt -partiesFileName parties.conf -inputFileName AesInputs0.txt -numThreads 2 -repetitionId 1"
   },
   "numOfRepetitions":1,
   "gitBranch": "MATRIX",
@@ -28,7 +26,8 @@
     "region_0":"us-east-1b"
   },
   "workingDirectory": "~/libscapi/protocols/GMW",
-  "resultsDirectory": "~/MATRIX/ExperimentReport/Results"
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "user": "liork.cryptobiu@gmail.com"
 
 }
 
