@@ -61,24 +61,24 @@ def deploy_instances():
         print('Deploying instances :\n region : %s\n number of instances : %s\n  ami_id : %s\n instance_type : %s\n '
               'valid until : %s' % (regions[idx], number_of_instances, amis_id[idx], machine_type, str(new_date)))
 
-    #     client.request_spot_instances(
-    #             DryRun=False,
-    #             SpotPrice=price_bids,
-    #             InstanceCount=number_of_instances,
-    #             LaunchSpecification=
-    #             {
-    #                 'ImageId': amis_id[idx],
-    #                 'KeyName': 'Matrix%s' % regions[idx].replace('-', '')[:-1],
-    #                 'SecurityGroups': ['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
-    #                 'InstanceType': machine_type,
-    #                 'Placement':
-    #                     {
-    #                         'AvailabilityZone': regions[idx],
-    #                     },
-    #             },
-    #             ValidUntil=new_date
-    #     )
-    #
+        # client.request_spot_instances(
+        #         DryRun=False,
+        #         SpotPrice=price_bids,
+        #         InstanceCount=number_of_instances,
+        #         LaunchSpecification=
+        #         {
+        #             'ImageId': amis_id[idx],
+        #             'KeyName': 'Matrix%s' % regions[idx].replace('-', '')[:-1],
+        #             'SecurityGroups': ['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
+        #             'InstanceType': machine_type,
+        #             'Placement':
+        #                 {
+        #                     'AvailabilityZone': regions[idx],
+        #                 },
+        #         },
+        #         ValidUntil=new_date
+        # )
+
     # time.sleep(240)
 
     get_network_details(regions)
@@ -113,17 +113,11 @@ def get_network_details(regions):
             ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
             instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
 
-            counter = 0
-            number_of_instances = len(response['SpotInstanceRequests'])
-
             for inst in instances:
-                if counter >= number_of_instances:
-                    break
-
-                public_ip_address.append(inst.public_ip_address)
-                if len(regions) == 1:
-                    private_ip_address.append(inst.private_ip_address)
-                counter += 1
+                if inst.id in instances_ids:
+                    public_ip_address.append(inst.public_ip_address)
+                    if len(regions) == 1:
+                        private_ip_address.append(inst.private_ip_address)
 
         # write public ips to file for fabric
         with open('public_ips', 'w+') as public_ip_file:
