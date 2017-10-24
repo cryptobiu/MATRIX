@@ -81,7 +81,7 @@ def deploy_instances():
                                 'AvailabilityZone': regions[idx],
                             },
                     },
-                    ValidUntil=new_date
+                    ValidUntil=new_date,
             )
 
             time.sleep(240)
@@ -153,6 +153,7 @@ def check_running_instances():
         regions = list(data['regions'].values())
 
         instances_ids = list()
+        instances_count = 0
 
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
@@ -160,18 +161,12 @@ def check_running_instances():
             for req_idx in range(len(response['SpotInstanceRequests'])):
                 instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
 
-            # save instance_ids for experiment termination
-            with open('instances_ids', 'w+') as ids_file:
-                for instance_idx in range(len(instances_ids)):
-                    ids_file.write('%s\n' % instances_ids[instance_idx])
+            ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
+            instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
 
-                ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
-                instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
-
-                instances_count = 0
-                for inst in instances:
-                    if inst.id in instances_ids:
-                        instances_count += 1
+            for inst in instances:
+                if inst.id in instances_ids:
+                    instances_count += 1
 
         return instances_count
 
