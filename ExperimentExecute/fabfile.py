@@ -1,5 +1,6 @@
 import json
 import sys
+from collections import OrderedDict
 
 from fabric.api import *
 from fabric.contrib.files import exists
@@ -32,14 +33,16 @@ def install_git_project(experiment_name, git_branch, working_directory):
         put(expanduser('~/Desktop/libOTe.tar.gz'))
         run('tar -xf libOTe.tar.gz')
         with cd('libOTe'):
+
             run('rm -rf CMakeFiles CMakeCache.txt Makefile')
             run('cmake .')
             run('make')
 
     with cd('%s' % working_directory):
         run('git checkout %s ' % git_branch)
-        sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
-        run('cmake .')
+        if exists('%s/CMakeLists.txt' % working_directory):
+            sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
+            run('cmake .')
         run('make')
 
 
@@ -48,8 +51,10 @@ def update_git_project(experiment_name, git_branch, working_directory):
 
     with cd('%s' % working_directory):
         run('git pull')
-        sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
-        run('cmake .')
+        run('make clean')
+        if exists('%s/CMakeLists.txt' % working_directory):
+            sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
+            run('cmake .')
         run('make')
 
 
@@ -64,18 +69,18 @@ def update_libscapi():
 @task
 def run_protocol(config_file):
     with open(config_file) as data_file:
-        data = json.load(data_file)
+        data = json.load(data_file, object_pairs_hook=OrderedDict)
         protocol_name = data['protocol']
         executable_name = data['executableName']
-        configurations = data['configurations']
+        configurations = list(data['configurations'].values())
         working_directory = data['workingDirectory']
-
-        sudo('rm -f ~/libscapi/protocols/GMW/*.json')
 
         # list of all configurations after parse
         lconf = list()
+
         for i in range(len(configurations)):
-            vals = configurations.values()
+            print(configurations[i])
+            vals = configurations[i]
             values_str = ''
 
             for val in vals:
@@ -85,15 +90,15 @@ def run_protocol(config_file):
 
         with cd(working_directory):
             put('parties.conf', run('pwd'))
-
+            sudo('killall -9 %s; exit 0' % executable_name)
+            sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
             party_id = env.hosts.index(env.host)
-            print(party_id)
 
             for idx in range(len(lconf)):
                 if protocol_name == 'GMW':
                     lconf[idx] = lconf[idx].replace('AesInputs0.txt', 'AesInputs%s.txt' % str(party_id))
-
-                run('./%s -partyID %s %s' % (executable_name, party_id, lconf[idx]))
+                print(lconf[idx])
+                run('./%s -partyID %s %s' % (executable_name, party_id, lconf[0]))
 
     sys.stdout.flush()
 

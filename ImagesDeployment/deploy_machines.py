@@ -70,6 +70,7 @@ def deploy_instances():
                     DryRun=False,
                     SpotPrice=price_bids,
                     InstanceCount=number_of_instances_to_deploy,
+                    ValidUntil=new_date,
                     LaunchSpecification=
                     {
                         'ImageId': amis_id[idx],
@@ -80,8 +81,7 @@ def deploy_instances():
                             {
                                 'AvailabilityZone': regions[idx],
                             },
-                    },
-                    ValidUntil=new_date,
+                    }
             )
 
             time.sleep(240)
