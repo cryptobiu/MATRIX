@@ -2,7 +2,7 @@
   "execRequestTime": "7.9.17 12:20",
   "amis":
   {
-    "region_0": "ami-5dfe2427"
+    "region_0": "ami-c12e8cbb"
   },
   "protocol":"MPCHonestMajorityNoTriples",
   "numOfParties":
@@ -16,7 +16,7 @@
   "preProcess": "False",
   "configurations":
   {
-    "conf_0": "-partiesNumber 3 -inputFile inputs333.txt -outputFile output.txt -circuitFile 1000000G_1000000MG_333In_50Out_20D_OutputOne3P.txt -fieldType ZpMersenne -partiesFile parties.conf -internalIterationsNumber 5"
+    "conf_0": "-partiesNumber@3@-inputFile@inputs333.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_333In_50Out_20D_OutputOne3P.txt@-fieldType@ZpMersenne@-partiesFile@parties.conf@-internalIterationsNumber@5"
   },
   "numOfRepetitions":1,
   "gitBranch": "master",
