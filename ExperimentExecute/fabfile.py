@@ -1,14 +1,12 @@
 import json
 import sys
 from collections import OrderedDict
-
 from fabric.api import *
 from fabric.contrib.files import exists
 from os.path import expanduser
 
 env.hosts = open('public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
-env.key_filename = [expanduser('~/Keys/matrix.pem')]
 
 
 @task
@@ -47,7 +45,7 @@ def install_git_project(experiment_name, git_branch, working_directory):
 
 
 @task
-def update_git_project(experiment_name, git_branch, working_directory):
+def update_git_project(working_directory):
 
     with cd('%s' % working_directory):
         run('git pull')
@@ -67,38 +65,31 @@ def update_libscapi():
 
 
 @task
-def run_protocol(config_file):
+def run_protocol(config_file, args):
     with open(config_file) as data_file:
         data = json.load(data_file, object_pairs_hook=OrderedDict)
         protocol_name = data['protocol']
         executable_name = data['executableName']
-        configurations = list(data['configurations'].values())
         working_directory = data['workingDirectory']
 
-        # list of all configurations after parse
-        lconf = list()
+        vals = args.split('@')
+        values_str = ''
 
-        for i in range(len(configurations)):
-            print(configurations[i])
-            vals = configurations[i]
-            values_str = ''
+        for val in vals:
+            values_str += '%s ' % val
 
-            for val in vals:
-                values_str += val
-
-            lconf.append(values_str)
-
+        print(values_str)
         with cd(working_directory):
             put('parties.conf', run('pwd'))
             sudo('killall -9 %s; exit 0' % executable_name)
             sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
             party_id = env.hosts.index(env.host)
 
-            for idx in range(len(lconf)):
-                if protocol_name == 'GMW':
-                    lconf[idx] = lconf[idx].replace('AesInputs0.txt', 'AesInputs%s.txt' % str(party_id))
-                print(lconf[idx])
-                run('./%s -partyID %s %s' % (executable_name, party_id, lconf[0]))
+            if protocol_name == 'GMW':
+                values_str = values_str.replace('AesInputs0.txt', 'AesInputs%s.txt' % str(party_id))
+
+            with warn_only():
+                run('./%s -partyID %s %s' % (executable_name, party_id, values_str))
 
     sys.stdout.flush()
 

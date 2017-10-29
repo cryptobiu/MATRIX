@@ -20,3 +20,4 @@ To install Node js on your machine refer to this [guide](https://nodejs.org/en/d
 
 To deploy the system at your machine with your credentials, you must have AWS account and configure your security keys.  
 In order to configure AWS account please read this [link](http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html).
+After you created your AWS key, run `ssh-add [key_path]/[key_name].pem`. 
