@@ -3,6 +3,7 @@ import os
 import sys
 
 import datetime
+from collections import OrderedDict
 
 config_file_path = sys.argv[1]
 
@@ -23,16 +24,17 @@ def install_experiment(experiment_name, git_branch, working_directory):
               % (experiment_name, git_branch, working_directory))
 
 
-def update_experiment(experiment_name, git_branch, working_directory):
+def update_experiment(experiment_name, working_directory):
     print('Updating experiment %s...' % experiment_name)
-    os.system('fab -f ExperimentExecute/fabfile.py update_git_project:%s,%s,%s --parallel --no-pty'
-              % (experiment_name, git_branch, working_directory))
+    os.system('fab -f ExperimentExecute/fabfile.py update_git_project:%s --parallel --no-pty' % working_directory)
 
 
-def execute_experiment(repetitions, experiment_name):
+def execute_experiment(repetitions, experiment_name, configurations):
     for i in range(repetitions):
         print('Executing experiment %s...' % experiment_name)
-        os.system('fab -f ExperimentExecute/fabfile.py run_protocol:%s --parallel --no-pty' % config_file_path)
+        for idx in range(len(configurations)):
+            os.system('fab -f ExperimentExecute/fabfile.py run_protocol:%s,%s --parallel --no-pty'
+                      % (config_file_path, configurations[idx]))
 
 
 def collect_results(results_remote_directory, results_local_directory, experiment_name):
@@ -47,7 +49,7 @@ def analyze_results(experiment_name, config_file_path, results_path):
 
 
 with open(config_file_path) as data_file:
-    data = json.load(data_file)
+    data = json.load(data_file, object_pairs_hook=OrderedDict)
     protocol_name = data['protocol']
     git_branch = data['gitBranch']
     pre_process_state = data['preProcess']
@@ -56,6 +58,7 @@ with open(config_file_path) as data_file:
                         str(now.hour) + str(now.minute)
     number_of_repetitions = data['numOfRepetitions']
     working_directory = data['workingDirectory']
+    configurations = list(data['configurations'].values())
 
 print('Starting running %s protocol with the following configuration:' % protocol_name)
 print('Using git branch : %s' % git_branch)
@@ -68,7 +71,8 @@ if pre_process_state == 'True':
     pre_process()
 
 
-install_experiment(protocol_name, git_branch, working_directory)
-execute_experiment(number_of_repetitions, protocol_name)
-collect_results(os.path.join('', working_directory), os.path.join('', results_directory), protocol_name)
-analyze_results(protocol_name, config_file_path, results_directory)
+# install_experiment(protocol_name, git_branch, working_directory)
+# update_experiment(protocol_name, working_directory)
+execute_experiment(number_of_repetitions, protocol_name, configurations)
+# collect_results(os.path.join('', working_directory), os.path.join('', results_directory), protocol_name)
+# analyze_results(protocol_name, config_file_path, results_directory)
