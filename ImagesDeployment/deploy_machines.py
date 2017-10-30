@@ -108,7 +108,9 @@ def get_network_details(regions):
         response = client.describe_spot_instance_requests()
 
         for req_idx in range(len(response['SpotInstanceRequests'])):
-            instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
+            if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
+                            response['SpotInstanceRequests'][req_idx]['State'] == 'open':
+                instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
 
         # save instance_ids for experiment termination
         with open('instances_ids', 'w+') as ids_file:
