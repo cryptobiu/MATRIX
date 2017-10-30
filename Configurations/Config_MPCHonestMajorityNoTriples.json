@@ -2,7 +2,7 @@
   "execRequestTime": "7.9.17 12:20",
   "amis":
   {
-    "region_0": "ami-c12e8cbb"
+    "region_0": "ami-ebf25e91"
   },
   "protocol":"MPCHonestMajorityNoTriples",
   "numOfParties":
