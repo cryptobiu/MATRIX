@@ -7,10 +7,7 @@
   "protocol":"GMW",
   "numOfParties":
   {
-    "size_0":3,
-    "size_1":5,
-    "size_2":7,
-    "size_3":10
+    "size_0":3
   },
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
@@ -19,13 +16,10 @@
   "preProcess": "False",
   "configurations":
   {
-    "conf_0": "-circuitFileName@NigelAes3Parties.txt@-partiesFileName@parties.conf@-inputFileName@AesInputs0.txt@-numThreads@2@-repetitionId@1",
-    "conf_1": "-circuitFileName@NigelAes5Parties.txt@-partiesFileName@parties.conf@-inputFileName@AesInputs0.txt@-numThreads@2@-repetitionId@1",
-    "conf_2": "-circuitFileName@NigelAes7Parties.txt@-partiesFileName@parties.conf@-inputFileName@AesInputs0.txt@-numThreads@2@-repetitionId@1",
-    "conf_3": "-circuitFileName@NigelAes10Parties.txt@-partiesFileName@parties.conf@-inputFileName@AesInputs0.txt@-numThreads@2@-repetitionId@1"
+    "conf_0": "-circuitFileName@NigelAes3Parties.txt@-partiesFileName@parties.conf@-inputFileName@AesInputs0.txt@-numThreads@2@-repetitionId@1"
   },
   "numOfRepetitions":1,
-  "gitBranch": "MATRIX",
+  "gitBranch": "dev",
   "IsPublished": "public",
   "regions":
   {

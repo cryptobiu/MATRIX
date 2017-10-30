@@ -19,7 +19,7 @@
     "conf_0": "-configFileName@YaoConfig.txt@-partiesFileName@parties.conf"
   },
   "numOfRepetitions":1,
-  "gitBranch": "MATRIX",
+  "gitBranch": "dev",
   "IsPublished": "public",
   "regions":
   {
