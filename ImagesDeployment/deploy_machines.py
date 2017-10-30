@@ -158,8 +158,11 @@ def check_running_instances():
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
             response = client.describe_spot_instance_requests()
+
             for req_idx in range(len(response['SpotInstanceRequests'])):
-                instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
+                if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
+                                response['SpotInstanceRequests'][req_idx]['State'] == 'open':
+                    instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
 
             ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
             instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
