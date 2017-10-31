@@ -7,6 +7,7 @@ from os.path import expanduser
 
 env.hosts = open('public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
+env.key_filename = [expanduser('~/Keys/matrix.pem')]
 
 
 @task
@@ -62,6 +63,8 @@ def update_git_project(working_directory):
 def update_libscapi():
     with cd('libscapi/'):
         run('git pull')
+        with settings(warn_only=True):
+            sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
         run('cmake .')
         sudo('make')
 
