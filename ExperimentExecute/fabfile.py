@@ -49,9 +49,11 @@ def update_git_project(working_directory):
 
     with cd('%s' % working_directory):
         run('git pull')
-        run('make clean')
+
         if exists('%s/CMakeLists.txt' % working_directory):
-            sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
+            with settings(warn_only=True):
+                sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
+                run('make clean')
             run('cmake .')
         run('make')
 
