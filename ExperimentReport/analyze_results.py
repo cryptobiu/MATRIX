@@ -94,15 +94,28 @@ def analyze_results():
                     data = json.load(f)
                 header_data += int(data[results_headers[header_idx]]['duration'])
             counter += 1
-            ws.write(header_idx + 1, party_idx + 1, header_data // len(headers_files_list[header_idx + 2 * party_idx]))
+            ws.write(header_idx + 1, party_idx + 1, header_data // len(headers_files_list[header_idx + 2 * party_idx]),
+                     style1)
+
+    # create chart
+    chart = wb.add_chart({'type': 'scatter', 'subtype': 'straight_with_markers'})
+    # categories are X axis, values are Y axis
+    # [sheetname, first_row, first_col, last_row, last_col]
+    chart.add_series({'categories': [protocol_name, 0, 0, len(results_headers), len(parties)],
+                      'values': [protocol_name, 0, 0, len(results_headers), len(parties)]}
+                     )
+    print(len(results_headers))
+    print(len(parties))
+
+    ws.insert_chart('A12', chart)
 
     wb.close()
 
-    send_email(results_file_name)
-
-    os.system('git add Results/Results_%s_%s.xlsx' % (protocol_name, protocol_time))
-    os.system('git commit -m \"Add results file for Experiment: %s\"' % protocol_name)
-    os.system('git push https://liorbiu:4aRotdy0vOhfvVgaUaSk@github.com/cryptobiu/MATRIX')
+    # send_email(results_file_name)
+    #
+    # os.system('git add Results/Results_%s_%s.xlsx' % (protocol_name, protocol_time))
+    # os.system('git commit -m \"Add results file for Experiment: %s\"' % protocol_name)
+    # os.system('git push https://liorbiu:4aRotdy0vOhfvVgaUaSk@github.com/cryptobiu/MATRIX')
 
 
 analyze_results()
