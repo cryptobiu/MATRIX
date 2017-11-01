@@ -11,15 +11,10 @@ env.key_filename = [expanduser('~/Keys/matrix.pem')]
 
 
 @task
-def pre_process():
-    put('ExperimentExecute/pre_process.py', '~')
-    run('python3 pre_process.py')
-
-# @task
-# def pre_process(experiment_name):
-#     with cd('/home/ubuntu/%s' % experiment_name):
-#         if exists('pre_process.py'):
-#             run('python 3 pre_process.py')
+def pre_process(experiment_name):
+    with cd('/home/ubuntu/%s' % experiment_name):
+        put(expanduser('ExperimentExecute/pre_process.py'))
+        run('python 3 pre_process.py')
 
 
 @task
@@ -53,8 +48,8 @@ def update_git_project(working_directory):
 
         if exists('%s/CMakeLists.txt' % working_directory):
             with settings(warn_only=True):
-                sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
                 run('make clean')
+                sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
             run('cmake .')
         run('make')
 
@@ -63,6 +58,7 @@ def update_git_project(working_directory):
 def update_libscapi():
     with cd('libscapi/'):
         run('git pull')
+
         with settings(warn_only=True):
             sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
         run('cmake .')
