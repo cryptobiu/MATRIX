@@ -16,9 +16,10 @@
   "preProcess": "False",
   "configurations":
   {
-    "conf_0": "-circuitFileName@NigelAes3Parties.txt@-partiesFileName@parties.conf@-inputFileName@AesInputs0.txt@-numThreads@2@-repetitionId@1"
+    "conf_0": "-circuitFileName@NigelAes3Parties.txt@-partiesFile@parties.conf@-inputFile@AesInputs0.txt@-numThreads@2@-internalIterationsNumber@1"
   },
   "numOfRepetitions":1,
+  "numOfInternalRepetitions":2,
   "gitBranch": "dev",
   "IsPublished": "public",
   "regions":
