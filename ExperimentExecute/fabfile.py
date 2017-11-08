@@ -58,11 +58,7 @@ def update_git_project(working_directory):
 def update_libscapi():
     with cd('libscapi/'):
         run('git pull')
-
-        with settings(warn_only=True):
-            sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
-        run('cmake .')
-        sudo('make')
+        run('make')
 
 
 @task
