@@ -5,7 +5,12 @@ import sys
 import datetime
 from collections import OrderedDict
 
+if len(sys.argv) != 3:
+    print(sys.argv)
+    print('Wrong number of arguments supplied\n Exiting...')
+    exit(-1)
 config_file_path = sys.argv[1]
+task_name = sys.argv[2]
 
 
 def pre_process():
@@ -60,19 +65,24 @@ with open(config_file_path) as data_file:
     working_directory = data['workingDirectory']
     configurations = list(data['configurations'].values())
 
-print('Starting running %s protocol with the following configuration:' % protocol_name)
-print('Using git branch : %s' % git_branch)
-print('Results will be copied to this path: %s' % results_directory)
-print(pre_process_state)
+print('Starting running task %s for %s protocol with the following configuration:' % (task_name, protocol_name))
 
-sys.stdout.flush()
-
-if pre_process_state == 'True':
+if task_name == 'Pre-process':
     pre_process()
+elif task_name == 'Install':
+    install_experiment(protocol_name, git_branch, working_directory)
+elif task_name == 'Update':
+    update_experiment(protocol_name, working_directory)
+elif task_name == 'Execute':
+    execute_experiment(number_of_repetitions, protocol_name, configurations)
+elif task_name == 'Results':
+    collect_results(os.path.join('', working_directory), os.path.join('', results_directory), protocol_name)
+    analyze_results(protocol_name, config_file_path, results_directory)
+else:
+    print('task not recognize. this tasks are allowed:\n'
+          '1. Pre-process\n'
+          '2. Install\n'
+          '3. Update\n'
+          '4. Execute\n'
+          '5. Results\n')
 
-
-# install_experiment(protocol_name, git_branch, working_directory)
-# update_experiment(protocol_name, working_directory)
-execute_experiment(number_of_repetitions, protocol_name, configurations)
-# collect_results(os.path.join('', working_directory), os.path.join('', results_directory), protocol_name)
-# analyze_results(protocol_name, config_file_path, results_directory)
