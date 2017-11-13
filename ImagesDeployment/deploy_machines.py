@@ -58,7 +58,7 @@ def deploy_instances():
     for idx in range(len(regions)):
         client = boto3.client('ec2', region_name=regions[idx][:-1])
 
-        print('Deploying instances :\n region : %s\n number of instances : %s\n  ami_id : %s\n instance_type : %s\n '
+        print('Deploying instances :\nregion : %s\nnumber of instances : %s\n ami_id : %s\ninstance_type : %s\n'
               'valid until : %s' % (regions[idx], number_of_instances, amis_id[idx], machine_type, str(new_date)))
 
         number_of_instances_to_deploy = check_running_instances()
@@ -135,18 +135,18 @@ def get_network_details(regions):
         with open('parties.conf', 'w+') as private_ip_file:
             if len(regions) > 1:
                 for private_idx in range(len(public_ip_address)):
-                    print('party_%s_ip = %s' % (private_idx, public_ip_address[private_idx]))
-                    private_ip_file.write('party_%s_ip = %s\n' % (private_idx, public_ip_address[private_idx]))
+                    print('party_%s_ip=%s' % (private_idx, public_ip_address[private_idx]))
+                    private_ip_file.write('party_%s_ip=%s\n' % (private_idx, public_ip_address[private_idx]))
             else:
                 for private_idx in range(len(private_ip_address)):
-                    print('party_%s_ip = %s' % (private_idx, private_ip_address[private_idx]))
-                    private_ip_file.write('party_%s_ip = %s\n' % (private_idx, private_ip_address[private_idx]))
+                    print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
+                    private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
 
             port_number = 8000
 
             for private_idx in range(len(public_ip_address)):
-                print('party_%s_port = %s' % (private_idx, port_number))
-                private_ip_file.write('party_%s_port = %s\n' % (private_idx, port_number))
+                print('party_%s_port=%s' % (private_idx, port_number))
+                private_ip_file.write('party_%s_port=%s\n' % (private_idx, port_number))
 
 
 def check_running_instances():
