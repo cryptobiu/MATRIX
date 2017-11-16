@@ -37,6 +37,14 @@ def create_security_group():
         security_group.authorize_ingress(IpProtocol="tcp", CidrIp="0.0.0.0/0", FromPort=0, ToPort=65535)
 
 
+def check_latest_price(instance_type, region):
+    client = boto3.client('ec2', region_name=region[:-1])
+    prices = client.describe_spot_price_history(InstanceTypes=[instance_type], MaxResults=1,
+                                                ProductDescriptions=['Linux/UNIX (Amazon VPC)'],
+                                                AvailabilityZone=region)
+    return prices['SpotPriceHistory'][0]
+
+
 def deploy_instances():
     with open(config_file_path) as data_file:
         data = json.load(data_file, object_pairs_hook=OrderedDict)
@@ -66,6 +74,11 @@ def deploy_instances():
         number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
 
         if number_of_instances_to_deploy > 0:
+            # check if price isn't too low
+            winning_bid_price = check_latest_price(machine_type, regions[idx])
+            if price_bids < float(winning_bid_price):
+                price_bids = winning_bid_price
+
             client.request_spot_instances(
                     DryRun=False,
                     SpotPrice=price_bids,
