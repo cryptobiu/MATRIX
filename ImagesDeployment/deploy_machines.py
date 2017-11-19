@@ -42,7 +42,7 @@ def check_latest_price(instance_type, region):
     prices = client.describe_spot_price_history(InstanceTypes=[instance_type], MaxResults=1,
                                                 ProductDescriptions=['Linux/UNIX (Amazon VPC)'],
                                                 AvailabilityZone=region)
-    return prices['SpotPriceHistory'][0]
+    return prices['SpotPriceHistory'][0]['SpotPrice']
 
 
 def deploy_instances():
@@ -76,8 +76,8 @@ def deploy_instances():
         if number_of_instances_to_deploy > 0:
             # check if price isn't too low
             winning_bid_price = check_latest_price(machine_type, regions[idx])
-            if price_bids < float(winning_bid_price):
-                price_bids = winning_bid_price
+            if float(price_bids) < float(winning_bid_price):
+                price_bids = str(winning_bid_price)
 
             client.request_spot_instances(
                     DryRun=False,
