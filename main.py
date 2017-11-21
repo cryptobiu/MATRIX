@@ -33,24 +33,30 @@ def print_execution_menu():
 
 def main():
     selection = print_main_menu()
+
     while not selection == '5':
+        if int(selection) > 5:
+            print('Choose valid option!')
+            selection = print_main_menu()
+            continue
+
         color_print('Enter configuration file:', 'blue')
         conf_file_path = input('Configuration file path (current path is: %s): ' % os.getcwd())
 
         if selection == '1':
             os.system('python3 ImagesDeployment/deploy_machines.py %s' % conf_file_path)
         elif selection == '2':
-            os.system('python3 /home/liork/MATRIX/ExperimentExecute/end_to_end.py %s Pre-process' % conf_file_path)
+            os.system('python3 ExperimentExecute/end_to_end.py %s Pre-process' % conf_file_path)
         elif selection == '3':
             execute_selection = print_execution_menu()
             if execute_selection == '1':
-                os.system('python3 /home/liork/MATRIX/ExperimentExecute/end_to_end.py %s Install' % conf_file_path)
+                os.system('python3 ExperimentExecute/end_to_end.py %s Install' % conf_file_path)
             elif execute_selection == '2':
-                os.system('python3 /home/liork/MATRIX/ExperimentExecute/end_to_end.py %s Update' % conf_file_path)
+                os.system('python3 ExperimentExecute/end_to_end.py %s Update' % conf_file_path)
             elif execute_selection == '3':
-                os.system('python3 /home/liork/MATRIX/ExperimentExecute/end_to_end.py %s Execute' % conf_file_path)
+                os.system('python3 ExperimentExecute/end_to_end.py %s Execute' % conf_file_path)
         elif selection == '4':
-            os.system('python3 /home/liork/MATRIX/ExperimentExecute/end_to_end.py %s Results' % conf_file_path)
+            os.system('python3 ExperimentExecute/end_to_end.py %s Results' % conf_file_path)
 
         selection = print_main_menu()
 
