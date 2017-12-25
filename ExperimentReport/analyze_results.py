@@ -46,11 +46,12 @@ def send_email(file_name):
 
 def analyze_results():
     results_directory = results_path
+    print(results_directory)
     files_list = glob.glob(expanduser('%s/*.json' % results_directory))
 
     parties = set()
     for file in files_list:
-        parties.add(int(file.split('_')[2].split('.')[0].split('=')[1]))
+        parties.add(int(file.split('_')[3].split('.')[0].split('=')[1]))
 
     parties = list(parties)
     parties.sort()
@@ -59,6 +60,8 @@ def analyze_results():
     # Assumption : all the parties measure the same tasks
 
     tasks_names = dict()
+
+    print(files_list)
 
     with open(files_list[0], 'r') as f:
         data = json.load(f)
@@ -93,10 +96,11 @@ def analyze_results():
         # write data to excel
         counter = 0
         for key in tasks_names.keys():
-            ws.write(counter + 1, 0, key, style1)
-            ws.write(counter + 1, party_idx + 1,
-                     sum(tasks_names[key]) / len(tasks_names[key]), style1)
-            counter += 1
+            if len(tasks_names) > 0:
+                ws.write(counter + 1, 0, key, style1)
+                ws.write(counter + 1, party_idx + 1,
+                         sum(tasks_names[key]) / len(tasks_names[key]), style1)
+                counter += 1
 
         # delete all the data from the lists after finish iterate al over party data
         for val in tasks_names.values():

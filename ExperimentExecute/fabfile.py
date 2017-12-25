@@ -95,4 +95,6 @@ def run_protocol(config_file, args):
 def collect_results(results_local_directory, results_remote_directory):
 
     local('mkdir -p %s' % results_remote_directory)
+    print(results_remote_directory)
+    print(results_local_directory)
     get('%s/*.json' % results_local_directory, results_remote_directory)

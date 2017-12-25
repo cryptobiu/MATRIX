@@ -76,6 +76,9 @@ elif task_name == 'Update':
 elif task_name == 'Execute':
     execute_experiment(number_of_repetitions, protocol_name, configurations)
 elif task_name == 'Results':
+    print('******************')
+    print(working_directory)
+    print(results_directory)
     collect_results(os.path.join('', working_directory), os.path.join('', results_directory), protocol_name)
     analyze_results(protocol_name, config_file_path, results_directory)
 elif task_name == 'Analyze':

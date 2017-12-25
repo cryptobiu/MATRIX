@@ -57,6 +57,8 @@ def main():
             elif execute_selection == '3':
                 os.system('python3 ExperimentExecute/end_to_end.py %s Execute' % conf_file_path)
         elif selection == '4':
+            os.system('python3 ExperimentExecute/end_to_end.py %s Results' % conf_file_path)
+        elif selection == '5':
             os.system('python3 ExperimentExecute/end_to_end.py %s Analyze' % conf_file_path)
 
         selection = print_main_menu()

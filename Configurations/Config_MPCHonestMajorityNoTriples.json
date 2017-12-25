@@ -7,7 +7,13 @@
   "protocol":"MPCHonestMajorityNoTriples",
   "numOfParties":
   {
-    "size_0":3
+    "size_0":3,
+    "size_1":5,
+    "size_2":7,
+    "size_3":9,
+    "size_4":11,
+    "size_5":30,
+    "size_6":50
   },
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
@@ -16,9 +22,16 @@
   "preProcess": "False",
   "configurations":
   {
-    "conf_0": "-partiesNumber@3@-inputFile@inputs333.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_333In_50Out_20D_OutputOne3P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5"
+    "conf_0": "-partiesNumber@3@-inputFile@inputs333.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_333In_50Out_20D_OutputOne3P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_1": "-partiesNumber@5@-inputFile@inputs200.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_200In_50Out_20D_OutputOne5P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_2": "-partiesNumber@7@-inputFile@inputs142.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_142In_50Out_20D_OutputOne7P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_3": "-partiesNumber@9@-inputFile@inputs111.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_111In_50Out_20D_OutputOne9P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_4": "-partiesNumber@11@-inputFile@inputs90.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_90In_50Out_20D_OutputOne11P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_5": "-partiesNumber@30@-inputFile@inputs33.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_33In_50Out_20D_OutputOne30P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_6": "-partiesNumber@50@-inputFile@inputs20.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_20In_50Out_20D_OutputOne50P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5"
   },
   "numOfRepetitions":1,
+  "numOfInternalRepetitions":5,
   "gitBranch": "master",
   "gitCommitId": "aed770e446b2d110a3996141e3bb2ba1c21dd49f",
   "IsPublished": "private",
