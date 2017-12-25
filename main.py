@@ -16,8 +16,9 @@ def print_main_menu():
     color_print('1. Deploy Machines', 'blue')
     color_print('2. Preform pre process operations', 'blue')
     color_print('3. Execute Menu', 'blue')
-    color_print('4. Collect Results', 'blue')
-    color_print('5. Exit', 'blue')
+    color_print('4. Collect & Analyze Results', 'blue')
+    color_print('5. Analyze Results', 'blue')
+    color_print('6. Exit', 'blue')
     selection = input('Your choice:')
     return selection
 
@@ -34,8 +35,8 @@ def print_execution_menu():
 def main():
     selection = print_main_menu()
 
-    while not selection == '5':
-        if int(selection) > 5:
+    while not selection == '6':
+        if int(selection) > 6:
             print('Choose valid option!')
             selection = print_main_menu()
             continue
@@ -56,7 +57,7 @@ def main():
             elif execute_selection == '3':
                 os.system('python3 ExperimentExecute/end_to_end.py %s Execute' % conf_file_path)
         elif selection == '4':
-            os.system('python3 ExperimentExecute/end_to_end.py %s Results' % conf_file_path)
+            os.system('python3 ExperimentExecute/end_to_end.py %s Analyze' % conf_file_path)
 
         selection = print_main_menu()
 

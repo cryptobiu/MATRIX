@@ -78,11 +78,14 @@ elif task_name == 'Execute':
 elif task_name == 'Results':
     collect_results(os.path.join('', working_directory), os.path.join('', results_directory), protocol_name)
     analyze_results(protocol_name, config_file_path, results_directory)
+elif task_name == 'Analyze':
+    analyze_results(protocol_name, config_file_path, results_directory)
 else:
-    print('task not recognize. this tasks are allowed:\n'
+    print('task not recognize. these tasks are allowed:\n'
           '1. Pre-process\n'
           '2. Install\n'
           '3. Update\n'
           '4. Execute\n'
-          '5. Results\n')
+          '5. Results\n'
+          '6. Analyze\n')
 
