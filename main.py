@@ -18,7 +18,8 @@ def print_main_menu():
     color_print('3. Execute Menu', 'blue')
     color_print('4. Collect & Analyze Results', 'blue')
     color_print('5. Analyze Results', 'blue')
-    color_print('6. Exit', 'blue')
+    color_print('6. Terminate Machines', 'blue')
+    color_print('7. Exit', 'blue')
     selection = input('Your choice:')
     return selection
 
@@ -35,8 +36,8 @@ def print_execution_menu():
 def main():
     selection = print_main_menu()
 
-    while not selection == '6':
-        if int(selection) > 6:
+    while not selection == '7':
+        if int(selection) > 7:
             print('Choose valid option!')
             selection = print_main_menu()
             continue
@@ -60,6 +61,8 @@ def main():
             os.system('python3 ExperimentExecute/end_to_end.py %s Results' % conf_file_path)
         elif selection == '5':
             os.system('python3 ExperimentExecute/end_to_end.py %s Analyze' % conf_file_path)
+        elif selection == '6':
+            os.system('python3 ExperimentExecute/terminate_machines.py %s' % conf_file_path)
 
         selection = print_main_menu()
 

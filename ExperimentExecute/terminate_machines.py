@@ -1,11 +1,14 @@
 import boto3
 import json
+import sys
+
+config_file_path = sys.argv[1]
 
 with open('instances_ids', 'r+') as ids_file:
     instances_ids = ids_file.readlines()
 
 
-with open('Config_MPCHonestMajorityNoTriples.json') as data_file:
+with open(config_file_path) as data_file:
         data = json.load(data_file)
         regions = list(data['regions'].values())
 
