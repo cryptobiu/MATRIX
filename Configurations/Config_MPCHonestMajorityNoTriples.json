@@ -13,7 +13,10 @@
     "size_3":9,
     "size_4":11,
     "size_5":30,
-    "size_6":50
+    "size_6":50,
+    "size_7":70,
+    "size_8":90,
+    "size_9":110
   },
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
@@ -28,7 +31,10 @@
     "conf_3": "-partiesNumber@9@-inputFile@inputs111.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_111In_50Out_20D_OutputOne9P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
     "conf_4": "-partiesNumber@11@-inputFile@inputs90.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_90In_50Out_20D_OutputOne11P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
     "conf_5": "-partiesNumber@30@-inputFile@inputs33.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_33In_50Out_20D_OutputOne30P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
-    "conf_6": "-partiesNumber@50@-inputFile@inputs20.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_20In_50Out_20D_OutputOne50P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5"
+    "conf_6": "-partiesNumber@50@-inputFile@inputs20.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_20In_50Out_20D_OutputOne50P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_7": "-partiesNumber@70@-inputFile@inputs14.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_14In_50Out_20D_OutputOne70P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_8": "-partiesNumber@90@-inputFile@inputs11.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_11In_50Out_20D_OutputOne90P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_9": "-partiesNumber@110@-inputFile@inputs9.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_9In_50Out_20D_OutputOne110P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5"
   },
   "numOfRepetitions":1,
   "numOfInternalRepetitions":5,
