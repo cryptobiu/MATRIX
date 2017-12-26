@@ -63,6 +63,7 @@ def analyze_results():
 
     print(files_list)
 
+    # load one of the data files to receive the headers to the xlsx file
     with open(files_list[0], 'r') as f:
         data = json.load(f)
 
@@ -81,12 +82,14 @@ def analyze_results():
     ws = wb.add_worksheet(protocol_name)
     ws.write(0, 0, 'Phase/Number of Parties')
 
+    files_list.sort()
+
     # counter = 0
     for party_idx in range(len(parties)):
         ws.write(0, party_idx + 1, parties[party_idx])
 
         for data_file in files_list:
-            if 'numOfParties=%s' % str(parties[party_idx]) in data_file:
+            if 'numOfParties=%s.json' % str(parties[party_idx]) in data_file:
                 with open(data_file, 'r') as df:
                     json_data = json.load(df)
                     for json_size_idx in range(len(json_data)):
