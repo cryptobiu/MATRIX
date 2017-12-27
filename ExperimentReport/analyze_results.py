@@ -1,4 +1,3 @@
-import os
 import sys
 import glob
 import json
@@ -21,27 +20,30 @@ with open(config_file_path) as conf_file:
 
 def send_email(file_name):
 
-    protocol_name = conf_data['protocol']
-    user = conf_data['user']
-    me = 'liork.cryptobiu@gmail.com'
+    users = list(conf_data['users'].values())
 
-    message = MIMEMultipart()
-    message['Subject'] = 'Experiment results for protocol %s' % protocol_name
-    message['From'] = me
-    message['To'] = user
-    message_body = 'Results for protocol %s are attached.' % protocol_name
-    message.attach(MIMEText(message_body))
+    for user in users:
 
-    with open(file_name, 'rb') as fli:
-        part = MIMEApplication(fli.read(), Name=basename(file_name))
-        part['Content-Disposition'] = 'attachment; filename="%s"' % basename(file_name)
-        message.attach(part)
+        protocol_name = conf_data['protocol']
+        me = 'liork.cryptobiu@gmail.com'
 
-    server = smtplib.SMTP('smtp.gmail.com:587')
-    server.starttls()
-    server.login(me, 'Orange12!@')
-    server.sendmail(me, user, message.as_string())
-    server.quit()
+        message = MIMEMultipart()
+        message['Subject'] = 'Experiment results for protocol %s' % protocol_name
+        message['From'] = me
+        message['To'] = user
+        message_body = 'Results for protocol %s are attached.' % protocol_name
+        message.attach(MIMEText(message_body))
+
+        with open(file_name, 'rb') as fli:
+            part = MIMEApplication(fli.read(), Name=basename(file_name))
+            part['Content-Disposition'] = 'attachment; filename="%s"' % basename(file_name)
+            message.attach(part)
+
+        server = smtplib.SMTP('smtp.gmail.com:587')
+        server.starttls()
+        server.login(me, 'Orange12!@')
+        server.sendmail(me, user, message.as_string())
+        server.quit()
 
 
 def analyze_results():
@@ -111,12 +113,7 @@ def analyze_results():
 
     wb.close()
 
-    # send_email(results_file_name)
-    #
-    # os.system('git add Results/Results_%s_%s.xlsx' % (protocol_name, protocol_time))
-    # os.system('git commit -m \"Add results file for Experiment: %s\"' % protocol_name)
-    # os.system('git push https://liorbiu:4aRotdy0vOhfvVgaUaSk@github.com/cryptobiu/MATRIX')
+    send_email(results_file_name)
 
 
 analyze_results()
-

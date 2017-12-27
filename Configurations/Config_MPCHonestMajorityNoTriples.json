@@ -47,7 +47,10 @@
   },
   "workingDirectory": "~/MPCHonestMajorityNoTriples",
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
-  "user": "liork.cryptobiu@gmail.com"
+  "users":
+  {
+    "user_0": "liork.cryptobiu@gmail.com"
+  }
 
 }
 
