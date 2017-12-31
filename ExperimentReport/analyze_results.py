@@ -1,10 +1,11 @@
 import sys
+import os
 import glob
 import json
 import time
+import smtplib
 from os.path import expanduser
 import xlsxwriter.styles
-import smtplib
 from os.path import basename
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
@@ -43,6 +44,26 @@ def send_email(file_name):
     server.login(me, 'CyberExp')
     server.sendmail(me, users, message.as_string())
     server.quit()
+
+
+def upload_to_git(results_file_name):
+    protocol_name = conf_data['protocol']
+    working_dir = '%s/ExperimentsResults/%s' % (expanduser('~'), protocol_name)
+    # create working directory for the protocol if not exist
+
+    os.system('mkdir -p %s ' % working_dir)
+
+    # move the results folder and the xlsx file to the protocol folder
+
+    os.system('mv %s %s' % (results_path, working_dir))
+    os.system('mv %s %s' % (results_file_name, working_dir))
+
+    # Upload data to git
+
+    os.curdir(expanduser('~/ExperimentsResults'))
+    os.system('git add %s/%s %s/%s' % (protocol_name, results_path, protocol_name, results_file_name))
+    os.system('git commit -m "Add results for protocol %s' % protocol_name)
+    os.system('git push git@github.com:cryptobiu/ExperimentsResults.git')
 
 
 def analyze_results():
@@ -109,6 +130,8 @@ def analyze_results():
     wb.close()
 
     send_email(results_file_name)
+
+    upload_to_git(results_file_name)
 
 
 analyze_results()
