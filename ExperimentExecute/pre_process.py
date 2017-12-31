@@ -1,4 +1,5 @@
 import os
+from os.path import expanduser
 
 
 def install_ntl():
@@ -10,7 +11,8 @@ def install_ntl():
 
 
 def install_malicious_yao_lib():
-    pass
+    os.chdir(expanduser('~/libscapi/protocols/MaliciousYaoBatch/lib'))
+    os.system('make')
 
 
 task_name = input('Enter task Name:\n'
