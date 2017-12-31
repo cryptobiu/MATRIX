@@ -47,7 +47,6 @@ def send_email(file_name):
 
 def analyze_results():
     results_directory = results_path
-    print(results_directory)
     files_list = glob.glob(expanduser('%s/*.json' % results_directory))
 
     parties = set()
@@ -62,8 +61,6 @@ def analyze_results():
 
     tasks_names = dict()
 
-    print(files_list)
-
     # load one of the data files to receive the headers to the xlsx file
     with open(files_list[0], 'r') as f:
         data = json.load(f)
@@ -76,7 +73,6 @@ def analyze_results():
 
     protocol_time = str(time.time())
     results_file_name = 'Results/Results_%s_%s.xlsx' % (protocol_name, protocol_time)
-    print(results_file_name)
     wb = xlsxwriter.Workbook(results_file_name)
     style1 = wb.add_format({'num_format': '#.##'})
 

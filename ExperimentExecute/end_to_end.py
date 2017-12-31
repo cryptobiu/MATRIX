@@ -65,8 +65,6 @@ with open(config_file_path) as data_file:
     working_directory = data['workingDirectory']
     configurations = list(data['configurations'].values())
 
-print('Starting running task %s for %s protocol with the following configuration:' % (task_name, protocol_name))
-
 if task_name == 'Pre-process':
     pre_process()
 elif task_name == 'Install':
@@ -76,12 +74,10 @@ elif task_name == 'Update':
 elif task_name == 'Execute':
     execute_experiment(number_of_repetitions, protocol_name, configurations)
 elif task_name == 'Results':
-    print('******************')
-    print(working_directory)
-    print(results_directory)
     collect_results(os.path.join('', working_directory), os.path.join('', results_directory), protocol_name)
     analyze_results(protocol_name, config_file_path, results_directory)
 elif task_name == 'Analyze':
+    results_directory = input('Enter results directory current path is: %s): ' % os.getcwd())
     analyze_results(protocol_name, config_file_path, results_directory)
 else:
     print('task not recognize. these tasks are allowed:\n'
