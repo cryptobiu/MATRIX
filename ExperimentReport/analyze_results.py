@@ -22,28 +22,26 @@ def send_email(file_name):
 
     users = list(conf_data['users'].values())
 
-    for user in users:
+    protocol_name = conf_data['protocol']
+    me = 'biu.cyber.experiments@gmail.com'
 
-        protocol_name = conf_data['protocol']
-        me = 'liork.cryptobiu@gmail.com'
+    message = MIMEMultipart()
+    message['Subject'] = 'Experiment results for protocol %s' % protocol_name
+    message['From'] = me
+    message['To'] = ', '.join(users)
+    message_body = 'Results for protocol %s are attached.' % protocol_name
+    message.attach(MIMEText(message_body))
 
-        message = MIMEMultipart()
-        message['Subject'] = 'Experiment results for protocol %s' % protocol_name
-        message['From'] = me
-        message['To'] = user
-        message_body = 'Results for protocol %s are attached.' % protocol_name
-        message.attach(MIMEText(message_body))
+    with open(file_name, 'rb') as fli:
+        part = MIMEApplication(fli.read(), Name=basename(file_name))
+        part['Content-Disposition'] = 'attachment; filename="%s"' % basename(file_name)
+        message.attach(part)
 
-        with open(file_name, 'rb') as fli:
-            part = MIMEApplication(fli.read(), Name=basename(file_name))
-            part['Content-Disposition'] = 'attachment; filename="%s"' % basename(file_name)
-            message.attach(part)
-
-        server = smtplib.SMTP('smtp.gmail.com:587')
-        server.starttls()
-        server.login(me, 'Orange12!@')
-        server.sendmail(me, user, message.as_string())
-        server.quit()
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server.starttls()
+    server.login(me, 'CyberExp')
+    server.sendmail(me, users, message.as_string())
+    server.quit()
 
 
 def analyze_results():
