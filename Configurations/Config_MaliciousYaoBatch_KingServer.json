@@ -1,0 +1,32 @@
+{
+  "execRequestTime": "7.9.17 12:20",
+  "amis":
+  {
+    "region_0": "ami-0b961e71"
+  },
+  "protocol":"MaliciousYaoBatch",
+  "numOfParties":
+  {
+    "size_0":1
+  },
+  "aWSInstType": "c4.large",
+  "aWWSBidPrice": "0.07",
+  "network": "LAN",
+  "executableName": "KingServerApp.out",
+  "preProcess": "True",
+  "configurations":
+  {
+    "conf_0": "-inputFile@NecAes.txt@"
+  },
+  "numOfRepetitions":1,
+  "gitBranch": "dev",
+  "IsPublished": "public",
+  "regions":
+  {
+    "region_0":"us-east-1b"
+  },
+  "workingDirectory": "~/libscapi/protocols/MaliciousYaoBatch",
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "user": "liork.cryptobiu@gmail.com"
+
+}
