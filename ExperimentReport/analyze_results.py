@@ -9,6 +9,7 @@ from os.path import basename
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
+from collections import OrderedDict
 
 
 config_file_path = sys.argv[1]
@@ -91,7 +92,7 @@ def analyze_results():
         for data_file in files_list:
             if 'numOfParties=%s.json' % str(parties[party_idx]) in data_file:
                 with open(data_file, 'r') as df:
-                    json_data = json.load(df)
+                    json_data = json.load(df, object_pairs_hook=OrderedDict)
                     for json_size_idx in range(len(json_data)):
                         for rep_idx in range(num_of_repetitions):
                             tasks_names[json_data[json_size_idx]['name']].append(
