@@ -42,27 +42,40 @@ def main():
             selection = print_main_menu()
             continue
 
-        color_print('Enter configuration file:', 'blue')
+        color_print('Enter configuration file(s):', 'blue')
         conf_file_path = input('Configuration file path (current path is: %s): ' % os.getcwd())
 
+        conf_file_list = conf_file_path.split(' ')
+
         if selection == '1':
-            os.system('python3 ImagesDeployment/deploy_machines.py %s' % conf_file_path)
+            for conf in conf_file_list:
+                os.system('python3 ImagesDeployment/deploy_machines.py %s' % conf)
         elif selection == '2':
-            os.system('python3 ExperimentExecute/end_to_end.py %s Pre-process' % conf_file_path)
+            for conf in conf_file_list:
+                try:
+                    os.system('python3 ExperimentExecute/end_to_end.py %s Pre-process' % conf)
+                except ValueError as ve:
+                    print(ve)
         elif selection == '3':
             execute_selection = print_execution_menu()
             if execute_selection == '1':
-                os.system('python3 ExperimentExecute/end_to_end.py %s Install' % conf_file_path)
+                for conf in conf_file_list:
+                    os.system('python3 ExperimentExecute/end_to_end.py %s Install' % conf)
             elif execute_selection == '2':
-                os.system('python3 ExperimentExecute/end_to_end.py %s Update' % conf_file_path)
+                for conf in conf_file_list:
+                    os.system('python3 ExperimentExecute/end_to_end.py %s Update' % conf)
             elif execute_selection == '3':
-                os.system('python3 ExperimentExecute/end_to_end.py %s Execute' % conf_file_path)
+                for conf in conf_file_list:
+                    os.system('python3 ExperimentExecute/end_to_end.py %s Execute' % conf)
         elif selection == '4':
-            os.system('python3 ExperimentExecute/end_to_end.py %s Results' % conf_file_path)
+            for conf in conf_file_list:
+                os.system('python3 ExperimentExecute/end_to_end.py %s Results' % conf)
         elif selection == '5':
-            os.system('python3 ExperimentExecute/end_to_end.py %s Analyze' % conf_file_path)
+            for conf in conf_file_list:
+                os.system('python3 ExperimentExecute/end_to_end.py %s Analyze' % conf)
         elif selection == '6':
-            os.system('python3 ExperimentExecute/terminate_machines.py %s' % conf_file_path)
+            for conf in conf_file_list:
+                os.system('python3 ExperimentExecute/terminate_machines.py %s' % conf)
 
         selection = print_main_menu()
 
