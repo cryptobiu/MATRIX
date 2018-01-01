@@ -25,7 +25,7 @@ def send_email(file_name):
     users = list(conf_data['users'].values())
 
     protocol_name = conf_data['protocol']
-    me = 'biu.cyber.experiments@gmail.com'
+    me = 'BIU Cyber Experiments <biu.cyber.experiments@gmail.com>'
 
     message = MIMEMultipart()
     message['Subject'] = 'Experiment results for protocol %s' % protocol_name
@@ -83,9 +83,11 @@ def analyze_results():
     tasks_names = dict()
 
     # load one of the data files to receive the headers to the xlsx file
+
     with open(files_list[0], 'r') as f:
         data = json.load(f)
 
+    # init list values
     for i in range(len(data)):
         tasks_names[data[i]['name']] = list()
 
