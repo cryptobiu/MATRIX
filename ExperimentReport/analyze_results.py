@@ -15,16 +15,18 @@ from collections import OrderedDict
 
 config_file_path = sys.argv[1]
 results_path = sys.argv[2]
+protocol_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
 with open(config_file_path) as conf_file:
     conf_data = json.load(conf_file)
 
 
-def send_email(file_name):
+def send_email():
 
     users = list(conf_data['users'].values())
 
     protocol_name = conf_data['protocol']
+    address_me = 'biu.cyber.experiments@gmail.com'
     me = 'BIU Cyber Experiments <biu.cyber.experiments@gmail.com>'
 
     message = MIMEMultipart()
@@ -34,14 +36,16 @@ def send_email(file_name):
     message_body = 'Results for protocol %s are attached.' % protocol_name
     message.attach(MIMEText(message_body))
 
-    with open(file_name, 'rb') as fli:
-        part = MIMEApplication(fli.read(), Name=basename(file_name))
-        part['Content-Disposition'] = 'attachment; filename="%s"' % basename(file_name)
-        message.attach(part)
+    results_files = glob.glob('ExperimentReport/Results_%s_%s_*.xlsx' % (protocol_name, protocol_time))
+    for file in results_files:
+        with open(file, 'rb') as fli:
+            part = MIMEApplication(fli.read(), Name=basename(file))
+            part['Content-Disposition'] = 'attachment; filename="%s"' % basename(file)
+            message.attach(part)
 
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.starttls()
-    server.login(me, 'CyberExp')
+    server.login(address_me, 'Cyberexp1!')
     server.sendmail(me, users, message.as_string())
     server.quit()
 
@@ -66,9 +70,7 @@ def upload_to_git(results_file_name):
     os.system('git push git@github.com:cryptobiu/ExperimentsResults.git')
 
 
-def analyze_results():
-    results_directory = results_path
-    files_list = glob.glob(expanduser('%s/*.json' % results_directory))
+def analyze_results(files_list, type):
 
     parties = set()
     for file in files_list:
@@ -94,8 +96,7 @@ def analyze_results():
     protocol_name = conf_data['protocol']
     num_of_repetitions = conf_data['numOfInternalRepetitions']
 
-    protocol_time = str(time.time())
-    results_file_name = 'Results/Results_%s_%s.xlsx' % (protocol_name, protocol_time)
+    results_file_name = 'ExperimentReport/Results_%s_%s_%s.xlsx' % (protocol_name, protocol_time, type)
     wb = xlsxwriter.Workbook(results_file_name)
     style1 = wb.add_format({'num_format': '#.##'})
 
@@ -131,9 +132,32 @@ def analyze_results():
 
     wb.close()
 
-    send_email(results_file_name)
+    # send_email(results_file_name)
 
-    upload_to_git(results_file_name)
+    # upload_to_git(results_file_name)
 
 
-analyze_results()
+def analyze_cpu():
+    files_list = glob.glob(expanduser('%s/*_cpu*.json' % results_path))
+    analyze_results(files_list, 'cpu')
+
+
+def analyze_comm_sent():
+    files_list = glob.glob(expanduser('%s/*_commSent*.json' % results_path))
+    analyze_results(files_list, 'sent')
+
+
+def analyze_comm_received():
+    files_list = glob.glob(expanduser('%s/*_commSent*.json' % results_path))
+    analyze_results(files_list, 'received')
+
+
+def analyze_all():
+    analyze_cpu()
+    analyze_comm_sent()
+    analyze_comm_received()
+    send_email()
+    # upload_to_git()
+
+
+analyze_all()

@@ -11,10 +11,10 @@ env.key_filename = [expanduser('~/Keys/matrix.pem')]
 
 
 @task
-def pre_process(experiment_name):
-    with cd('/home/ubuntu/%s' % experiment_name):
+def pre_process(working_directory, task_idx):
+    with cd(working_directory):
         put(expanduser('ExperimentExecute/pre_process.py'))
-        run('python 3 pre_process.py')
+        run('python 3 pre_process.py %s' % task_idx)
 
 
 @task

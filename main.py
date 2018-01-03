@@ -43,7 +43,7 @@ def main():
             continue
 
         color_print('Enter configuration file(s):', 'blue')
-        conf_file_path = input('Configuration file path (current path is: %s): ' % os.getcwd())
+        conf_file_path = input('Configuration file(s) path (current path is: %s): ' % os.getcwd())
 
         conf_file_list = conf_file_path.split(' ')
 

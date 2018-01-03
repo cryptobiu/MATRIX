@@ -1,4 +1,5 @@
 import os
+import sys
 from os.path import expanduser
 
 
@@ -15,9 +16,7 @@ def install_malicious_yao_lib():
     os.system('make')
 
 
-task_name = input('Enter task Name:\n'
-                  '1. Install NTL-9.10.0'
-                  '2. Install Malicious Yao Batch library')
+task_name = sys.argv[1]
 
 if task_name == '1':
     install_ntl()

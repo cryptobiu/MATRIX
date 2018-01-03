@@ -13,9 +13,10 @@ config_file_path = sys.argv[1]
 task_name = sys.argv[2]
 
 
-def pre_process():
+def pre_process(working_directory, pre_process_task):
     print('Performing pre process operations')
-    os.system('fab -f ExperimentExecute/fabfile.py pre_process --parallel --no-pty')
+    os.system('fab -f ExperimentExecute/fabfile.py pre_process:%s,%s --parallel --no-pty'
+              % (working_directory, pre_process_task))
 
 
 def update_libscapi():
@@ -57,16 +58,18 @@ with open(config_file_path) as data_file:
     data = json.load(data_file, object_pairs_hook=OrderedDict)
     protocol_name = data['protocol']
     git_branch = data['gitBranch']
-    pre_process_state = data['preProcess']
+    # pre_process_state = data['preProcess']
     now = datetime.datetime.now()
     results_directory = data['resultsDirectory'] + '_' + str(now.year) + str(now.month) + str(now.day) + \
                         str(now.hour) + str(now.minute)
     number_of_repetitions = data['numOfRepetitions']
     working_directory = data['workingDirectory']
     configurations = list(data['configurations'].values())
+    if 'preProcessTask' in data.keys():
+        pre_process_task = data['preProcessTask']
 
 if task_name == 'Pre-process':
-    pre_process()
+    pre_process(working_directory, pre_process_task)
 elif task_name == 'Install':
     install_experiment(protocol_name, git_branch, working_directory)
 elif task_name == 'Update':
