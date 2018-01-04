@@ -1,6 +1,7 @@
 import boto3
 import json
 import sys
+import os
 
 config_file_path = sys.argv[1]
 
@@ -16,3 +17,6 @@ for idx in range(len(regions)):
     instances_ids = [x.strip() for x in instances_ids]
     client = boto3.client('ec2', region_name=regions[idx][:-1])
     response = client.terminate_instances(InstanceIds=instances_ids)
+
+os.remove('instances_ids')
+os.remove('public_ips')
