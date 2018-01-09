@@ -1,5 +1,6 @@
 import json
 import sys
+import time
 from collections import OrderedDict
 from fabric.api import *
 from fabric.contrib.files import exists
@@ -7,6 +8,7 @@ from os.path import expanduser
 
 env.hosts = open('public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
+# env.password=''
 env.key_filename = [expanduser('~/Keys/matrix.pem')]
 
 
@@ -18,10 +20,10 @@ def pre_process(working_directory, task_idx):
 
 
 @task
-def install_git_project(experiment_name, git_branch, working_directory):
+def install_git_project(experiment_name, git_branch, working_directory, git_address):
 
     if not exists('%s' % working_directory):
-        run('git clone https://liorbiu:4aRotdy0vOhfvVgaUaSk@github.com/cryptobiu/%s.git' % experiment_name)
+        run('git clone %s' % git_address)
 
     if experiment_name == 'LowCostConstantRoundMPC':
         put(expanduser('~/Desktop/libOTe.tar.gz'))
@@ -45,6 +47,7 @@ def update_git_project(working_directory):
 
     with cd('%s' % working_directory):
         run('git pull')
+        # run('git checkout MeasurmentAPI')
 
         if exists('%s/CMakeLists.txt' % working_directory):
             with settings(warn_only=True):
@@ -58,6 +61,7 @@ def update_git_project(working_directory):
 def update_libscapi():
     with cd('libscapi/'):
         run('git pull')
+        run('git checkout MeasurmentAPI')
         run('make')
 
 
@@ -75,7 +79,6 @@ def run_protocol(config_file, args):
         for val in vals:
             values_str += '%s ' % val
 
-        print(values_str)
         with cd(working_directory):
             put('parties.conf', run('pwd'))
             sudo('killall -9 %s; exit 0' % executable_name)
@@ -86,7 +89,21 @@ def run_protocol(config_file, args):
                 values_str = values_str.replace('AesInputs0.txt', 'AesInputs%s.txt' % str(party_id))
 
             with warn_only():
-                run('./%s -partyID %s %s' % (executable_name, party_id, values_str))
+                if 'coordinatorConfig' in data and env.hosts.index(env.host) == len(env.hosts) - 1:
+                    coordinator_executable = data['coordinatorExecutable']
+                    coordinator_args = list(data['coordinatorConfig'].values())[0].split('@')
+                    coordinator_values_str = ''
+
+                    for coordinator_val in coordinator_args:
+                        coordinator_values_str += '%s ' % coordinator_val
+
+                    print(' I`m coordinator')
+                    time.sleep(2)
+                    run('./%s %s' % (coordinator_executable, coordinator_values_str))
+
+                else:
+                    print('I`m client idx : %d total hosts : %d' % (env.hosts.index(env.host), len(env.hosts)))
+                    run('./%s -partyID %s %s' % (executable_name, party_id, values_str))
 
     sys.stdout.flush()
 

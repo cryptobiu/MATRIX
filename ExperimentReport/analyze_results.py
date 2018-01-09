@@ -23,7 +23,7 @@ with open(config_file_path) as conf_file:
 
 def send_email():
 
-    users = list(conf_data['users'].values())
+    users = list(conf_data['emails'].values())
 
     protocol_name = conf_data['protocol']
     address_me = 'biu.cyber.experiments@gmail.com'
@@ -70,11 +70,11 @@ def upload_to_git(results_file_name):
     os.system('git push git@github.com:cryptobiu/ExperimentsResults.git')
 
 
-def analyze_results(files_list, type):
+def analyze_results(files_list, analysis_type):
 
     parties = set()
     for file in files_list:
-        parties.add(int(file.split('_')[3].split('.')[0].split('=')[1]))
+        parties.add(int(file.split('_')[4].split('.')[0].split('=')[1]))
 
     parties = list(parties)
     parties.sort()
@@ -96,7 +96,7 @@ def analyze_results(files_list, type):
     protocol_name = conf_data['protocol']
     num_of_repetitions = conf_data['numOfInternalRepetitions']
 
-    results_file_name = 'ExperimentReport/Results_%s_%s_%s.xlsx' % (protocol_name, protocol_time, type)
+    results_file_name = 'ExperimentReport/Results_%s_%s_%s.xlsx' % (protocol_name, protocol_time, analysis_type)
     wb = xlsxwriter.Workbook(results_file_name)
     style1 = wb.add_format({'num_format': '#.##'})
 
@@ -148,14 +148,20 @@ def analyze_comm_sent():
 
 
 def analyze_comm_received():
-    files_list = glob.glob(expanduser('%s/*_commSent*.json' % results_path))
+    files_list = glob.glob(expanduser('%s/*_commReceived*.json' % results_path))
     analyze_results(files_list, 'received')
+
+
+def analyze_memory():
+    files_list = glob.glob(expanduser('%s/*_memory*.json' % results_path))
+    analyze_results(files_list, 'memory')
 
 
 def analyze_all():
     analyze_cpu()
     analyze_comm_sent()
     analyze_comm_received()
+    analyze_memory()
     send_email()
     # upload_to_git()
 

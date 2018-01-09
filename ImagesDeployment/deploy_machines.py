@@ -60,13 +60,13 @@ def deploy_instances():
         number_of_instances = max(number_of_parties)
 
     date = datetime.now().replace(hour=datetime.now().hour - 3)
-    print('Current date : \n %s' % str(date))
+    print('Current date : \n%s' % str(date))
     new_date = date.replace(hour=date.hour + 6)
 
     for idx in range(len(regions)):
         client = boto3.client('ec2', region_name=regions[idx][:-1])
 
-        print('Deploying instances :\nregion : %s\nnumber of instances : %s\n ami_id : %s\ninstance_type : %s\n'
+        print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
               'valid until : %s' % (regions[idx], number_of_instances, amis_id[idx], machine_type, str(new_date)))
 
         number_of_instances_to_deploy = check_running_instances()
@@ -116,50 +116,62 @@ def get_network_details(regions):
     if len(regions) == 1:
         private_ip_address = list()
 
-    for idx in range(len(regions)):
-        client = boto3.client('ec2', region_name=regions[idx][:-1])
-        response = client.describe_spot_instance_requests()
-
-        for req_idx in range(len(response['SpotInstanceRequests'])):
-            if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
-                            response['SpotInstanceRequests'][req_idx]['State'] == 'open':
-                instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
-
-        # save instance_ids for experiment termination
-        with open('instances_ids', 'w+') as ids_file:
-            for instance_idx in range(len(instances_ids)):
-                ids_file.write('%s\n' % instances_ids[instance_idx])
-
-            ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
-            instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
-
-            for inst in instances:
-                if inst.id in instances_ids:
-                    public_ip_address.append(inst.public_ip_address)
-                    if len(regions) == 1:
-                        private_ip_address.append(inst.private_ip_address)
-
-        # write public ips to file for fabric
-        with open('public_ips', 'w+') as public_ip_file:
-            for public_idx in range(len(public_ip_address)):
-                public_ip_file.write('%s\n' % public_ip_address[public_idx])
-
-        print('Parties network configuration')
+    number_of_parties = max(list(data['numOfParties'].values()))
+    if 'local' in regions:
         with open('parties.conf', 'w+') as private_ip_file:
-            if len(regions) > 1:
+                for ip_idx in range(len(number_of_parties)):
+                    print('party_%s_ip=127.0.0.1' % ip_idx)
+                    private_ip_file.write('party_%s_ip=127.0.0.1' % ip_idx)
+
+    elif 'servers' in regions:
+        server_file = input('Enter your server file configuration: ')
+        os.system('mv %s public_ips' % server_file)
+
+    else:
+        for idx in range(len(regions)):
+            client = boto3.client('ec2', region_name=regions[idx][:-1])
+            response = client.describe_spot_instance_requests()
+
+            for req_idx in range(len(response['SpotInstanceRequests'])):
+                if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
+                                response['SpotInstanceRequests'][req_idx]['State'] == 'open':
+                    instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
+
+            # save instance_ids for experiment termination
+            with open('instances_ids', 'a+') as ids_file:
+                for instance_idx in range(len(instances_ids)):
+                    ids_file.write('%s\n' % instances_ids[instance_idx])
+
+                ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
+                instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
+
+                for inst in instances:
+                    if inst.id in instances_ids:
+                        public_ip_address.append(inst.public_ip_address)
+                        if len(regions) == 1:
+                            private_ip_address.append(inst.private_ip_address)
+
+            # write public ips to file for fabric
+            with open('public_ips', 'w+') as public_ip_file:
+                for public_idx in range(len(public_ip_address)):
+                    public_ip_file.write('%s\n' % public_ip_address[public_idx])
+
+            print('Parties network configuration')
+            with open('parties.conf', 'w+') as private_ip_file:
+                if len(regions) > 1:
+                    for private_idx in range(len(public_ip_address)):
+                        print('party_%s_ip=%s' % (private_idx, public_ip_address[private_idx]))
+                        private_ip_file.write('party_%s_ip=%s\n' % (private_idx, public_ip_address[private_idx]))
+                else:
+                    for private_idx in range(len(private_ip_address)):
+                        print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
+                        private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
+
+                port_number = 8000
+
                 for private_idx in range(len(public_ip_address)):
-                    print('party_%s_ip=%s' % (private_idx, public_ip_address[private_idx]))
-                    private_ip_file.write('party_%s_ip=%s\n' % (private_idx, public_ip_address[private_idx]))
-            else:
-                for private_idx in range(len(private_ip_address)):
-                    print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
-                    private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
-
-            port_number = 8000
-
-            for private_idx in range(len(public_ip_address)):
-                print('party_%s_port=%s' % (private_idx, port_number))
-                private_ip_file.write('party_%s_port=%s\n' % (private_idx, port_number))
+                    print('party_%s_port=%s' % (private_idx, port_number))
+                    private_ip_file.write('party_%s_port=%s\n' % (private_idx, port_number))
 
 
 def check_running_instances():
