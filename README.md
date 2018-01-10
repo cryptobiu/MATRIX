@@ -59,12 +59,12 @@ After config file was created, You will need to deploy your images(instances). M
 3. AWS deployment
 
 #### Local Deployment
-To deploy MATRIX locally set `regions` parameter to `local` at the config [file](../blob/master/Configurations/Config_BMR.json)
+To deploy MATRIX locally set `regions` parameter to `local` at the config [file](../master/Configurations/Config_BMR.json)
 
 #### Servers Deployment
 To deploy MATRIX on your own server cluster, supply a file that contains servers addresses.
 A sample file can be found [here](../blob/master/Assets/servers_file).
-You will need also to change this lines at [fabfile.py](../blob/master/ExperimentExecute/fabfile.py):
+You will need also to change this lines at [fabfile.py](../master/ExperimentExecute/fabfile.py):
 1. Set the correct user at `env.user = 'ubuntu'`
 2. Uncomment `# env.password=''` and fill your password.
 3. Comment this line `env.key_filename = [expanduser('~/Keys/matrix.pem')]`
@@ -72,7 +72,7 @@ You will need also to change this lines at [fabfile.py](../blob/master/Experimen
 #### AWS Deployment
 To deploy MATRIX at your machine with your credentials, you must have AWS account and configure your security keys.  
 In order to configure AWS account please read this [link](http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html).
-After you created your AWS key, change this line at [fabfile.py](../blob/master/ExperimentExecute/fabfile.py):
+After you created your AWS key, change this line at [fabfile.py](../master/ExperimentExecute/fabfile.py):
 
 - set the correct location of your AWS key `env.key_filename = [expanduser('~/Keys/matrix.pem')]`
 
@@ -98,7 +98,7 @@ MATRIX uses libscapi logger [API](https://github.com/cryptobiu/libscapi/blob/dev
 The logging is done at the protocol code. The logger generate suitable json files for the report module.  
 If you don't want to use libscapi logger API, make sure your files are at this name and format:   
 `protocolName_analyzedParameter_partyId=id_numOfParties=#parties.json`  
-Example file can be found [here](../blob/master/Assets/MPCHonestMajorityNoTriples_cpu_partyId=0_numOfParties=3.json)
+Example file can be found [here](../master/Assets/MPCHonestMajorityNoTriples_cpu_partyId=0_numOfParties=3.json)
 
 
 ### MATRIX Usage
