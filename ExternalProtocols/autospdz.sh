@@ -3,7 +3,7 @@
 ########################################################################################
 show_usage() {
 	echo $0" OPTIONS"
-	echo "-i <pid>		The party identity number"
+	echo "-partyID <pid>		The party identity number"
 	echo "-n <prts>		The number of parties"
 	echo "-x			Use SPDZ extension library"
 	echo "-p			Port number"
@@ -18,7 +18,7 @@ do
  h) show_usage; exit 0;;
  x) EXT=on;;
  n) PARTIES=${OPTARG};;
- i) PID=$OPTARG;;
+ partyID) PID=$OPTARG;;
  p) PORT=$OPTARG;;
  esac
 done
