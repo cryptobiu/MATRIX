@@ -89,7 +89,7 @@ The execution module supports these operations:
 ### ExperimentReport
 
 The report module analyze the results files that was taken from the images. MATRIX analyze four parameters:
-1. CPU runtime(milliseconds)
+1. CPU runtime (milliseconds)
 2. RAM usage (GB)
 3. Sent bytes (bytes)
 4. Received bytes (bytes)
