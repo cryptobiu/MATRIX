@@ -2,7 +2,7 @@
   "execRequestTime": "7.9.17 12:20",
   "amis":
   {
-    "region_0": "ami-0b961e71"
+    "region_0": "ami-f0520a8a"
   },
   "protocol":"Semi-Honest-BMR",
   "numOfParties":
@@ -13,7 +13,6 @@
   "aWWSBidPrice": "0.07",
   "network": "LAN",
   "executableName": "SemiHonestBMR",
-  "preProcess": "False",
   "configurations":
   {
     "conf_0": "-circuitFile@3Party/AESout@-inputsFile@3Party/aesP0@-partiesFile@parties.conf@-key@3Party/aesP@-version@2",

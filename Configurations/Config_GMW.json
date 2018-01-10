@@ -2,25 +2,24 @@
   "execRequestTime": "7.9.17 12:20",
   "amis":
   {
-    "region_0": "ami-0b961e71"
+    "region_0": "ami-f0520a8a"
   },
   "protocol":"GMW",
   "numOfParties":
   {
-    "size_0":3
+    "size_0":4
   },
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
   "network": "LAN",
   "executableName": "GMW",
-  "preProcess": "False",
   "configurations":
   {
-    "conf_0": "-circuitFileName@NigelAes3Parties.txt@-partiesFile@parties.conf@-inputFile@AesInputs0.txt@-numThreads@2@-internalIterationsNumber@1"
+    "conf_0": "-circuitFile@NigelAes4Parties.txt@-partiesFile@parties.conf@-inputFile@AesInputs0.txt@-numThreads@2@-internalIterationsNumber@2"
   },
   "numOfRepetitions":1,
   "numOfInternalRepetitions":2,
-  "gitBranch": "dev",
+  "gitBranch": "MeasurmentAPI",
   "IsPublished": "public",
   "regions":
   {
@@ -28,7 +27,10 @@
   },
   "workingDirectory": "~/libscapi/protocols/GMW",
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
-  "user": "liork.cryptobiu@gmail.com"
+  "users":
+  {
+    "user_0": "liork.cryptobiu@gmail.com"
+  }
 
 }
 

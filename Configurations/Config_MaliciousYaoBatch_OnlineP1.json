@@ -2,7 +2,7 @@
   "execRequestTime": "7.9.17 12:20",
   "amis":
   {
-    "region_0": "ami-0b961e71"
+    "region_0": "ami-f0520a8a"
   },
   "protocol":"MaliciousYaoBatch",
   "numOfParties":
@@ -13,7 +13,7 @@
   "aWWSBidPrice": "0.07",
   "network": "LAN",
   "executableName": "AppOnlineP1.out",
-  "preProcess": "True",
+  "preProcessTask": "2",
   "configurations":
   {
     "conf_0":"-circuitFile@/lib/assets/circuits/AES/NigelAes.txt@-inputFile@/lib/assets/circuits/AES/AESPartyOneInputs.txt@-circuitCRFile@/lib/assets/circuits/CheatingRecovery/UnlockP1Input.txt@-bucketsPrefixMain@/lib/data/P1/aes@-bucketsPrefixCR@/lib/data/P1/cr@-partiesFile@/lib/assets/conf/PartiesConfig.txt@-n1@32@-b1@7@-s1@40@-p1@0.62@-n2@32@-b2@20@-s2@40@-p2@0.71@"

@@ -2,23 +2,24 @@
   "execRequestTime": "7.9.17 12:20",
   "amis":
   {
-    "region_0": "ami-0b961e71"
+    "region_0": "ami-946f39ee"
   },
   "protocol":"NEC",
   "numOfParties":
   {
-    "size_0":3
+    "size_0":4
   },
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
   "network": "LAN",
   "executableName": "MPCServerApp.out",
-  "preProcess": "False",
   "configurations":
   {
-    "conf_0": "-circuitFile@NecAes.txt@"
+    "conf_0": "-groupID@0@-partiesFile@parties.conf@-circuitFile@NecAes.txt@-internalIterationsNumber@1@"
   },
   "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "gitAddress":"",
   "gitBranch": "master",
   "IsPublished": "public",
   "regions":
@@ -27,6 +28,11 @@
   },
   "workingDirectory": "~/NEC/",
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
-  "user": "liork.cryptobiu@gmail.com"
+  "emails": "liork.cryptobiu@gmail.com",
+  "coordinatorConfig":
+  {
+    "conf_0": "-groupID@0@-inputFile@CircuitInputs.txt@-partiesFile@parties.conf@-internalIterationsNumber@1@"
+  },
+  "coordinatorExecutable":"KingServerApp.out"
 
 }
