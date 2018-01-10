@@ -8,7 +8,7 @@ It uses AWS [spot instances](https://aws.amazon.com/ec2/spot/), and can be used 
 ## Installation
 The system can be deploy on local machine, remote server or AWS machine.
 MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [xlsxwriter](http://xlsxwriter.readthedocs.io/).
-Matrix tested on Ubuntu 16.04.3 LTS and CentOS 7.3.
+Matrix tested on Ubuntu 16.04.3 LTS and CentOS 7.3.  
 To install python3 and pip under Ubuntu 16.04 :
 
 `sudo apt-get install python3 python3-pip`
@@ -23,7 +23,7 @@ After You installed python 3 and pip3 you will need to install the modules MATRI
 
 After the modules installed, clone this repository to install MATRIX on your system.
 
-##MATRIX Modules
+## MATRIX Modules
 
 ### Configurations
 MATRIX uses configuration file to set it execution. The configuration file is written in [json](https://en.wikipedia.org/wiki/JSON) format.  
