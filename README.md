@@ -103,4 +103,6 @@ Example file can be found [here](../master/Assets/MPCHonestMajorityNoTriples_cpu
 
 ### MATRIX Usage
 
-In order to receive easy access to the MATRIX system, MATRIX uses basic CLI. To run the CLI run: `python3 main.py` 
+In order to receive easy access to the MATRIX system, MATRIX uses basic CLI. To run the CLI run: `python3 main.py`
+
+For features requests open an issue or send mail to liork.cryptobiu@gmail.com
