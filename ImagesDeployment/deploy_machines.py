@@ -119,13 +119,32 @@ def get_network_details(regions):
     number_of_parties = max(list(data['numOfParties'].values()))
     if 'local' in regions:
         with open('parties.conf', 'w+') as private_ip_file:
-                for ip_idx in range(len(number_of_parties)):
-                    print('party_%s_ip=127.0.0.1' % ip_idx)
-                    private_ip_file.write('party_%s_ip=127.0.0.1' % ip_idx)
+            for ip_idx in range(len(number_of_parties)):
+                private_ip_file.write('party_%s_ip=127.0.0.1\n' % ip_idx)
+                public_ip_address.append('127.0.0.1')
+
+            port_counter = 8000
+            for ip_idx in range(len(number_of_parties)):
+                private_ip_file.write('party_%s_port=%s\n' % (ip_idx, port_counter))
+                port_counter += 100
 
     elif 'servers' in regions:
         server_file = input('Enter your server file configuration: ')
         os.system('mv %s public_ips' % server_file)
+
+        server_ips = []
+        with open('public_ips', 'r+') as server_ips_file:
+            for line in server_ips_file:
+                server_ips.append(line)
+
+            with open('parties.conf', 'w+') as private_ip_file:
+                for ip_idx in range(len(server_ips)):
+                    print('party_%s_ip=%s' % (ip_idx, server_ips[ip_idx]))
+                    private_ip_file.write('party_%s_ip=127.0.0.1' % ip_idx)
+
+                port_counter = 8000
+                for ip_idx in range(len(server_ips)):
+                    private_ip_file.write('party_%s_port=%s\n' % (ip_idx, port_counter))
 
     else:
         for idx in range(len(regions)):
@@ -151,11 +170,6 @@ def get_network_details(regions):
                         if len(regions) == 1:
                             private_ip_address.append(inst.private_ip_address)
 
-            # write public ips to file for fabric
-            with open('public_ips', 'w+') as public_ip_file:
-                for public_idx in range(len(public_ip_address)):
-                    public_ip_file.write('%s\n' % public_ip_address[public_idx])
-
             print('Parties network configuration')
             with open('parties.conf', 'w+') as private_ip_file:
                 if len(regions) > 1:
@@ -172,6 +186,12 @@ def get_network_details(regions):
                 for private_idx in range(len(public_ip_address)):
                     print('party_%s_port=%s' % (private_idx, port_number))
                     private_ip_file.write('party_%s_port=%s\n' % (private_idx, port_number))
+
+    # write public ips to file for fabric
+    if 'local' in regions or not 'server' in regions:
+        with open('public_ips', 'w+') as public_ip_file:
+            for public_idx in range(len(public_ip_address)):
+                public_ip_file.write('%s\n' % public_ip_address[public_idx])
 
 
 def check_running_instances():
