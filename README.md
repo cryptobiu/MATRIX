@@ -1,6 +1,6 @@
 # MATRIX
 
-MATRIX is an MPC Test Automation Framework developed by developed by [Bar Ilan University Cryptography Research Group](http://crypto.biu.ac.il/).
+MATRIX is an MPC Test Automation Framework developed by [Bar Ilan University Cryptography Research Group](http://crypto.biu.ac.il/).
 It automates the tedious process of deploying, running, monitoring and summarizing results.
 It uses AWS [spot instances](https://aws.amazon.com/ec2/spot/), and can be used internally on a local host or in a container deployment.
 
