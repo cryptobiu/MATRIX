@@ -61,7 +61,6 @@ def update_git_project(working_directory):
 def update_libscapi():
     with cd('libscapi/'):
         run('git pull')
-        run('git checkout MeasurmentAPI')
         run('make')
 
 
