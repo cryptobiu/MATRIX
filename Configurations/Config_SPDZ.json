@@ -1,0 +1,34 @@
+{
+  "execRequestTime": "7.9.17 12:20",
+  "amis":
+  {
+    "region_0": "ami-f0520a8a"
+  },
+  "protocol":"Semi-Honest-BMR",
+  "numOfParties":
+  {
+    "size_0":3
+  },
+  "aWSInstType": "c4.large",
+  "aWWSBidPrice": "0.07",
+  "network": "LAN",
+  "executableName": "SemiHonestBMR",
+  "configurations":
+  {
+    "conf_0": "-circuitFile@3Party/AESout@-inputsFile@3Party/aesP0@-partiesFile@parties.conf@-key@3Party/aesP@-version@2",
+    "conf_1": "-circuitFile@3Party/AESout@-inputsFile@3Party/aesP0@-partiesFile@parties.conf@-key@3Party/aesP@-version@3",
+    "conf_2": "-circuitFile@3Party/AESout@-inputsFile@3Party/aesP0@-partiesFile@parties.conf@-key@3Party/aesP@-version@4"
+  },
+  "numOfRepetitions":1,
+  "gitBranch": "experimentation",
+  "IsPublished": "public",
+  "regions":
+  {
+    "region_0":"us-east-1b"
+  },
+  "workingDirectory": "~/Semi-Honest-BMR",
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "user": "liork.cryptobiu@gmail.com"
+
+}
+
