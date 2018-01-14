@@ -14,32 +14,39 @@ env.key_filename = [expanduser('~/Keys/matrix.pem')]
 
 @task
 def pre_process(working_directory, task_idx):
+    sudo('apt-get install python3 -y')
     with cd(working_directory):
         put(expanduser('ExperimentExecute/pre_process.py'))
-        run('python 3 pre_process.py %s' % task_idx)
+        run('python3 pre_process.py %s' % task_idx)
 
 
 @task
-def install_git_project(experiment_name, git_branch, working_directory, git_address):
+def install_git_project(experiment_name, git_branch, working_directory, git_address, external, install_script):
 
-    if not exists('%s' % working_directory):
-        run('git clone %s' % git_address)
+    if external == 'True':
+        put('ExternalProtocols/%s' % install_script, run('pwd'))
+        sudo('chmod +x %s' % install_script)
+        run('./%s' % install_script)
 
-    if experiment_name == 'LowCostConstantRoundMPC':
-        put(expanduser('~/Desktop/libOTe.tar.gz'))
-        run('tar -xf libOTe.tar.gz')
-        with cd('libOTe'):
+    else:
+        if not exists('%s' % working_directory):
+            run('git clone %s' % git_address)
 
-            run('rm -rf CMakeFiles CMakeCache.txt Makefile')
-            run('cmake .')
+        if experiment_name == 'LowCostConstantRoundMPC':
+            put(expanduser('~/Desktop/libOTe.tar.gz'))
+            run('tar -xf libOTe.tar.gz')
+            with cd('libOTe'):
+
+                run('rm -rf CMakeFiles CMakeCache.txt Makefile')
+                run('cmake .')
+                run('make')
+
+        with cd('%s' % working_directory):
+            run('git checkout %s ' % git_branch)
+            if exists('%s/CMakeLists.txt' % working_directory):
+                sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
+                run('cmake .')
             run('make')
-
-    with cd('%s' % working_directory):
-        run('git checkout %s ' % git_branch)
-        if exists('%s/CMakeLists.txt' % working_directory):
-            sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
-            run('cmake .')
-        run('make')
 
 
 @task
@@ -71,7 +78,7 @@ def run_protocol(config_file, args):
         protocol_name = data['protocol']
         executable_name = data['executableName']
         working_directory = data['workingDirectory']
-
+        external_protocol = data['external']
         vals = args.split('@')
         values_str = ''
 
@@ -80,7 +87,13 @@ def run_protocol(config_file, args):
 
         with cd(working_directory):
             put('parties.conf', run('pwd'))
+            if external_protocol == 'True':
+                put('ExternalProtocols/%s' % executable_name, run('pwd'))
+                sudo('chmod +x %s' % executable_name)
+
             sudo('killall -9 %s; exit 0' % executable_name)
+            sudo('killall -9 Player-Online.x; exit 0')
+            sudo('killall -9 Server.x; exit 0')
             sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
             party_id = env.hosts.index(env.host)
 
@@ -88,23 +101,23 @@ def run_protocol(config_file, args):
                 values_str = values_str.replace('AesInputs0.txt', 'AesInputs%s.txt' % str(party_id))
 
             with warn_only():
-                if 'coordinatorConfig' in data and env.hosts.index(env.host) == len(env.hosts) - 1:
-                    coordinator_executable = data['coordinatorExecutable']
-                    coordinator_args = list(data['coordinatorConfig'].values())[0].split('@')
-                    coordinator_values_str = ''
-
-                    for coordinator_val in coordinator_args:
-                        coordinator_values_str += '%s ' % coordinator_val
-
-                    print(' I`m coordinator')
-                    time.sleep(2)
-                    run('./%s %s' % (coordinator_executable, coordinator_values_str))
+                if external_protocol == 'True':
+                    run('./%s -i %s %s' % (executable_name, party_id, values_str))
 
                 else:
-                    print('I`m client idx : %d total hosts : %d' % (env.hosts.index(env.host), len(env.hosts)))
-                    run('./%s -partyID %s %s' % (executable_name, party_id, values_str))
+                    if 'coordinatorConfig' in data and env.hosts.index(env.host) == len(env.hosts) - 1:
+                        coordinator_executable = data['coordinatorExecutable']
+                        coordinator_args = list(data['coordinatorConfig'].values())[0].split('@')
+                        coordinator_values_str = ''
 
-    sys.stdout.flush()
+                        for coordinator_val in coordinator_args:
+                            coordinator_values_str += '%s ' % coordinator_val
+
+                        time.sleep(2)
+                        run('./%s %s' % (coordinator_executable, coordinator_values_str))
+
+                    else:
+                        run('./%s -partyID %s %s' % (executable_name, party_id, values_str))
 
 
 @task

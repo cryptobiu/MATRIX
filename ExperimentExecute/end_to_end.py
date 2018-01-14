@@ -24,10 +24,11 @@ def update_libscapi():
     os.system('fab -f ExperimentExecute/fabfile.py update_libscapi --parallel --no-pty')
 
 
-def install_experiment(experiment_name, git_branch, working_directory, git_address):
+def install_experiment(experiment_name, git_branch, working_directory,
+                       git_address, external_protocol=False, install_script=''):
     print('Installing experiment %s...' % experiment_name)
-    os.system('fab -f ExperimentExecute/fabfile.py install_git_project:%s,%s,%s,%s --parallel --no-pty'
-              % (experiment_name, git_branch, working_directory, git_address))
+    os.system('fab -f ExperimentExecute/fabfile.py install_git_project:%s,%s,%s,%s,%s,%s --parallel --no-pty'
+              % (experiment_name, git_branch, working_directory, git_address, external_protocol, install_script))
 
 
 def update_experiment(experiment_name, working_directory):
@@ -57,8 +58,15 @@ def analyze_results(experiment_name, config_file_path, results_path):
 with open(config_file_path) as data_file:
     data = json.load(data_file, object_pairs_hook=OrderedDict)
     protocol_name = data['protocol']
-    git_address = data['gitAddress']
-    git_branch = data['gitBranch']
+    git_address = ''
+    git_branch = ''
+    pre_process_task = ''
+    external_protocol = ''
+    install_script = ''
+
+    if 'gitAddress' in data:
+        git_address = data['gitAddress']
+        git_branch = data['gitBranch']
     # pre_process_state = data['preProcess']
     now = datetime.datetime.now()
     results_directory = data['resultsDirectory'] + '_' + str(now.year) + str(now.month) + str(now.day) + \
@@ -68,11 +76,14 @@ with open(config_file_path) as data_file:
     configurations = list(data['configurations'].values())
     if 'preProcessTask' in data.keys():
         pre_process_task = data['preProcessTask']
+    if 'external' in data.keys():
+        external_protocol = data['external']
+        install_script = data['installScript']
 
 if task_name == 'Pre-process':
     pre_process(working_directory, pre_process_task)
 elif task_name == 'Install':
-    install_experiment(protocol_name, git_branch, working_directory, git_address)
+    install_experiment(protocol_name, git_branch, working_directory, git_address, external_protocol, install_script)
 elif task_name == 'Update':
     update_experiment(protocol_name, working_directory)
 elif task_name == 'Execute':
