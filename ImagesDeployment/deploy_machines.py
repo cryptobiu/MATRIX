@@ -1,40 +1,60 @@
 import os
 import sys
+from os.path import expanduser
+
 import boto3
+import botocore
 import json
 import time
 from datetime import datetime
 from collections import OrderedDict
+from botocore import exceptions
 
 
 config_file_path = sys.argv[1]
+task_idx = sys.argv[2]
 
 
 def create_key_pair():
     with open(config_file_path) as regions_file:
-        regions = list(regions_file['regions'].values())
+        data = json.load(regions_file, object_pairs_hook=OrderedDict)
+        regions = list(data['regions'].values())
 
-    for region in regions:
-        ec2 = boto3.resource('ec2', region_name=region)
-        keypair = ec2.create_key_pair(KeyName='Matrix%s' % region.replace('-', ''))
-        print(keypair.key_material)
+    for idx in range(len(regions)):
+        client = boto3.client('ec2', region_name=regions[idx][:-1])
+        try:
+            key_pair = client.create_key_pair(KeyName='Matrix%s' % regions[idx].replace('-', ''))
+            print(key_pair.KeyMaterial)
+        except botocore.exceptions.EndpointConnectionError as e:
+            print(e.response['Error']['Message'])
+        except botocore.exceptions.ClientError as e:
+            print(e.response['Error']['Message'])
 
 
 def create_security_group():
     with open(config_file_path) as regions_file:
-        regions = list(regions_file['regions'].values())
+        data = json.load(regions_file, object_pairs_hook=OrderedDict)
+        regions = list(data['regions'].values())
 
-    for region in regions:
-        client = boto3.client('ec2', region_name=region)
-        response = client.create_security_group(
-            Description='Matrix system security group',
-            GroupName='MatrixSG%s' % region.replace('-', ''),
-            DryRun=False
-        )
-        sg_id = response['GroupId']
-        ec2 = boto3.resource('ec2', region_name=region)
-        security_group = ec2.SecurityGroup(sg_id)
-        security_group.authorize_ingress(IpProtocol="tcp", CidrIp="0.0.0.0/0", FromPort=0, ToPort=65535)
+    for idx in range(len(regions)):
+        client = boto3.client('ec2', region_name=regions[idx][:-1])
+        # create security group
+        try:
+            response = client.create_security_group(
+                Description='Matrix system security group',
+                GroupName='MatrixSG%s' % regions[idx].replace('-', '')[:-1],
+                DryRun=False
+            )
+
+            # Add FW rules
+            sg_id = response['GroupId']
+            ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
+            security_group = ec2.SecurityGroup(sg_id)
+            security_group.authorize_ingress(IpProtocol="tcp", CidrIp="0.0.0.0/0", FromPort=0, ToPort=65535)
+        except botocore.exceptions.EndpointConnectionError as e:
+            print(e.response['Error']['Message'])
+        except botocore.exceptions.ClientError as e:
+            print(e.response['Error']['Message'])
 
 
 def check_latest_price(instance_type, region):
@@ -221,4 +241,11 @@ def check_running_instances():
         return instances_count
 
 
-deploy_instances()
+if task_idx == '1':
+    deploy_instances()
+elif task_idx == '2':
+    create_key_pair()
+elif task_idx == '3':
+    create_security_group()
+else:
+    raise ValueError('Invalid choice')
