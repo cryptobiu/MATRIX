@@ -1,7 +1,5 @@
 import os
 import sys
-from os.path import expanduser
-
 import boto3
 import botocore
 import json
@@ -23,12 +21,14 @@ def create_key_pair():
     for idx in range(len(regions)):
         client = boto3.client('ec2', region_name=regions[idx][:-1])
         try:
-            key_pair = client.create_key_pair(KeyName='Matrix%s' % regions[idx].replace('-', ''))
-            print(key_pair.KeyMaterial)
+            key_pair = client.create_key_pair(KeyName='Matrix%s' % regions[idx].replace('-', '')[:-1])
+            print('Key value for : %s' % key_pair['KeyName'])
+            print(key_pair['KeyMaterial'])
+            print()
         except botocore.exceptions.EndpointConnectionError as e:
-            print(e.response['Error']['Message'])
+            print(e.response['Error']['Message'].upper())
         except botocore.exceptions.ClientError as e:
-            print(e.response['Error']['Message'])
+            print(e.response['Error']['Message'].upper())
 
 
 def create_security_group():
@@ -52,9 +52,9 @@ def create_security_group():
             security_group = ec2.SecurityGroup(sg_id)
             security_group.authorize_ingress(IpProtocol="tcp", CidrIp="0.0.0.0/0", FromPort=0, ToPort=65535)
         except botocore.exceptions.EndpointConnectionError as e:
-            print(e.response['Error']['Message'])
+            print(e.response['Error']['Message'].upper())
         except botocore.exceptions.ClientError as e:
-            print(e.response['Error']['Message'])
+            print(e.response['Error']['Message'].upper())
 
 
 def check_latest_price(instance_type, region):
@@ -73,9 +73,12 @@ def deploy_instances():
         number_of_parties = list(data['numOfParties'].values())
         amis_id = list(data['amis'].values())
         regions = list(data['regions'].values())
+        number_duplicated_servers = 0
 
     if len(regions) > 1:
         number_of_instances = max(number_of_parties) // len(regions)
+        if max(number_of_parties) % len(regions):
+            number_duplicated_servers = max(number_of_parties) % len(regions)
     else:
         number_of_instances = max(number_of_parties)
 
@@ -89,52 +92,55 @@ def deploy_instances():
         print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
               'valid until : %s' % (regions[idx], number_of_instances, amis_id[idx], machine_type, str(new_date)))
 
-        number_of_instances_to_deploy = check_running_instances()
-
-        number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
+        number_of_instances_to_deploy = check_running_instances(regions[idx][:-1])
+        if idx < number_duplicated_servers:
+            number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
+        else:
+            number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
 
         if number_of_instances_to_deploy > 0:
             # check if price isn't too low
             winning_bid_price = check_latest_price(machine_type, regions[idx])
             if float(price_bids) < float(winning_bid_price):
                 price_bids = str(winning_bid_price)
+            try:
+                client.request_spot_instances(
+                        DryRun=False,
+                        SpotPrice=price_bids,
+                        InstanceCount=number_of_instances_to_deploy,
+                        ValidUntil=new_date,
+                        LaunchSpecification=
+                        {
+                            'ImageId': amis_id[idx],
+                            'KeyName': 'Matrix%s' % regions[idx].replace('-', '')[:-1],
+                            'SecurityGroups': ['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
+                            'InstanceType': machine_type,
+                            'Placement':
+                                {
+                                    'AvailabilityZone': regions[idx],
+                                },
+                        }
+                )
+            except botocore.exceptions.ClientError as e:
+                print(e.response['Error']['Message'].upper())
 
-            client.request_spot_instances(
-                    DryRun=False,
-                    SpotPrice=price_bids,
-                    InstanceCount=number_of_instances_to_deploy,
-                    ValidUntil=new_date,
-                    LaunchSpecification=
-                    {
-                        'ImageId': amis_id[idx],
-                        'KeyName': 'Matrix%s' % regions[idx].replace('-', '')[:-1],
-                        'SecurityGroups': ['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
-                        'InstanceType': machine_type,
-                        'Placement':
-                            {
-                                'AvailabilityZone': regions[idx],
-                            },
-                    }
-            )
-
-            time.sleep(240)
-            get_network_details(regions)
+    time.sleep(240)
+    get_network_details()
 
     print('Finished to deploy machines')
-    sys.stdout.flush()
 
 
-def get_network_details(regions):
+def get_network_details():
     with open(config_file_path) as data_file:
         data = json.load(data_file)
-        protocol_name = data['protocol']
-        os.system('mkdir -p ../%s' % protocol_name)
+        regions = list(data['regions'].values())
 
-    instances_ids = list()
-    public_ip_address = list()
+    instances_ids = []
+    public_ip_address = [[] for i in range(len(regions))]
+    public_ip_address_fixed =[]
 
     if len(regions) == 1:
-        private_ip_address = list()
+        private_ip_address = []
 
     number_of_parties = max(list(data['numOfParties'].values()))
     if 'local' in regions:
@@ -186,59 +192,60 @@ def get_network_details(regions):
 
                 for inst in instances:
                     if inst.id in instances_ids:
-                        public_ip_address.append(inst.public_ip_address)
+                        public_ip_address[idx].append(inst.public_ip_address)
                         if len(regions) == 1:
                             private_ip_address.append(inst.private_ip_address)
 
-            print('Parties network configuration')
-            with open('parties.conf', 'w+') as private_ip_file:
-                if len(regions) > 1:
-                    for private_idx in range(len(public_ip_address)):
-                        print('party_%s_ip=%s' % (private_idx, public_ip_address[private_idx]))
-                        private_ip_file.write('party_%s_ip=%s\n' % (private_idx, public_ip_address[private_idx]))
-                else:
-                    for private_idx in range(len(private_ip_address)):
-                        print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
-                        private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
+        # rearrange the list that the ips from the same regions will not be followed
+        for idx1 in range(len(public_ip_address)):
+            for idx2 in range(public_ip_address[idx1]):
+                public_ip_address_fixed.append(public_ip_address[idx2][idx1])
 
-                port_number = 8000
+        print('Parties network configuration')
+        with open('parties.conf', 'w+') as private_ip_file:
+            if len(regions) > 1:
+                for public_idx in range(len(public_ip_address_fixed)):
+                    print('party_%s_ip=%s' % (public_idx, public_ip_address[public_idx]))
+                    public_ip_address_fixed.write('party_%s_ip=%s\n' % (public_idx, public_ip_address[public_idx]))
+            else:
+                for private_idx in range(len(private_ip_address)):
+                    print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
+                    private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
 
-                for private_idx in range(len(public_ip_address)):
-                    print('party_%s_port=%s' % (private_idx, port_number))
-                    private_ip_file.write('party_%s_port=%s\n' % (private_idx, port_number))
+            port_number = 8000
+
+            for port_idx in range(len(public_ip_address)):
+                print('party_%s_port=%s' % (port_idx, port_number))
+                private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_number))
 
     # write public ips to file for fabric
-    if 'local' in regions or not 'server' in regions:
+    if 'local' in regions or 'server' not in regions:
         with open('public_ips', 'w+') as public_ip_file:
             for public_idx in range(len(public_ip_address)):
                 public_ip_file.write('%s\n' % public_ip_address[public_idx])
 
 
-def check_running_instances():
-    with open(config_file_path) as data_file:
-        data = json.load(data_file, object_pairs_hook=OrderedDict)
-        regions = list(data['regions'].values())
+def check_running_instances(region):
 
-        instances_ids = list()
-        instances_count = 0
+    instances_ids = list()
+    instances_count = 0
 
-        for idx in range(len(regions)):
-            client = boto3.client('ec2', region_name=regions[idx][:-1])
-            response = client.describe_spot_instance_requests()
+    client = boto3.client('ec2', region_name=region)
+    response = client.describe_spot_instance_requests()
 
-            for req_idx in range(len(response['SpotInstanceRequests'])):
-                if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
-                                response['SpotInstanceRequests'][req_idx]['State'] == 'open':
-                    instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
+    for req_idx in range(len(response['SpotInstanceRequests'])):
+        if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
+                        response['SpotInstanceRequests'][req_idx]['State'] == 'open':
+            instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
 
-            ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
-            instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
+    ec2 = boto3.resource('ec2', region_name=region)
+    instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
 
-            for inst in instances:
-                if inst.id in instances_ids:
-                    instances_count += 1
+    for inst in instances:
+        if inst.id in instances_ids:
+            instances_count += 1
 
-        return instances_count
+    return instances_count
 
 
 if task_idx == '1':
@@ -247,5 +254,7 @@ elif task_idx == '2':
     create_key_pair()
 elif task_idx == '3':
     create_security_group()
+elif task_idx == '4':
+    get_network_details()
 else:
     raise ValueError('Invalid choice')

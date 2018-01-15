@@ -14,11 +14,15 @@ from collections import OrderedDict
 
 
 config_file_path = sys.argv[1]
-results_path = sys.argv[2]
+task_idx = sys.argv[2]
+
+results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
+
 protocol_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
 with open(config_file_path) as conf_file:
     conf_data = json.load(conf_file)
+    remote_directory = conf_data['workingDirectory']
 
 
 def send_email():
@@ -166,4 +170,9 @@ def analyze_all():
     # upload_to_git()
 
 
-analyze_all()
+if task_idx == '1':
+    os.system('fab -f ExperimentExecute/fabfile.py collect_results:%s,%s --parallel --no-pty'
+              % (remote_directory, results_path))
+    analyze_all()
+elif task_idx == '2':
+    analyze_all()

@@ -121,9 +121,12 @@ def run_protocol(config_file, args):
 
 
 @task
-def collect_results(results_local_directory, results_remote_directory):
+def collect_results(results_server_directory, results_local_directory):
+    local('mkdir -p %s' % results_local_directory)
+    get('%s/*.json' % results_server_directory, results_local_directory)
 
-    local('mkdir -p %s' % results_remote_directory)
-    print(results_remote_directory)
-    print(results_local_directory)
-    get('%s/*.json' % results_local_directory, results_remote_directory)
+
+@task
+def delete_json_files(working_directory):
+    with cd(working_directory):
+        sudo('rm *.json')
