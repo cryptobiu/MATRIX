@@ -46,7 +46,8 @@ def execute_experiment(repetitions, experiment_name, configurations, working_dir
 
 def update_libscapi():
     print('Updating libscapi library')
-    os.system('fab -f ExperimentExecute/fabfile.py update_libscapi --parallel --no-pty')
+    branch = input('Enter libscapi branch to update from:')
+    os.system('fab -f ExperimentExecute/fabfile.py update_libscapi:%s --parallel --no-pty' % branch)
 
 
 with open(config_file_path) as data_file:

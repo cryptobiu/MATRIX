@@ -54,7 +54,6 @@ def update_git_project(working_directory):
 
     with cd('%s' % working_directory):
         run('git pull')
-        # run('git checkout MeasurmentAPI')
 
         if exists('%s/CMakeLists.txt' % working_directory):
             with settings(warn_only=True):
@@ -65,8 +64,9 @@ def update_git_project(working_directory):
 
 
 @task
-def update_libscapi():
+def update_libscapi(branch):
     with cd('libscapi/'):
+        run('git checkout %s' % branch)
         run('git pull')
         run('make')
 
