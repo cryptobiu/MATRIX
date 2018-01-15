@@ -68,11 +68,6 @@ def main():
             deploy_selection = print_deployment_menu()
             os.system('python3 ImagesDeployment/deploy_machines.py %s %s' % (conf_file_path, deploy_selection))
         elif selection == '2':
-            try:
-                os.system('python3 ExperimentExecute/end_to_end.py %s 0' % conf_file_path)
-            except ValueError as ve:
-                print(ve)
-        elif selection == '2':
             execute_selection = print_execution_menu()
             try:
                 os.system('python3 ExperimentExecute/end_to_end.py %s %s' % (conf_file_path, execute_selection))
