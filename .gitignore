@@ -6,7 +6,7 @@ __pycache__/
 .idea/
 *.jar
 instances_ids
-parties.conf
+parties*.conf
 public_ips
 Results.xlsx
 NodeApp/public/*.json
