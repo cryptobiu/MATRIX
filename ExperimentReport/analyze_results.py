@@ -21,7 +21,7 @@ results_path = input('Enter results directory. current path is: %s): ' % os.getc
 protocol_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
 with open(config_file_path) as conf_file:
-    conf_data = json.load(conf_file)
+    conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
     remote_directory = conf_data['workingDirectory']
 
 
@@ -30,6 +30,8 @@ def send_email():
     users = list(conf_data['emails'].values())
 
     protocol_name = conf_data['protocol']
+    configurations = list(conf_data['configurations'].values())
+    regions = list(conf_data['regions'].values())
     address_me = 'biu.cyber.experiments@gmail.com'
     me = 'BIU Cyber Experiments <biu.cyber.experiments@gmail.com>'
 
@@ -37,9 +39,26 @@ def send_email():
     message['Subject'] = 'Experiment results for protocol %s' % protocol_name
     message['From'] = me
     message['To'] = ', '.join(users)
-    message_body = 'Results for protocol %s are attached.' % protocol_name
+    message_body = 'Results for protocol %s are attached.\n' % protocol_name
+    message_body += 'The configuration(s) for this experiment are:\n\n'
+
+    # write all the configuration to mail
+    for conf in configurations:
+        vals = conf.split('@')
+        values_str = ''
+
+        for val in vals:
+            values_str += '%s ' % val
+        message_body += '%s\n' % values_str
+    # write all regions to mail
+    message_body += 'The region(s) the experiment executed are:\n\n'
+    for region in regions:
+        message_body += '%s\n' % region
+
+    message_body += '\nBIU Cyber Experiments'
     message.attach(MIMEText(message_body))
 
+    # attach to mail all the reports file
     results_files = glob.glob('ExperimentReport/Results_%s_%s_*.xlsx' % (protocol_name, protocol_time))
     for file in results_files:
         with open(file, 'rb') as fli:
@@ -78,7 +97,7 @@ def analyze_results(files_list, analysis_type):
 
     parties = set()
     for file in files_list:
-        parties.add(int(file.split('_')[4].split('.')[0].split('=')[1]))
+        parties.add(int(basename(file.split('_')[3].split('.')[0].split('=')[1])))
 
     parties = list(parties)
     parties.sort()
@@ -104,7 +123,7 @@ def analyze_results(files_list, analysis_type):
     wb = xlsxwriter.Workbook(results_file_name)
     style1 = wb.add_format({'num_format': '#.##'})
 
-    ws = wb.add_worksheet(protocol_name)
+    ws = wb.add_worksheet(protocol_name[:30])  # Excel sheet name must be <= 31 chars
     ws.write(0, 0, 'Phase/Number of Parties')
 
     files_list.sort()
@@ -126,6 +145,7 @@ def analyze_results(files_list, analysis_type):
         for key in tasks_names.keys():
             if len(tasks_names) > 0:
                 ws.write(counter + 1, 0, key, style1)
+
                 ws.write(counter + 1, party_idx + 1,
                          sum(tasks_names[key]) / len(tasks_names[key]), style1)
                 counter += 1

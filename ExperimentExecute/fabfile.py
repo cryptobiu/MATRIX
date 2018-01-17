@@ -79,6 +79,7 @@ def run_protocol(config_file, args):
         executable_name = data['executableName']
         working_directory = data['workingDirectory']
         external_protocol = data['external']
+        regions = list(data['regions'].values())
         vals = args.split('@')
         values_str = ''
 
@@ -86,16 +87,23 @@ def run_protocol(config_file, args):
             values_str += '%s ' % val
 
         with cd(working_directory):
-            put('parties.conf', run('pwd'))
+            party_id = env.hosts.index(env.host)
+            if len(regions) > 1:
+                put('parties%s.conf' % party_id, run('pwd'))
+                run('mv parties%s.conf parties.conf' % party_id)
+            else:
+                put('parties.conf', run('pwd'))
             if external_protocol == 'True':
                 put('ExternalProtocols/%s' % executable_name, run('pwd'))
                 sudo('chmod +x %s' % executable_name)
+                programs = list(data['programNames'])
+                for program in programs:
+                    sudo('killall -9 %s; exit 0' % program)
 
-            sudo('killall -9 %s; exit 0' % executable_name)
-            sudo('killall -9 Player-Online.x; exit 0')
-            sudo('killall -9 Server.x; exit 0')
+            else:
+                sudo('killall -9 %s; exit 0' % executable_name)
+
             sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
-            party_id = env.hosts.index(env.host)
 
             if protocol_name == 'GMW':
                 values_str = values_str.replace('AesInputs0.txt', 'AesInputs%s.txt' % str(party_id))

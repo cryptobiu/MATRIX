@@ -4,6 +4,8 @@ import boto3
 import botocore
 import json
 import time
+import copy
+from random import shuffle
 from datetime import datetime
 from collections import OrderedDict
 from botocore import exceptions
@@ -89,14 +91,14 @@ def deploy_instances():
     for idx in range(len(regions)):
         client = boto3.client('ec2', region_name=regions[idx][:-1])
 
-        print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
-              'valid until : %s' % (regions[idx], number_of_instances, amis_id[idx], machine_type, str(new_date)))
-
         number_of_instances_to_deploy = check_running_instances(regions[idx][:-1])
         if idx < number_duplicated_servers:
             number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
         else:
             number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
+
+        print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
+              'valid until : %s' % (regions[idx], number_of_instances_to_deploy, amis_id[idx], machine_type, str(new_date)))
 
         if number_of_instances_to_deploy > 0:
             # check if price isn't too low
@@ -124,10 +126,92 @@ def deploy_instances():
             except botocore.exceptions.ClientError as e:
                 print(e.response['Error']['Message'].upper())
 
+    print('Waiting for the images to be deployed..')
     time.sleep(240)
     get_network_details()
 
     print('Finished to deploy machines')
+
+
+def create_parties_files_multi_regions():
+    with open('parties.conf', 'r') as origin_file:
+        parties = origin_file.readlines()
+
+    number_of_parties = len(parties) // 2
+
+    for idx in range(number_of_parties):
+        new_parties = copy.deepcopy(parties)
+        new_parties[idx] = 'party_%s_ip=0.0.0.0\n' % idx
+
+        # write data to file
+        with open('parties%s.conf' % idx, 'w+') as new_file:
+            new_file.writelines(new_parties)
+
+
+def get_aws_network_details():
+    with open(config_file_path) as data_file:
+        data = json.load(data_file)
+        regions = list(data['regions'].values())
+
+    instances_ids = []
+    public_ip_address = []
+
+    if len(regions) == 1:
+        private_ip_address = []
+
+    # get the spot instances ids
+    for idx in range(len(regions)):
+        client = boto3.client('ec2', region_name=regions[idx][:-1])
+        response = client.describe_spot_instance_requests()
+
+        for req_idx in range(len(response['SpotInstanceRequests'])):
+            if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
+                            response['SpotInstanceRequests'][req_idx]['State'] == 'open':
+                instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
+
+        # save instance_ids for experiment termination
+        with open('instances_ids', 'a+') as ids_file:
+            for instance_idx in range(len(instances_ids)):
+                ids_file.write('%s\n' % instances_ids[instance_idx])
+
+            ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
+            instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
+
+            for inst in instances:
+                if inst.id in instances_ids:
+                    public_ip_address.append(inst.public_ip_address)
+                    if len(regions) == 1:
+                        private_ip_address.append(inst.private_ip_address)
+
+    # rearrange the list that the ips from the same regions will not be followed
+    shuffle(public_ip_address)
+
+    print('Parties network configuration')
+    with open('parties.conf', 'w+') as private_ip_file:
+        if len(regions) > 1:
+            for public_idx in range(len(public_ip_address)):
+                print('party_%s_ip=%s' % (public_idx, public_ip_address[public_idx]))
+                private_ip_file.write('party_%s_ip=%s\n' % (public_idx, public_ip_address[public_idx]))
+        else:
+            for private_idx in range(len(private_ip_address)):
+                print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
+                private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
+
+        port_number = 8000
+
+        for port_idx in range(len(public_ip_address)):
+            print('party_%s_port=%s' % (port_idx, port_number))
+            private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_number))
+
+    # write public ips to file for fabric
+    if 'local' in regions or 'server' not in regions:
+        with open('public_ips', 'w+') as public_ip_file:
+            for public_idx in range(len(public_ip_address)):
+                public_ip_file.write('%s\n' % public_ip_address[public_idx])
+
+    # create party file for each instance
+    if len(regions) > 1:
+        create_parties_files_multi_regions()
 
 
 def get_network_details():
@@ -135,12 +219,7 @@ def get_network_details():
         data = json.load(data_file)
         regions = list(data['regions'].values())
 
-    instances_ids = []
-    public_ip_address = [[] for i in range(len(regions))]
-    public_ip_address_fixed =[]
-
-    if len(regions) == 1:
-        private_ip_address = []
+    public_ip_address = []
 
     number_of_parties = max(list(data['numOfParties'].values()))
     if 'local' in regions:
@@ -171,58 +250,8 @@ def get_network_details():
                 port_counter = 8000
                 for ip_idx in range(len(server_ips)):
                     private_ip_file.write('party_%s_port=%s\n' % (ip_idx, port_counter))
-
     else:
-        for idx in range(len(regions)):
-            client = boto3.client('ec2', region_name=regions[idx][:-1])
-            response = client.describe_spot_instance_requests()
-
-            for req_idx in range(len(response['SpotInstanceRequests'])):
-                if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
-                                response['SpotInstanceRequests'][req_idx]['State'] == 'open':
-                    instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
-
-            # save instance_ids for experiment termination
-            with open('instances_ids', 'a+') as ids_file:
-                for instance_idx in range(len(instances_ids)):
-                    ids_file.write('%s\n' % instances_ids[instance_idx])
-
-                ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
-                instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
-
-                for inst in instances:
-                    if inst.id in instances_ids:
-                        public_ip_address[idx].append(inst.public_ip_address)
-                        if len(regions) == 1:
-                            private_ip_address.append(inst.private_ip_address)
-
-        # rearrange the list that the ips from the same regions will not be followed
-        for idx1 in range(len(public_ip_address)):
-            for idx2 in range(public_ip_address[idx1]):
-                public_ip_address_fixed.append(public_ip_address[idx2][idx1])
-
-        print('Parties network configuration')
-        with open('parties.conf', 'w+') as private_ip_file:
-            if len(regions) > 1:
-                for public_idx in range(len(public_ip_address_fixed)):
-                    print('party_%s_ip=%s' % (public_idx, public_ip_address[public_idx]))
-                    public_ip_address_fixed.write('party_%s_ip=%s\n' % (public_idx, public_ip_address[public_idx]))
-            else:
-                for private_idx in range(len(private_ip_address)):
-                    print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
-                    private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
-
-            port_number = 8000
-
-            for port_idx in range(len(public_ip_address)):
-                print('party_%s_port=%s' % (port_idx, port_number))
-                private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_number))
-
-    # write public ips to file for fabric
-    if 'local' in regions or 'server' not in regions:
-        with open('public_ips', 'w+') as public_ip_file:
-            for public_idx in range(len(public_ip_address)):
-                public_ip_file.write('%s\n' % public_ip_address[public_idx])
+        get_aws_network_details()
 
 
 def check_running_instances(region):
