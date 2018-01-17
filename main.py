@@ -67,7 +67,7 @@ def main():
         if selection == '1':
             deploy_selection = print_instances_management_menu()
             if deploy_selection == '5':
-                os.system('python3 ExperimentExecute/terminate_machines.py %s' % conf_file_path)
+                os.system('python3 ImagesManagement/terminate_machines.py %s' % conf_file_path)
             else:
                 os.system('python3 ImagesManagement/deploy_machines.py %s %s' % (conf_file_path, deploy_selection))
         elif selection == '2':
