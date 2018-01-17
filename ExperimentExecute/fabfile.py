@@ -129,4 +129,5 @@ def collect_results(results_server_directory, results_local_directory):
 @task
 def delete_json_files(working_directory):
     with cd(working_directory):
-        sudo('rm *.json')
+        if exists('/*.json'):
+            sudo('rm *.json')
