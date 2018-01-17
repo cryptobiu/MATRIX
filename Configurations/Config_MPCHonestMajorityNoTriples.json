@@ -3,7 +3,7 @@
   {
     "region_0": "ami-f0520a8a",
     "region_1": "ami-21c05c4e",
-    "region_3": "ami-a5d780ca"
+    "region_2": "ami-a5d780ca"
   },
   "protocol":"MPCHonestMajorityNoTriples",
   "numOfParties":
@@ -37,7 +37,7 @@
   {
     "region_0":"us-east-1b",
     "region_1":"eu-central-1b",
-    "region_3":"ap-south-1b"
+    "region_2":"ap-south-1b"
   },
   "workingDirectory": "~/MPCHonestMajorityNoTriples",
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
