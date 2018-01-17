@@ -51,7 +51,7 @@ If using custom AWS AMI, the AMI need to be installed in all the regions that we
 * coordinatorExecutable - The name of the coordinator executable
 * institute - Research Group identifier
 
-### ImagesManagement
+### InstancesManagement
 
 After config file was created, You will need to deploy your images(instances). MATRIX supports three different deployments:
 1. Local deployment
