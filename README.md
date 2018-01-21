@@ -98,6 +98,12 @@ MATRIX uses libscapi logger [API](https://github.com/cryptobiu/libscapi/blob/dev
 The logging is done at the protocol code. The logger generate suitable json files for the report module.  
 If you don't want to use libscapi logger API, make sure your files are at this name and format:   
 `protocolName_analyzedParameter_partyId=id_numOfParties=#parties.json`  
+The values for analyzedParameter can be:
+1. cpu
+2. commSent
+3. commReceived
+4. memory
+
 Example file can be found [here](../master/Assets/MPCHonestMajorityNoTriples_cpu_partyId=0_numOfParties=3.json)
 
 
