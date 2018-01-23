@@ -4,13 +4,15 @@ import glob
 import json
 import time
 import smtplib
-from os.path import expanduser
-import xlsxwriter.styles
+from os.path import expanduser, exists
 from os.path import basename
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from collections import OrderedDict
+from openpyxl import Workbook
+from openpyxl import load_workbook
+from openpyxl.styles import NamedStyle
 
 
 config_file_path = sys.argv[1]
@@ -18,18 +20,22 @@ task_idx = sys.argv[2]
 
 results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
 
-protocol_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-
 with open(config_file_path) as conf_file:
     conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
     remote_directory = conf_data['workingDirectory']
 
 
+protocol_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+protocol_name = conf_data['protocol']
+
+results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, protocol_time)
+style1 = NamedStyle(number_format='#.##')
+# style1 = wb.add_format({'num_format': '#.##'})
+
+
 def send_email():
 
     users = list(conf_data['emails'].values())
-
-    protocol_name = conf_data['protocol']
     configurations = list(conf_data['configurations'].values())
     regions = list(conf_data['regions'].values())
     address_me = 'biu.cyber.experiments@gmail.com'
@@ -73,8 +79,7 @@ def send_email():
     server.quit()
 
 
-def upload_to_git(results_file_name):
-    protocol_name = conf_data['protocol']
+def upload_to_git():
     working_dir = '%s/ExperimentsResults/%s' % (expanduser('~'), protocol_name)
     # create working directory for the protocol if not exist
 
@@ -116,21 +121,23 @@ def analyze_results(files_list, analysis_type):
     for i in range(len(data)):
         tasks_names[data[i]['name']] = list()
 
-    protocol_name = conf_data['protocol']
     num_of_repetitions = conf_data['numOfInternalRepetitions']
 
-    results_file_name = 'ExperimentReport/Results_%s_%s_%s.xlsx' % (protocol_name, protocol_time, analysis_type)
-    wb = xlsxwriter.Workbook(results_file_name)
-    style1 = wb.add_format({'num_format': '#.##'})
+    if not exists(results_file_name):
+        wb = Workbook(write_only=False)
+        ws = wb.active
+        wb.remove(ws)
+    else:
+        wb = load_workbook(results_file_name)
 
-    ws = wb.add_worksheet(protocol_name[:30])  # Excel sheet name must be <= 31 chars
-    ws.write(0, 0, 'Phase/Number of Parties')
+    ws = wb.create_sheet(analysis_type)
+    ws.cell(row=1, column=1, value='Phase/Number of Parties')
 
     files_list.sort()
 
     # counter = 0
     for party_idx in range(len(parties)):
-        ws.write(0, party_idx + 1, parties[party_idx])
+        ws.cell(row=1, column=party_idx + 2, value=parties[party_idx])
 
         for data_file in files_list:
             if 'numOfParties=%s.json' % str(parties[party_idx]) in data_file:
@@ -141,22 +148,20 @@ def analyze_results(files_list, analysis_type):
                             tasks_names[json_data[json_size_idx]['name']].append(
                                 json_data[json_size_idx]['iteration_%s' % str(rep_idx)])
         # write data to excel
-        counter = 0
+        counter = 1
         for key in tasks_names.keys():
             if len(tasks_names) > 0:
-                ws.write(counter + 1, 0, key, style1)
-
-                ws.write(counter + 1, party_idx + 1,
-                         sum(tasks_names[key]) / len(tasks_names[key]), style1)
+                ws.cell(row=counter + 1, column=1, value=key)
+                ws.cell(row=counter + 1, column=party_idx + 2, value=sum(tasks_names[key]) / len(tasks_names[key]))
                 counter += 1
 
         # delete all the data from the lists after finish iterate al over party data
         for val in tasks_names.values():
             val.clear()
 
-    wb.close()
+    wb.save(results_file_name)
 
-    # send_email(results_file_name)
+    send_email()
 
     # upload_to_git(results_file_name)
 
@@ -186,13 +191,15 @@ def analyze_all():
     analyze_comm_sent()
     analyze_comm_received()
     analyze_memory()
-    send_email()
+    # send_email()
     # upload_to_git()
 
 
 if task_idx == '1':
     os.system('fab -f ExperimentExecute/fabfile.py collect_results:%s,%s --parallel --no-pty'
               % (remote_directory, results_path))
+    # wait for all clients to download data
+    time.sleep(10)
     analyze_all()
 elif task_idx == '2':
     analyze_all()
