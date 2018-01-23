@@ -30,7 +30,6 @@ protocol_name = conf_data['protocol']
 
 results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, protocol_time)
 style1 = NamedStyle(number_format='#.##')
-# style1 = wb.add_format({'num_format': '#.##'})
 
 
 def send_email():
@@ -65,12 +64,10 @@ def send_email():
     message.attach(MIMEText(message_body))
 
     # attach to mail all the reports file
-    results_files = glob.glob('ExperimentReport/Results_%s_%s_*.xlsx' % (protocol_name, protocol_time))
-    for file in results_files:
-        with open(file, 'rb') as fli:
-            part = MIMEApplication(fli.read(), Name=basename(file))
-            part['Content-Disposition'] = 'attachment; filename="%s"' % basename(file)
-            message.attach(part)
+    with open(results_file_name, 'rb') as fli:
+        part = MIMEApplication(fli.read(), Name=basename(results_file_name))
+        part['Content-Disposition'] = 'attachment; filename="%s"' % basename(results_file_name)
+        message.attach(part)
 
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.starttls()
@@ -161,7 +158,7 @@ def analyze_results(files_list, analysis_type):
 
     wb.save(results_file_name)
 
-    send_email()
+    # send_email()
 
     # upload_to_git(results_file_name)
 
