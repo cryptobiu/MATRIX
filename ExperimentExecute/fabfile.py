@@ -6,7 +6,7 @@ from fabric.api import *
 from fabric.contrib.files import exists
 from os.path import expanduser
 
-env.hosts = open('public_ips', 'r').read().splitlines()
+env.hosts = open('InstancesDetails/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
 env.key_filename = [expanduser('~/Keys/matrix.pem')]
@@ -90,9 +90,9 @@ def run_protocol(config_file, args):
             party_id = env.hosts.index(env.host)
             if len(regions) > 1:
                 put('parties%s.conf' % party_id, run('pwd'))
-                run('mv parties%s.conf parties.conf' % party_id)
+                run('mv InstancesDetails/parties%s.conf parties.conf' % party_id)
             else:
-                put('parties.conf', run('pwd'))
+                put('InstancesDetails/parties.conf', run('pwd'))
             if external_protocol == 'True':
                 put('ExternalProtocols/%s' % executable_name, run('pwd'))
                 sudo('chmod +x %s' % executable_name)
@@ -137,5 +137,5 @@ def collect_results(results_server_directory, results_local_directory):
 @task
 def delete_json_files(working_directory):
     with cd(working_directory):
-        if exists('/*.json'):
-            sudo('rm *.json')
+        if exists('%s/*.json' % working_directory):
+            sudo('rm %s/*.json' % working_directory)

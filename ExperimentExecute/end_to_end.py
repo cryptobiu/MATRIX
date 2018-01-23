@@ -14,28 +14,27 @@ config_file_path = sys.argv[1]
 task_idx = sys.argv[2]
 
 
-def pre_process(working_directory, pre_process_task):
+def pre_process():
     print('Performing pre process operations')
     os.system('fab -f ExperimentExecute/fabfile.py pre_process:%s,%s --parallel --no-pty'
               % (working_directory, pre_process_task))
 
 
-def install_experiment(experiment_name, git_branch, working_directory,
-                       git_address, external_protocol=False, install_script=''):
+def install_experiment(experiment_name):
     print('Installing experiment %s...' % experiment_name)
     os.system('fab -f ExperimentExecute/fabfile.py install_git_project:%s,%s,%s,%s,%s,%s --parallel --no-pty'
               % (experiment_name, git_branch, working_directory, git_address, external_protocol, install_script))
 
 
-def update_experiment(experiment_name, working_directory):
+def update_experiment(experiment_name):
     print('Updating experiment %s...' % experiment_name)
     os.system('fab -f ExperimentExecute/fabfile.py update_git_project:%s --parallel --no-pty' % working_directory)
 
 
-def execute_experiment(repetitions, experiment_name, configurations, working_directory):
+def execute_experiment(repetitions, experiment_name):
 
     # before executing experiment delete all the existing log files
-    os.system('fab -f ExperimentExecute/fabfile.py delete_json_files:%s' % working_directory)
+    os.system('fab -f ExperimentExecute/fabfile.py delete_json_files:%s --parallel --no-pty' % working_directory)
 
     for i in range(repetitions):
         print('Executing experiment %s...' % experiment_name)
@@ -74,16 +73,16 @@ with open(config_file_path) as data_file:
         install_script = data['installScript']
 
 if task_idx == '0':
-    pre_process(working_directory, pre_process_task)
+    pre_process()
 
 elif task_idx == '1':
-    install_experiment(protocol_name, git_branch, working_directory, git_address, external_protocol, install_script)
+    install_experiment(protocol_name)
 
 elif task_idx == '2':
-    update_experiment(protocol_name, working_directory)
+    update_experiment(protocol_name)
 
 elif task_idx == '3':
-    execute_experiment(number_of_repetitions, protocol_name, configurations, working_directory)
+    execute_experiment(number_of_repetitions, protocol_name)
 
 elif task_idx == '4':
     update_libscapi()
