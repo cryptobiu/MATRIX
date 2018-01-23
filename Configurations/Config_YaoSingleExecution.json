@@ -2,7 +2,7 @@
   "execRequestTime": "7.9.17 12:20",
   "amis":
   {
-    "region_0": "ami-f0520a8a"
+    "region_0": "ami-a16254db"
   },
   "protocol":"Yao",
   "numOfParties":
