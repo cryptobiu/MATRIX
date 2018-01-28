@@ -16,6 +16,6 @@ for idx in range(len(regions)):
     instances_ids = [x.strip() for x in instances_ids]
     client = boto3.client('ec2', region_name=regions[idx][:-1])
     response = client.terminate_instances(InstanceIds=instances_ids)
-    os.remove('InstancesDetails/instances_ids_%s')
+    os.remove('InstancesConfigurations/instances_ids_%s')
 
-os.remove('InstancesDetails/public_ips*')
+os.remove('InstancesConfigurations/public_ips*')

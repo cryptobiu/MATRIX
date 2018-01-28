@@ -134,7 +134,7 @@ def deploy_instances():
 
 
 def create_parties_files_multi_regions():
-    with open('InstancesDetails/parties.conf', 'r') as origin_file:
+    with open('InstancesConfigurations/parties.conf', 'r') as origin_file:
         parties = origin_file.readlines()
 
     number_of_parties = len(parties) // 2
@@ -144,7 +144,7 @@ def create_parties_files_multi_regions():
         new_parties[idx] = 'party_%s_ip=0.0.0.0\n' % idx
 
         # write data to file
-        with open('InstancesDetails/parties%s.conf' % idx, 'w+') as new_file:
+        with open('InstancesConfigurations/parties%s.conf' % idx, 'w+') as new_file:
             new_file.writelines(new_parties)
 
 
@@ -186,7 +186,7 @@ def get_aws_network_details():
     shuffle(public_ip_address)
 
     print('Parties network configuration')
-    with open('InstancesDetails/parties.conf', 'w+') as private_ip_file:
+    with open('InstancesConfigurations/parties.conf', 'w+') as private_ip_file:
         if len(regions) > 1:
             for public_idx in range(len(public_ip_address)):
                 print('party_%s_ip=%s' % (public_idx, public_ip_address[public_idx]))
@@ -204,7 +204,7 @@ def get_aws_network_details():
 
     # write public ips to file for fabric
     if 'local' in regions or 'server' not in regions:
-        with open('InstancesDetails/public_ips', 'w+') as public_ip_file:
+        with open('InstancesConfigurations/public_ips', 'w+') as public_ip_file:
             for public_idx in range(len(public_ip_address)):
                 public_ip_file.write('%s\n' % public_ip_address[public_idx])
 
@@ -222,7 +222,7 @@ def get_network_details():
 
     number_of_parties = max(list(data['numOfParties'].values()))
     if 'local' in regions:
-        with open('InstancesDetails/parties.conf', 'w+') as private_ip_file:
+        with open('InstancesConfigurations/parties.conf', 'w+') as private_ip_file:
             for ip_idx in range(len(number_of_parties)):
                 private_ip_file.write('party_%s_ip=127.0.0.1\n' % ip_idx)
                 public_ip_address.append('127.0.0.1')
@@ -234,14 +234,14 @@ def get_network_details():
 
     elif 'servers' in regions:
         server_file = input('Enter your server file configuration: ')
-        os.system('mv %s InstancesDetails/public_ips' % server_file)
+        os.system('mv %s InstancesConfigurations/public_ips' % server_file)
 
         server_ips = []
-        with open('InstancesDetails/public_ips', 'r+') as server_ips_file:
+        with open('InstancesConfigurations/public_ips', 'r+') as server_ips_file:
             for line in server_ips_file:
                 server_ips.append(line)
 
-            with open('InstancesDetails/parties.conf', 'w+') as private_ip_file:
+            with open('InstancesConfigurations/parties.conf', 'w+') as private_ip_file:
                 for ip_idx in range(len(server_ips)):
                     print('party_%s_ip=%s' % (ip_idx, server_ips[ip_idx]))
                     private_ip_file.write('party_%s_ip=127.0.0.1' % ip_idx)

@@ -6,7 +6,7 @@ from fabric.api import *
 from fabric.contrib.files import exists
 from os.path import expanduser
 
-env.hosts = open('InstancesDetails/public_ips', 'r').read().splitlines()
+env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
 env.key_filename = [expanduser('~/Keys/matrix.pem')]
@@ -90,9 +90,9 @@ def run_protocol(config_file, args):
             party_id = env.hosts.index(env.host)
             if len(regions) > 1:
                 put('parties%s.conf' % party_id, run('pwd'))
-                run('mv InstancesDetails/parties%s.conf parties.conf' % party_id)
+                run('mv InstancesConfigurations/parties%s.conf parties.conf' % party_id)
             else:
-                put('InstancesDetails/parties.conf', run('pwd'))
+                put('InstancesConfigurations/parties.conf', run('pwd'))
             if external_protocol == 'True':
                 put('ExternalProtocols/%s' % executable_name, run('pwd'))
                 sudo('chmod +x %s' % executable_name)
