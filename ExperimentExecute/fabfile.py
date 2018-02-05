@@ -21,7 +21,7 @@ def pre_process(working_directory, task_idx):
 
 
 @task
-def install_git_project(experiment_name, git_branch, working_directory, git_address, external, install_script):
+def install_git_project(git_branch, working_directory, git_address, external, install_script):
 
     if external == 'True':
         put('ExternalProtocols/%s' % install_script, run('pwd'))
@@ -31,15 +31,6 @@ def install_git_project(experiment_name, git_branch, working_directory, git_addr
     else:
         if not exists('%s' % working_directory):
             run('git clone %s' % git_address)
-
-        if experiment_name == 'LowCostConstantRoundMPC':
-            put(expanduser('~/Desktop/libOTe.tar.gz'))
-            run('tar -xf libOTe.tar.gz')
-            with cd('libOTe'):
-
-                run('rm -rf CMakeFiles CMakeCache.txt Makefile')
-                run('cmake .')
-                run('make')
 
         with cd('%s' % working_directory):
             run('git checkout %s ' % git_branch)
@@ -89,8 +80,8 @@ def run_protocol(config_file, args):
         with cd(working_directory):
             party_id = env.hosts.index(env.host)
             if len(regions) > 1:
-                put('parties%s.conf' % party_id, run('pwd'))
-                run('mv InstancesConfigurations/parties%s.conf parties.conf' % party_id)
+                put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
+                run('mv parties%s.conf parties.conf' % party_id)
             else:
                 put('InstancesConfigurations/parties.conf', run('pwd'))
             if external_protocol == 'True':
@@ -136,6 +127,5 @@ def collect_results(results_server_directory, results_local_directory):
 
 @task
 def delete_json_files(working_directory):
-    with cd(working_directory):
-        if exists('%s/*.json' % working_directory):
-            sudo('rm %s/*.json' % working_directory)
+    with warn_only():
+        sudo('rm %s/*.json' % working_directory)
