@@ -91,14 +91,15 @@ def deploy_instances():
     for idx in range(len(regions)):
         client = boto3.client('ec2', region_name=regions[idx][:-1])
 
-        number_of_instances_to_deploy = check_running_instances(regions[idx][:-1])
+        number_of_instances_to_deploy = check_running_instances(regions[idx][:-1], machine_type)
         if idx < number_duplicated_servers:
             number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
         else:
             number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
 
         print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
-              'valid until : %s' % (regions[idx], number_of_instances_to_deploy, amis_id[idx], machine_type, str(new_date)))
+              'valid until : %s' % (regions[idx], number_of_instances_to_deploy,
+                                    amis_id[idx], machine_type, str(new_date)))
 
         if number_of_instances_to_deploy > 0:
             # check if price isn't too low
@@ -170,7 +171,7 @@ def get_aws_network_details():
                 instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
 
         # save instance_ids for experiment termination
-        with open('instances_ids_%s' % regions[idx][:-1], 'a+') as ids_file:
+        with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'a+') as ids_file:
             for instance_idx in range(len(instances_ids)):
                 ids_file.write('%s\n' % instances_ids[instance_idx])
             ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
@@ -183,7 +184,8 @@ def get_aws_network_details():
                         private_ip_address.append(inst.private_ip_address)
 
     # rearrange the list that the ips from the same regions will not be followed
-    shuffle(public_ip_address)
+    if len(regions) > 1:
+        shuffle(public_ip_address)
 
     print('Parties network configuration')
     with open('InstancesConfigurations/parties.conf', 'w+') as private_ip_file:
@@ -253,7 +255,7 @@ def get_network_details():
         get_aws_network_details()
 
 
-def check_running_instances(region):
+def check_running_instances(region, machine_type):
 
     instances_ids = list()
     instances_count = 0
@@ -262,8 +264,9 @@ def check_running_instances(region):
     response = client.describe_spot_instance_requests()
 
     for req_idx in range(len(response['SpotInstanceRequests'])):
-        if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
-                        response['SpotInstanceRequests'][req_idx]['State'] == 'open':
+        if (response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
+                        response['SpotInstanceRequests'][req_idx]['State'] == 'open')\
+                and response['SpotInstanceRequests'][req_idx]['LaunchSpecification']['InstanceType'] == machine_type:
             instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
 
     ec2 = boto3.resource('ec2', region_name=region)
