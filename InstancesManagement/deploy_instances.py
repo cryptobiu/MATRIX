@@ -76,6 +76,7 @@ def deploy_instances():
         amis_id = list(data['amis'].values())
         regions = list(data['regions'].values())
         number_duplicated_servers = 0
+        spot_request = data['isSpotRequest']
 
     if len(regions) > 1:
         number_of_instances = max(number_of_parties) // len(regions)
@@ -102,30 +103,44 @@ def deploy_instances():
                                     amis_id[idx], machine_type, str(new_date)))
 
         if number_of_instances_to_deploy > 0:
-            # check if price isn't too low
-            winning_bid_price = check_latest_price(machine_type, regions[idx])
-            if float(price_bids) < float(winning_bid_price):
-                price_bids = str(winning_bid_price)
-            try:
-                client.request_spot_instances(
-                        DryRun=False,
-                        SpotPrice=price_bids,
-                        InstanceCount=number_of_instances_to_deploy,
-                        ValidUntil=new_date,
-                        LaunchSpecification=
-                        {
-                            'ImageId': amis_id[idx],
-                            'KeyName': 'Matrix%s' % regions[idx].replace('-', '')[:-1],
-                            'SecurityGroups': ['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
-                            'InstanceType': machine_type,
-                            'Placement':
-                                {
-                                    'AvailabilityZone': regions[idx],
-                                },
-                        }
+            if spot_request == 'True':
+                # check if price isn't too low
+                winning_bid_price = check_latest_price(machine_type, regions[idx])
+                if float(price_bids) < float(winning_bid_price):
+                    price_bids = str(winning_bid_price)
+                try:
+                    client.request_spot_instances(
+                            DryRun=False,
+                            SpotPrice=price_bids,
+                            InstanceCount=number_of_instances_to_deploy,
+                            ValidUntil=new_date,
+                            LaunchSpecification=
+                            {
+                                'ImageId': amis_id[idx],
+                                'KeyName': 'Matrix%s' % regions[idx].replace('-', '')[:-1],
+                                'SecurityGroups': ['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
+                                'InstanceType': machine_type,
+                                'Placement':
+                                    {
+                                        'AvailabilityZone': regions[idx],
+                                    },
+                            }
+                    )
+                except botocore.exceptions.ClientError as e:
+                    print(e.response['Error']['Message'].upper())
+            else:
+                client.run_instances(
+                    ImageId=amis_id[idx],
+                    KeyName='Matrix%s' % regions[idx].replace('-', '')[:-1],
+                    MinCount=int(number_of_instances_to_deploy),
+                    MaxCount=int(number_of_instances_to_deploy),
+                    SecurityGroups=['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
+                    InstanceType=machine_type,
+                    Placement=
+                    {
+                        'AvailabilityZone': regions[idx],
+                    }
                 )
-            except botocore.exceptions.ClientError as e:
-                print(e.response['Error']['Message'].upper())
 
     print('Waiting for the images to be deployed..')
     time.sleep(240)
