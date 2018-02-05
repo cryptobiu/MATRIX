@@ -15,29 +15,25 @@ task_idx = sys.argv[2]
 
 
 def pre_process():
-    print('Performing pre process operations')
     os.system('fab -f ExperimentExecute/fabfile.py pre_process:%s,%s --parallel --no-pty'
               % (working_directory, pre_process_task))
 
 
-def install_experiment(experiment_name):
-    print('Installing experiment %s...' % experiment_name)
-    os.system('fab -f ExperimentExecute/fabfile.py install_git_project:%s,%s,%s,%s,%s,%s --parallel --no-pty'
-              % (experiment_name, git_branch, working_directory, git_address, external_protocol, install_script))
+def install_experiment():
+    os.system('fab -f ExperimentExecute/fabfile.py install_git_project:%s,%s,%s,%s,%s --parallel --no-pty'
+              % (git_branch, working_directory, git_address, external_protocol, install_script))
 
 
-def update_experiment(experiment_name):
-    print('Updating experiment %s...' % experiment_name)
+def update_experiment():
     os.system('fab -f ExperimentExecute/fabfile.py update_git_project:%s --parallel --no-pty' % working_directory)
 
 
-def execute_experiment(repetitions, experiment_name):
+def execute_experiment(repetitions):
 
     # before executing experiment delete all the existing log files
     os.system('fab -f ExperimentExecute/fabfile.py delete_json_files:%s --parallel --no-pty' % working_directory)
 
     for i in range(repetitions):
-        print('Executing experiment %s...' % experiment_name)
         for idx in range(len(configurations)):
             os.system('fab -f ExperimentExecute/fabfile.py run_protocol:%s,%s --parallel --no-pty'
                       % (config_file_path, configurations[idx]))
@@ -76,13 +72,13 @@ if task_idx == '0':
     pre_process()
 
 elif task_idx == '1':
-    install_experiment(protocol_name)
+    install_experiment()
 
 elif task_idx == '2':
-    update_experiment(protocol_name)
+    update_experiment()
 
 elif task_idx == '3':
-    execute_experiment(number_of_repetitions, protocol_name)
+    execute_experiment(number_of_repetitions)
 
 elif task_idx == '4':
     update_libscapi()
