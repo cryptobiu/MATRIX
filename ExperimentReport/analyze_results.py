@@ -188,7 +188,9 @@ def analyze_all():
     analyze_comm_sent()
     analyze_comm_received()
     analyze_memory()
-    # send_email()
+    to_send = input('Do you want to send the results to email? (y/n):')
+    if to_send == 'y':
+        send_email()
     # upload_to_git()
 
 
