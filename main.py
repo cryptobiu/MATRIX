@@ -46,8 +46,9 @@ def print_execution_menu():
 
 def print_analysis_menu():
     color_print('Choose analysis task to be executed:', 'green')
-    color_print('1. Collect & Analyze Results', 'green')
-    color_print('2. Analyze Results', 'green')
+    color_print('1. Download & Analyze Results', 'green')
+    color_print('2. Download Results', 'green')
+    color_print('3. Analyze Results', 'green')
     selection = input('Your choice:')
     return selection
 

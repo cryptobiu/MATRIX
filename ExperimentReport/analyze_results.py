@@ -32,6 +32,13 @@ results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, prot
 style1 = NamedStyle(number_format='#.##')
 
 
+def download_data():
+    os.system('fab -f ExperimentExecute/fabfile.py collect_results:%s,%s --parallel --no-pty'
+              % (remote_directory, results_path))
+    # wait for all clients to download data
+    time.sleep(10)
+
+
 def send_email():
 
     users = list(conf_data['emails'].values())
@@ -195,10 +202,9 @@ def analyze_all():
 
 
 if task_idx == '1':
-    os.system('fab -f ExperimentExecute/fabfile.py collect_results:%s,%s --parallel --no-pty'
-              % (remote_directory, results_path))
-    # wait for all clients to download data
-    time.sleep(10)
+    download_data()
     analyze_all()
 elif task_idx == '2':
+    download_data()
+elif task_idx == '3':
     analyze_all()
