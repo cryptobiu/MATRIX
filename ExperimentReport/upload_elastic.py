@@ -1,6 +1,7 @@
 import certifi
 import json
 import sys
+import os
 from os.path import basename
 from collections import OrderedDict
 from elasticsearch import Elasticsearch

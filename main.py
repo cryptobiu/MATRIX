@@ -81,7 +81,7 @@ def main():
         elif selection == '3':
             analysis_selection = print_analysis_menu()
             if analysis_selection == '4':
-                os.system('python3 ExperimentReport/upload_elastic.py.py %s %s' % (conf_file_path, analysis_selection))
+                os.system('python3 ExperimentReport/upload_elastic.py %s %s' % (conf_file_path, analysis_selection))
             else:
                 os.system('python3 ExperimentReport/analyze_results.py %s %s' % (conf_file_path, analysis_selection))
 
