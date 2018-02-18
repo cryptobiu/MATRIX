@@ -49,6 +49,7 @@ def print_analysis_menu():
     color_print('1. Download & Analyze Results', 'green')
     color_print('2. Download Results', 'green')
     color_print('3. Analyze Results', 'green')
+    color_print('4. Upload data to Elasticsearch', 'green')
     selection = input('Your choice:')
     return selection
 
@@ -79,7 +80,10 @@ def main():
                 print(ve)
         elif selection == '3':
             analysis_selection = print_analysis_menu()
-            os.system('python3 ExperimentReport/analyze_results.py %s %s' % (conf_file_path, analysis_selection))
+            if analysis_selection == '4':
+                os.system('python3 ExperimentReport/upload_elastic.py.py %s %s' % (conf_file_path, analysis_selection))
+            else:
+                os.system('python3 ExperimentReport/analyze_results.py %s %s' % (conf_file_path, analysis_selection))
 
         selection = print_main_menu()
 
