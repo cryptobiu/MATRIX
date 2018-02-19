@@ -43,9 +43,6 @@ def upload_data():
                     val += data[task_idx]['iteration_%s' % iteration_idx]
                 doc[data[task_idx]['name']] = val / float(number_of_iterations)
 
-        table_size = len(
-                es.search(index='%sresults' % analyzed_parameter, body={"query": {"match_all": {}}})['hits']['hits'])
-        es.index(index='%sresults' % analyzed_parameter, doc_type=analyzed_parameter, id=table_size, body=doc)
-
+        es.index(index='%sresults_new' % analyzed_parameter, doc_type=analyzed_parameter, body=doc)
 
 upload_data()
