@@ -21,7 +21,8 @@ More on AMI can be found [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGu
 Information on ES can be found [here](https://www.elastic.co/). We are also using the built in [Kibana](https://www.elastic.co/products/kibana)
 plugin to visualize our results.
 
-Basic architecture of MATRIX: ![alt text](../dev/Assets/BasicArchitecture.png)   
+Basic architecture of MATRIX:  
+![alt text](../dev/Assets/BasicArchitecture.png)   
 
 ## Installation
 MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [xlsxwriter](http://xlsxwriter.readthedocs.io/).  
