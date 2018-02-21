@@ -4,10 +4,27 @@ MATRIX is an MPC Test Automation Framework developed by [Bar Ilan University Cry
 It automates the tedious process of deploying, running, monitoring and summarizing results.
 It uses AWS [spot instances](https://aws.amazon.com/ec2/spot/), and can be used internally on a local host or in a container deployment.
 
+The system requires a management computer (Manager) - a computer that centralized all the execution.
+The Manager executes all the experiment phases, starting from install the experiment up to analyze it's results.
+The Manager is a stand alone workstation and it's not part of the the workstations that participate in the experiment.
+
+In order to use MATRIX an account at AWS is required. To create account at AWS: 
+1. Sing up for [AWS](https://portal.aws.amazon.com/billing/signup#/start).   
+2. Define your [credentials](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) at the Manager computer. 
+
+MATRIX uses two services of AWS:
+1. Spot instances - The execution of the protocols is done by deploy spot instances. All the instances have the same AMI(Amazon Machine Image).
+In most cases we are using a custom AMI that contains [libscapi](https://github.com/cryptobiu/libscapi). AMI are defined per region.
+If you are executing an experiment on two different regions(locations), you will need to copy the AMI to the requested regions.
+More on AMI can be found [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html).
+2. Elasticsearch service - The analysis done by Elasticsearch (ES). All the results are uploaded and stored at ES.
+Information on ES can be found [here](https://www.elastic.co/). We are also using the built in [Kibana](https://www.elastic.co/products/kibana)
+plugin to visualize our results.
+
+Basic architecture of MATRIX: ![alt text](../dev/Assets/BasicArchitecture.png)   
 
 ## Installation
-The system can be deploy on local machine, remote server or AWS machine.
-MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [xlsxwriter](http://xlsxwriter.readthedocs.io/).
+MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [xlsxwriter](http://xlsxwriter.readthedocs.io/).  
 Matrix tested on Ubuntu 16.04.3 LTS and CentOS 7.3.  
 To install python3 and pip under Ubuntu 16.04 :
 
