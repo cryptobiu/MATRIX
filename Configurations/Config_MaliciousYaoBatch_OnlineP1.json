@@ -1,17 +1,16 @@
 {
-  "execRequestTime": "7.9.17 12:20",
   "amis":
   {
-    "region_0": "ami-f0520a8a"
+    "region_0": "ami-94dc3de9"
   },
   "protocol":"MaliciousYaoBatch",
   "numOfParties":
   {
     "size_0":1
   },
+  "gitAddress": "https://github.com/cryptobiu/libscapi.git",
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
-  "network": "LAN",
   "executableName": "AppOnlineP1.out",
   "preProcessTask": "2",
   "configurations":
@@ -19,14 +18,20 @@
     "conf_0":"-circuitFile@/lib/assets/circuits/AES/NigelAes.txt@-inputFile@/lib/assets/circuits/AES/AESPartyOneInputs.txt@-circuitCRFile@/lib/assets/circuits/CheatingRecovery/UnlockP1Input.txt@-bucketsPrefixMain@/lib/data/P1/aes@-bucketsPrefixCR@/lib/data/P1/cr@-partiesFile@/lib/assets/conf/PartiesConfig.txt@-n1@32@-b1@7@-s1@40@-p1@0.62@-n2@32@-b2@20@-s2@40@-p2@0.71@"
   },
   "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "isSpotRequest": "True",
   "gitBranch": "dev",
-  "IsPublished": "public",
+  "IsPublished": "True",
+  "isExternal": "False",
   "regions":
   {
     "region_0":"us-east-1b"
   },
   "workingDirectory": "~/libscapi/protocols/MaliciousYaoBatch/",
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
-  "user": "liork.cryptobiu@gmail.com"
-
+  "emails":
+  {
+    "email_0": "liork.cryptobiu@gmail.com"
+  },
+  "institute":"Bar Ilan Cyber Center"
 }

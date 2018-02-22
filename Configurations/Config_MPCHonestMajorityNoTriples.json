@@ -1,28 +1,33 @@
 {
-  "execRequestTime": "7.9.17 12:20",
   "amis":
   {
-    "region_0": "ami-f0520a8a"
+    "region_0": "ami-94dc3de9"
   },
   "protocol":"MPCHonestMajorityNoTriples",
   "numOfParties":
   {
-    "size_0":3
+    "size_0":3,
+    "size_1":5,
+    "size_2":7,
+    "size_3":9
   },
-  "gitAddress": "https://liorbiu:4aRotdy0vOhfvVgaUaSk@github.com/cryptobiu/MPCHonestMajorityNoTriples.git",
+  "gitAddress": "https://github.com/cryptobiu/MPCHonestMajorityNoTriples.git",
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
-  "network": "LAN",
   "executableName": "MPCHonestMajorityNoTriples",
   "configurations":
   {
-    "conf_0": "-partiesNumber@3@-inputFile@inputs333.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_333In_50Out_20D_OutputOne3P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5"
+    "conf_0": "-partiesNumber@3@-inputFile@inputs333.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_333In_50Out_100D_OutputOne3P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_1": "-partiesNumber@5@-inputFile@inputs200.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_200In_50Out_100D_OutputOne5P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_2": "-partiesNumber@7@-inputFile@inputs142.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_142In_50Out_100D_OutputOne7P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5",
+    "conf_3": "-partiesNumber@9@-inputFile@inputs111.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_111In_50Out_100D_OutputOne9P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5"
   },
   "numOfRepetitions":1,
   "numOfInternalRepetitions":5,
+  "isSpotRequest": "True",
   "gitBranch": "master",
-  "gitCommitId": "aed770e446b2d110a3996141e3bb2ba1c21dd49f",
-  "IsPublished": "private",
+  "IsPublished": "False",
+  "isExternal": "False",
   "regions":
   {
     "region_0":"us-east-1b"
@@ -31,8 +36,11 @@
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
   "emails":
   {
-    "email_0": "liork.cryptobiu@gmail.com"
-  }
-
+    "email_0": "nofdinar@gmail.com",
+    "email_1": "Yehuda.Lindell@biu.ac.il",
+    "email_2": "levymeit@gmail.com",
+    "email_3": "abarak.cryptobiu@gmail.com",
+    "email_4": "liork.cryptobiu@gmail.com"
+  },
+  "institute":"Bar Ilan Cyber Center"
 }
-
