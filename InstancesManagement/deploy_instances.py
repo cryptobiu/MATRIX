@@ -168,6 +168,7 @@ def get_aws_network_details():
     with open(config_file_path) as data_file:
         data = json.load(data_file)
         regions = list(data['regions'].values())
+        is_spot_request = data['isSpotRequest']
 
     instances_ids = []
     public_ip_address = []
@@ -178,12 +179,17 @@ def get_aws_network_details():
     # get the spot instances ids
     for idx in range(len(regions)):
         client = boto3.client('ec2', region_name=regions[idx][:-1])
-        response = client.describe_spot_instance_requests()
-
-        for req_idx in range(len(response['SpotInstanceRequests'])):
-            if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
-                            response['SpotInstanceRequests'][req_idx]['State'] == 'open':
-                instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
+        if is_spot_request == 'True':
+            response = client.describe_spot_instance_requests()
+            for req_idx in range(len(response['SpotInstanceRequests'])):
+                if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
+                        response['SpotInstanceRequests'][req_idx]['State'] == 'open':
+                    instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
+        else:
+            response = client.describe_instances()
+            for res_idx in range(len(response['Reservations'])):
+                if response['Reservations'][res_idx]['Instances'][0]['State']['Name'] == 'running':
+                    instances_ids.append(response['Reservations'][res_idx]['Instances'][0]['InstanceId'])
 
         # save instance_ids for experiment termination
         with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'a+') as ids_file:
