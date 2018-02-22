@@ -2,19 +2,43 @@ import certifi
 import json
 import sys
 import os
+from datetime import datetime
 from os.path import basename
 from collections import OrderedDict
 from elasticsearch import Elasticsearch
 from glob import glob
 
 config_file_path = sys.argv[1]
-results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
-es = Elasticsearch('https://search-cryptobiu-cmw7q5rwp6rlsugf5fgdnharbe.us-east-1.es.amazonaws.com/', use_ssl=True,
+es = Elasticsearch('my_server', use_ssl=True,
                    ca_certs=certifi.where())
 
 
-def upload_data():
+def delete_index(index_name):
+    es.indices.delete(index_name)
 
+
+def create_index():
+    request_body = \
+        {
+            'mappings':
+            {
+                'cpu':
+                {
+                    'properties':
+                        {
+                            'partiesNumber': {'type': 'integer'},
+                            'partyId': {'type': 'integer'},
+                            'protocolName': {'type': 'text'},
+                            'executionTime': {'type': 'date'}
+                        }
+                }
+            }
+        }
+    es.indices.create(index='cpuresults', body=request_body)
+
+
+def upload_data():
+    results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
     with open(config_file_path) as data_file:
         data = json.load(data_file, object_pairs_hook=OrderedDict)
         raw_configurations = list(data['configurations'].values())[0].split('@')
@@ -23,7 +47,8 @@ def upload_data():
         raw_configurations.insert(0, 'partyId')
         raw_configurations.insert(0, 'protocolName')
 
-    results_files = glob('%s/*.json' % results_path)
+    dts = datetime.utcnow()
+    results_files = glob('%s/*cpu*.json' % results_path)
     for results_file in results_files:
         config_values = basename(results_file).split('*')
         config_values[-1] = config_values[-1][:-5]
@@ -42,7 +67,9 @@ def upload_data():
                 for iteration_idx in range(number_of_iterations):
                     val += data[task_idx]['iteration_%s' % iteration_idx]
                 doc[data[task_idx]['name']] = val / float(number_of_iterations)
+            doc['executionTime'] = dts
 
-        es.index(index='%sresults_new' % analyzed_parameter, doc_type=analyzed_parameter, body=doc)
+        es.index(index='%sresults' % analyzed_parameter, doc_type=analyzed_parameter, body=doc)
+
 
 upload_data()
