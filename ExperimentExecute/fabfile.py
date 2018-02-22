@@ -69,7 +69,7 @@ def run_protocol(config_file, args):
         protocol_name = data['protocol']
         executable_name = data['executableName']
         working_directory = data['workingDirectory']
-        external_protocol = data['external']
+        external_protocol = data['isExternal']
         regions = list(data['regions'].values())
         vals = args.split('@')
         values_str = ''

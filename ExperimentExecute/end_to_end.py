@@ -64,8 +64,8 @@ with open(config_file_path) as data_file:
     configurations = list(data['configurations'].values())
     if 'preProcessTask' in data.keys():
         pre_process_task = data['preProcessTask']
-    if data['external'] == 'True':
-        external_protocol = data['external']
+    if data['isExternal'] == 'True':
+        external_protocol = data['isExternal']
         install_script = data['installScript']
 
 if task_idx == '0':

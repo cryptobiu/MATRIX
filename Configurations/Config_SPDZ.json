@@ -1,19 +1,19 @@
 {
-  "execRequestTime": "7.9.17 12:20",
   "amis":
   {
-    "region_0": "ami-a16254db"
+    "region_0": "ami-f77a7e8d"
   },
   "protocol":"SPDZ",
   "numOfParties":
   {
-    "size_0":4
+    "size_0":3
   },
-  "aWSInstType": "c4.large",
+  "gitAddress": "https://github.com/cryptobiu/spdz-2_extension_library.git",
+  "aWSInstType": "c4.2xlarge",
   "aWWSBidPrice": "0.07",
-  "network": "LAN",
   "installScript":"spdz_setup.sh",
   "executableName": "spdz_test.sh",
+  "preProcessTask":"3",
   "programNames":
   {
     "program_0": "Player-Online.x",
@@ -24,17 +24,21 @@
     "conf_0": "-n@3@-p@8000@-s@172.31.28.232"
   },
   "numOfRepetitions":1,
-  "preProcessTask":"3",
+  "numOfInternalRepetitions":1,
+  "isSpotRequest": "True",
   "gitBranch": "experimentation",
-  "IsPublished": "private",
+  "IsPublished": "False",
+  "isExternal": "True",
   "regions":
   {
     "region_0":"us-east-1b"
   },
-  "external": "True",
   "workingDirectory": "~/",
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
-  "user": "liork.cryptobiu@gmail.com"
+  "emails":
+  {
+    "email_0": "liork.cryptobiu@gmail.com"
+  }
 
 }
 
