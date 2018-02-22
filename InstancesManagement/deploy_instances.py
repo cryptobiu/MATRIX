@@ -78,6 +78,11 @@ def deploy_instances():
         number_duplicated_servers = 0
         spot_request = data['isSpotRequest']
 
+    with open('GlobalConfigurations/conf.json') as gc_file:
+        global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+        keys = list(global_config['keys'])
+        security_group = list(global_config['securityGroup'])
+
     if len(regions) > 1:
         number_of_instances = max(number_of_parties) // len(regions)
         if max(number_of_parties) % len(regions):
@@ -117,8 +122,8 @@ def deploy_instances():
                             LaunchSpecification=
                             {
                                 'ImageId': amis_id[idx],
-                                'KeyName': 'Matrix%s' % regions[idx].replace('-', '')[:-1],
-                                'SecurityGroups': ['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
+                                'KeyName': keys[idx],
+                                'SecurityGroups': security_group[idx],
                                 'InstanceType': machine_type,
                                 'Placement':
                                     {
@@ -131,10 +136,10 @@ def deploy_instances():
             else:
                 client.run_instances(
                     ImageId=amis_id[idx],
-                    KeyName='Matrix%s' % regions[idx].replace('-', '')[:-1],
+                    KeyName=keys[idx],
                     MinCount=int(number_of_instances_to_deploy),
                     MaxCount=int(number_of_instances_to_deploy),
-                    SecurityGroups=['MatrixSG%s' % regions[idx].replace('-', '')[:-1]],
+                    SecurityGroups=security_group[idx],
                     InstanceType=machine_type,
                     Placement=
                     {

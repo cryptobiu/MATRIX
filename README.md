@@ -37,41 +37,16 @@ To install under CentOS 7.3:
 
 After You installed python 3 and pip3 you will need to install the modules MATRIX uses. To install this three modules use pip3
 
-`pip3 install --user openpyxl fabric fabric3`
+`pip3 install --user openpyxl fabric fabric3 boto3 colorama`
+
+**NOTE**: on some computers the following error may appear: `locale.Error: unsupported locale setting`
+To fix it, run:
+1. sudo apt-get clean && sudo apt-get update && sudo apt-get install -y locales
+2. locale-gen en_US.UTF-8
 
 After the modules installed, clone this repository to install MATRIX on your system.
 
 ## MATRIX Modules
-
-### Configurations
-MATRIX uses configuration file to set it execution. The configuration file is written in [json](https://en.wikipedia.org/wiki/JSON) format.  
-Each configuration file has the following fields:
-* amis - List of AMI(s).
-If using custom AWS AMI, the AMI need to be installed in all the regions that we want to test.
-* protocol - Name of protocol
-* numOfParties - Size of the parties
-* gitAddress - Git  repository path. MATRIX will clone the repository into all target servers, configure, 
-make and install. If installation of other libraries is needed to be done, see pre-process section of MATRIX for details.
-* awsInstType - AWS instance type. For details about the different instance types, you can read [here](https://aws.amazon.com/ec2/instance-types/).
-* awsBidPrice - Bid price for spot instances machine in USD
-* executableName - The name of the executable to execute
-* preProcessTask - ID of the pre process task that required.
-The available pre process tasks that defines in MATRIX can be found in this [script](../master/ExperimentExecute/pre_process.py)
-* Configurations - List of configurations to run. Each configuration is a set of CLI arguments to the executable.
-The arguments are separated between them by '@'. Party ID is added automatically
-* numOfRepetitions - How Many times MATRIX will execute the protocol
-* numOfInternalRepetitions - How many times the protocol will be executed on single run.
-* gitBranch - The branch the protocol uses. default value is `master`
-* isPublished - Indicate if the protocol was published.
-* isExternal - Indicate if the protocol external to libscapi library
-* regions - AWS regions to execute the protocol.
-* workingDirectory - The directory of the protocol and the data related to the protocol.
-* resultsDirectory - Directory to copy to the results files from the servers. The directory is local directory at the MATRIX system computer.
-* emails - MATRIX will send notifications to this email addresses. Multiple email addresses are supported
-* institute - Research Group identifier
-* coordinatorConfig - If coordinator exists in the protocol, the configuration for him will described here.
-The configuration need to be in the same format of 'configurations' field
-* coordinatorExecutable - The name of the coordinator executable
 
 ### InstancesManagement
 
@@ -82,7 +57,7 @@ After config file was created, You will need to deploy your images(instances). M
 
 #### Local Deployment
 
-To deploy MATRIX locally set `regions` parameter to `local` at the config [file](../master/Configurations/Config_BMR.json)
+To deploy MATRIX locally set `regions` parameter to `local` at the config [file](../master/ProtocolsConfigurations/Config_BMR.json)
 
 #### AWS Deployment
 
@@ -126,6 +101,44 @@ The values for analysedParameter are:
 4. memory
 
 Example file can be found [here](../master/Assets/MPCHonestMajorityNoTriples_cpu_partyId=0_numOfParties=3.json)
+
+## MATRIX Configurations
+
+### GlobalConfigurations
+
+In order to connect to the instances MATRIX uses a file that contains the AWS keys and security groups.
+For each region in AWS you need to create an entry in the global configuration file.
+Sample configuration file can be found [here](../master/GlobalConfigurations/conf.json)
+
+### ProtocolsConfigurations
+MATRIX uses configuration file to set it execution. The configuration file is written in [json](https://en.wikipedia.org/wiki/JSON) format.  
+Each configuration file has the following fields:
+* amis - List of AMI(s).
+If using custom AWS AMI, the AMI need to be installed in all the regions that we want to test.
+* protocol - Name of protocol
+* numOfParties - Size of the parties
+* gitAddress - Git  repository path. MATRIX will clone the repository into all target servers, configure, 
+make and install. If installation of other libraries is needed to be done, see pre-process section of MATRIX for details.
+* awsInstType - AWS instance type. For details about the different instance types, you can read [here](https://aws.amazon.com/ec2/instance-types/).
+* awsBidPrice - Bid price for spot instances machine in USD
+* executableName - The name of the executable to execute
+* preProcessTask - ID of the pre process task that required.
+The available pre process tasks that defines in MATRIX can be found in this [script](../master/ExperimentExecute/pre_process.py)
+* Configurations - List of configurations to run. Each configuration is a set of CLI arguments to the executable.
+The arguments are separated between them by '@'. Party ID is added automatically
+* numOfRepetitions - How Many times MATRIX will execute the protocol
+* numOfInternalRepetitions - How many times the protocol will be executed on single run.
+* gitBranch - The branch the protocol uses. default value is `master`
+* isPublished - Indicate if the protocol was published.
+* isExternal - Indicate if the protocol external to libscapi library
+* regions - AWS regions to execute the protocol.
+* workingDirectory - The directory of the protocol and the data related to the protocol.
+* resultsDirectory - Directory to copy to the results files from the servers. The directory is local directory at the MATRIX system computer.
+* emails - MATRIX will send notifications to this email addresses. Multiple email addresses are supported
+* institute - Research Group identifier
+* coordinatorConfig - If coordinator exists in the protocol, the configuration for him will described here.
+The configuration need to be in the same format of 'configurations' field
+* coordinatorExecutable - The name of the coordinator executable
 
 
 ### MATRIX Usage
