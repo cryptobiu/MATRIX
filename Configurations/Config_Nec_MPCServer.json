@@ -31,7 +31,7 @@
   "emails":
   {
     "email_0": "liork.cryptobiu@gmail.com"
-  }
+  },
   "coordinatorConfig":
   {
     "conf_0": "-groupID@0@-inputFile@CircuitInputs.txt@-partiesFile@parties.conf@-internalIterationsNumber@1@"
