@@ -188,8 +188,14 @@ def get_aws_network_details():
         else:
             response = client.describe_instances()
             for res_idx in range(len(response['Reservations'])):
-                if response['Reservations'][res_idx]['Instances'][0]['State']['Name'] == 'running':
-                    instances_ids.append(response['Reservations'][res_idx]['Instances'][0]['InstanceId'])
+                reservations_len = len(response['Reservations'][res_idx]['Instances'])
+                for reserve_idx in range(reservations_len):
+                    if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running':
+                        instances_ids.append(response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceId'])
+
+        # check if InstancesConfigurations dir exists
+        if not os.path.isdir('%s/InstancesConfigurations' % os.getcwd()) == 'True':
+            os.makedirs('%s/InstancesConfigurations' % os.getcwd())
 
         # save instance_ids for experiment termination
         with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'a+') as ids_file:
