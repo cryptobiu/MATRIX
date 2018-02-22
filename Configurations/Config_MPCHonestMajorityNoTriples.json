@@ -1,7 +1,7 @@
 {
   "amis":
   {
-    "region_0": "ami-a16254db"
+    "region_0": "ami-94dc3de9"
   },
   "protocol":"MPCHonestMajorityNoTriples",
   "numOfParties":
@@ -41,5 +41,6 @@
     "email_2": "levymeit@gmail.com",
     "email_3": "abarak.cryptobiu@gmail.com",
     "email_4": "liork.cryptobiu@gmail.com"
-  }
+  },
+  "institute":"Bar Ilan Cyber Center"
 }

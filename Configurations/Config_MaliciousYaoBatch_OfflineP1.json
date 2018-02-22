@@ -1,7 +1,7 @@
 {
   "amis":
   {
-    "region_0": "ami-a16254db"
+    "region_0": "ami-94dc3de9"
   },
   "protocol":"MaliciousYaoBatch",
   "numOfParties":
@@ -32,5 +32,6 @@
   "emails":
   {
     "email_0": "liork.cryptobiu@gmail.com"
-  }
+  },
+  "institute":"Bar Ilan Cyber Center"
 }
