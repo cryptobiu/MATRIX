@@ -80,8 +80,8 @@ def deploy_instances():
 
     with open('GlobalConfigurations/conf.json') as gc_file:
         global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
-        keys = list(global_config['keys'])
-        security_group = list(global_config['securityGroup'])
+        keys = list(global_config['keys'].values())
+        security_group = list(global_config['securityGroups'].values())
 
     if len(regions) > 1:
         number_of_instances = max(number_of_parties) // len(regions)
@@ -123,7 +123,7 @@ def deploy_instances():
                             {
                                 'ImageId': amis_id[idx],
                                 'KeyName': keys[idx],
-                                'SecurityGroups': security_group[idx],
+                                'SecurityGroups': [security_group[idx]],
                                 'InstanceType': machine_type,
                                 'Placement':
                                     {
@@ -199,7 +199,7 @@ def get_aws_network_details():
                         instances_ids.append(response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceId'])
 
         # check if InstancesConfigurations dir exists
-        if not os.path.isdir('%s/InstancesConfigurations' % os.getcwd()) == 'True':
+        if os.path.isdir('%s/InstancesConfigurations' % os.getcwd()) == 'False':
             os.makedirs('%s/InstancesConfigurations' % os.getcwd())
 
         # save instance_ids for experiment termination

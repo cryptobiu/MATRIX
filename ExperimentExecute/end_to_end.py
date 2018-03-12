@@ -30,9 +30,6 @@ def update_experiment():
 
 def execute_experiment(repetitions):
 
-    # before executing experiment delete all the existing log files
-    os.system('fab -f ExperimentExecute/fabfile.py delete_json_files:%s --parallel --no-pty' % working_directory)
-
     for i in range(repetitions):
         for idx in range(len(configurations)):
             os.system('fab -f ExperimentExecute/fabfile.py run_protocol:%s,%s --parallel --no-pty'

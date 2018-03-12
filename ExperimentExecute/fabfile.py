@@ -78,6 +78,8 @@ def run_protocol(config_file, args):
             values_str += '%s ' % val
 
         with cd(working_directory):
+            if exists('*.tar.gz'):
+                run('tar -xf *.tar.gz')
             party_id = env.hosts.index(env.host)
             if len(regions) > 1:
                 put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
@@ -124,8 +126,3 @@ def collect_results(results_server_directory, results_local_directory):
     local('mkdir -p %s' % results_local_directory)
     get('%s/*.json' % results_server_directory, results_local_directory)
 
-
-@task
-def delete_json_files(working_directory):
-    with warn_only():
-        sudo('rm %s/*.json' % working_directory)

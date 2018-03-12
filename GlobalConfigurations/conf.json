@@ -1,10 +1,10 @@
 {
   "keys":
   {
-    "key_0":"Matrixuseast1.pem"
+    "key_0":"Matrixuseast1"
   },
   "securityGroups":
   {
-    "securityGroup_0":"MatrixSGusest1"
+    "securityGroup_0":"MatrixSGuseast1"
   }
 }
