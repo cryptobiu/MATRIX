@@ -1,5 +1,4 @@
 import os
-import sys
 import boto3
 import botocore
 import json
@@ -11,8 +10,7 @@ from collections import OrderedDict
 from botocore import exceptions
 
 
-config_file_path = sys.argv[1]
-task_idx = sys.argv[2]
+config_file_path = ''
 
 
 def create_key_pair():
@@ -296,7 +294,7 @@ def check_running_instances(region, machine_type):
     response = client.describe_spot_instance_requests()
 
     for req_idx in range(len(response['SpotInstanceRequests'])):
-        if (response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
+        if (response['SpotInstanceRequests'][req_idx]['State'] == 'active' or
                         response['SpotInstanceRequests'][req_idx]['State'] == 'open')\
                 and response['SpotInstanceRequests'][req_idx]['LaunchSpecification']['InstanceType'] == machine_type:
             instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
@@ -310,14 +308,3 @@ def check_running_instances(region, machine_type):
 
     return instances_count
 
-
-if task_idx == '1':
-    deploy_instances()
-elif task_idx == '2':
-    create_key_pair()
-elif task_idx == '3':
-    create_security_group()
-elif task_idx == '4':
-    get_network_details()
-else:
-    raise ValueError('Invalid choice')

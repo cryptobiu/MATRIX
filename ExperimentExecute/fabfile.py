@@ -1,5 +1,4 @@
 import json
-import sys
 import time
 from collections import OrderedDict
 from fabric.api import *

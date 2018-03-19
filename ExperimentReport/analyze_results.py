@@ -1,4 +1,3 @@
-import sys
 import os
 import glob
 import json
@@ -15,24 +14,20 @@ from openpyxl import load_workbook
 from openpyxl.styles import NamedStyle
 
 
-config_file_path = sys.argv[1]
-task_idx = sys.argv[2]
-
-results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
-
-with open(config_file_path) as conf_file:
-    conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
-    remote_directory = conf_data['workingDirectory']
+config_file_path = ''
 
 
 protocol_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-protocol_name = conf_data['protocol']
 
-results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, protocol_time)
 style1 = NamedStyle(number_format='#.##')
 
 
 def download_data():
+    with open(config_file_path) as conf_file:
+        conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
+        remote_directory = conf_data['workingDirectory']
+
+    results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
     os.system('fab -f ExperimentExecute/fabfile.py collect_results:%s,%s --parallel --no-pty'
               % (remote_directory, results_path))
     # wait for all clients to download data
@@ -40,12 +35,17 @@ def download_data():
 
 
 def send_email():
+    with open(config_file_path) as conf_file:
+        conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
 
+    protocol_name = conf_data['protocol']
     users = list(conf_data['emails'].values())
     configurations = list(conf_data['configurations'].values())
     regions = list(conf_data['regions'].values())
     address_me = 'biu.cyber.experiments@gmail.com'
     me = 'BIU Cyber Experiments <biu.cyber.experiments@gmail.com>'
+
+    results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, protocol_time)
 
     message = MIMEMultipart()
     message['Subject'] = 'Experiment results for protocol %s' % protocol_name
@@ -83,27 +83,13 @@ def send_email():
     server.quit()
 
 
-def upload_to_git():
-    working_dir = '%s/ExperimentsResults/%s' % (expanduser('~'), protocol_name)
-    # create working directory for the protocol if not exist
-
-    os.system('mkdir -p %s ' % working_dir)
-
-    # move the results folder and the xlsx file to the protocol folder
-
-    os.system('mv %s %s' % (results_path, working_dir))
-    os.system('mv %s %s' % (results_file_name, working_dir))
-
-    # Upload data to git
-
-    os.curdir(expanduser('~/ExperimentsResults'))
-    os.system('git add %s/%s %s/%s' % (protocol_name, results_path, protocol_name, results_file_name))
-    os.system('git commit -m "Add results for protocol %s' % protocol_name)
-    os.system('git push git@github.com:cryptobiu/ExperimentsResults.git')
-
-
 def analyze_results(files_list, analysis_type):
+    with open(config_file_path) as conf_file:
+        conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
 
+    protocol_name = conf_data['protocol']
+
+    results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, protocol_time)
     parties = set()
     for file in files_list:
         parties.add(int(basename(file.split('_')[3].split('.')[0].split('=')[1])))
@@ -165,46 +151,33 @@ def analyze_results(files_list, analysis_type):
 
     wb.save(results_file_name)
 
-    # send_email()
 
-    # upload_to_git(results_file_name)
-
-
-def analyze_cpu():
+def analyze_cpu(results_path):
     files_list = glob.glob(expanduser('%s/*_cpu*.json' % results_path))
     analyze_results(files_list, 'cpu')
 
 
-def analyze_comm_sent():
+def analyze_comm_sent(results_path):
     files_list = glob.glob(expanduser('%s/*_commSent*.json' % results_path))
     analyze_results(files_list, 'sent')
 
 
-def analyze_comm_received():
+def analyze_comm_received(results_path):
     files_list = glob.glob(expanduser('%s/*_commReceived*.json' % results_path))
     analyze_results(files_list, 'received')
 
 
-def analyze_memory():
+def analyze_memory(results_path):
     files_list = glob.glob(expanduser('%s/*_memory*.json' % results_path))
     analyze_results(files_list, 'memory')
 
 
 def analyze_all():
-    analyze_cpu()
-    analyze_comm_sent()
-    analyze_comm_received()
-    analyze_memory()
+    results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
+    analyze_cpu(results_path)
+    analyze_comm_sent(results_path)
+    analyze_comm_received(results_path)
+    analyze_memory(results_path)
     to_send = input('Do you want to send the results to email? (y/n):')
     if to_send == 'y':
         send_email()
-    # upload_to_git()
-
-
-if task_idx == '1':
-    download_data()
-    analyze_all()
-elif task_idx == '2':
-    download_data()
-elif task_idx == '3':
-    analyze_all()

@@ -1,14 +1,14 @@
-import certifi
-import json
-import sys
 import os
-from datetime import datetime
+import json
+import certifi
+from glob import glob
 from os.path import basename
+from datetime import datetime
 from collections import OrderedDict
 from elasticsearch import Elasticsearch
-from glob import glob
 
-config_file_path = sys.argv[1]
+
+config_file_path = ''
 es = Elasticsearch('my_server', use_ssl=True,
                    ca_certs=certifi.where())
 
@@ -70,6 +70,3 @@ def upload_data():
             doc['executionTime'] = dts
 
         es.index(index='%sresults' % analyzed_parameter, doc_type=analyzed_parameter, body=doc)
-
-
-upload_data()
