@@ -36,19 +36,19 @@ def print_instances_management_menu(conf_file_path):
     color_print('5. Terminate Machines', 'red')
     selection = input('Your choice:')
 
-    di.config_file_path = conf_file_path
+    deploy = di.Deploy(conf_file_path)
 
     if selection == '1':
-        di.deploy_instances()
+        deploy.deploy_instances()
     elif selection == '2':
-        di.create_key_pair()
+        deploy.create_key_pair(2)
     elif selection == '3':
-        di.create_security_group()
+        deploy.create_security_group()
     elif selection == '4':
-        di.get_network_details()
+        deploy.get_network_details()
     elif selection == '5':
-        ti.config_file_path = conf_file_path
-        ti.main()
+        terminate = ti.Terminate(conf_file_path)
+        terminate.terminate()
 
 
 def print_execution_menu(conf_file_path):
@@ -60,18 +60,18 @@ def print_execution_menu(conf_file_path):
     color_print('4. Update libscapi:', 'yellow')
     selection = input('Your choice:')
 
-    e2e.config_file_path = conf_file_path
+    ee = e2e.E2E(conf_file_path)
 
     if selection == '0':
-        e2e.pre_process()
+        ee.pre_process()
     elif selection == '1':
-        e2e.install_experiment()
+        ee.install_experiment()
     elif selection == '2':
-        e2e.update_experiment()
+        ee.update_experiment()
     elif selection == '3':
-        e2e.execute_experiment()
+        ee.execute_experiment()
     elif selection == '4':
-        e2e.update_libscapi()
+        ee.update_libscapi()
 
 
 def print_analysis_menu(conf_file_path):
@@ -82,18 +82,18 @@ def print_analysis_menu(conf_file_path):
     color_print('4. Upload data to Elasticsearch', 'green')
     selection = input('Your choice:')
 
-    ar.config_file_path = conf_file_path
+    a = ar.Analyze(conf_file_path)
 
     if selection == '1':
-        ar.download_data()
-        ar.analyze_all()
+        a.download_data()
+        a.analyze_all()
     elif selection == '2':
-        ar.download_data()
+        a.download_data()
     elif selection == '3':
-        ar.analyze_all()
+        a.analyze_all()
     elif selection == '4':
-        ue.config_file_path = conf_file_path
-        ue.upload_data()
+        e = ue.Elastic(conf_file_path)
+        e.upload_data()
 
 
 def main():
