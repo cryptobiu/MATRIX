@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  h3 #{title}
+  <br>
+  form(method='POST' action='' enctype="multipart/form-data")
+    div.form-group
+       label(for='name') Name Of Poll:
+            input#name.form-control(type='text', placeholder='Poll Name' name='name')
+    div.form-group
+       label(for='numberOfOnlineParties') Number Of Online Parties:
+            input#name.form-control(type='text', placeholder=1 name='numberOfOnlineParties')
+    div.form-group
+       label(for='IPs') Online Users IPs. Insert the IPs as string with , as separator :
+            input#name.form-control(type='text', placeholder='10.0.0.1' name='IPs')
+    div.form-group
+       label(for='numberOfOfflineParties') Number Of Offline Parties:
+            input#name.form-control(type='text', placeholder=4 name='numberOfOfflineParties')
+
+    button.btn.btn-primary(type='submit') Prepare Online Poll
+
+  if errors
+    ul
+      for error in errors
+        li!= error.msg
