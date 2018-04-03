@@ -1,15 +1,13 @@
-const express = require('express');
-const formidable = require('formidable');
-const spawn = require('child_process').spawn;
-const util = require('util');
+var formidable = require('formidable');
+var spawn = require('child_process').spawn;
 
 
 exports.prepareOnline = function (req, res) {
     var form = new formidable.IncomingForm();
-    form.multiples = true
-    form.keepExtensions = true
+    form.multiples = true;
+    form.keepExtensions = true;
 
-    form.parse(req, function(err, fields, files) {
+    form.parse(req, function(err, fields) {
         var pollName =  fields['name'];
         var numberOfOnlineParties =  fields['numberOfOnlineParties'];
         var numberOfOfflineParties =  fields['numberOfOfflineParties'];
@@ -26,7 +24,7 @@ exports.prepareOnline = function (req, res) {
 
     }, 100);
     // var options = {shell: true};
-    // const scriptExec = spawn('python3', ['../main.py'], options);
+    // var scriptExec = spawn('python3', ['../main.py'], options);
     // scriptExec.stdin.setEncoding('utf-8');
     // // scriptExec.stdout.pipe(scriptExec.stdout);
     // scriptExec.stdin.write('1\n');
