@@ -5,7 +5,7 @@ In order to use the app open your browser and navigate to our [server](http://35
 
 In order to start a poll you have to follow this steps:
 1. Navigate to 35.171.69.162/polls
-2. Submit the form at Prepare for [Online] (http://35.171.69.162/polls/prepareOnline).
+2. Submit the form at Prepare for [Online](http://35.171.69.162/polls/prepareOnline).
 3. Download parties file. 
 4. Download Circuit file.
 5. Download Configuration files.
