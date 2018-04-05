@@ -1,5 +1,11 @@
 var formidable = require('formidable');
 var spawn = require('child_process').spawn;
+var PythonShell = require('python-shell');
+var options = {
+    mode:'text',
+    pythonPath: '/usr/bin/python3.5',
+    pythonOptions:['-u']
+};
 
 
 exports.prepareOnline = function (req, res) {
@@ -12,36 +18,29 @@ exports.prepareOnline = function (req, res) {
         var numberOfOnlineParties =  fields['numberOfOnlineParties'];
         var numberOfOfflineParties =  fields['numberOfOfflineParties'];
         var arr = fields['IPs'].split(",");
-        // sessionStorage.setItem('IPs', fields['IPs']);
-        // sessionStorage.setItem('pollName', pollName);
-        // sessionStorage.setItem('numberOfOnlineParties', numberOfOnlineParties);
-        // sessionStorage.setItem('numberOfOfflineParties', numberOfOfflineParties);
+
+        // init python shell
+        var pyshell = new PythonShell('../main.py', options);
+        // enter to Deploy instances menu
+        pyshell.send('1');
+        // insert the configuration file
+        pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
+        // invoke get_aws_network_details_from_api
+        pyshell.send('6');
+        // send to python shell the online users ips
+        pyshell.send(fields['IPs']);
+        // exit python shell
+        pyshell.send('4');
+
+        pyshell.end(function (err, code, signal) {
+            if(err) throw err;
+            console.log('The exit code was: ' + code);
+            console.log('The exit signal was: ' + signal);
+            console.log('finished');
+            console.log('finished');
+        });
+        res.redirect('/polls');
     });
-    setTimeout(function () {
-        var child = spawn('/usr/bin/nodejs');
-        child.stdin.write("console.log('Hey')\n");
-        child.stdin.end();
-
-    }, 100);
-    // var options = {shell: true};
-    // var scriptExec = spawn('python3', ['../main.py'], options);
-    // scriptExec.stdin.setEncoding('utf-8');
-    // // scriptExec.stdout.pipe(scriptExec.stdout);
-    // scriptExec.stdin.write('1\n');
-    // scriptExec.stdin.write('public/assets/Config_SecretSharing.json\n');
-    // scriptExec.stdin.write('1\n');
-    // scriptExec.stdin.end();
-    // scriptExec.stdout.on('error', function (err) {
-    //     console.log(err);
-
-    // });
-
-    // scriptExec.stderr.on('error', function (err) {
-    //     console.log(err);
-    // })
-    // pythonProc.send('1');
-
-    res.redirect('/polls');
 };
 
 exports.isReadyForPoll = function (req, res) {

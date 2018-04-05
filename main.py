@@ -34,6 +34,7 @@ def print_instances_management_menu(conf_file_path):
     color_print('3. Create security group(s)', 'red')
     color_print('4. Get instances network data', 'red')
     color_print('5. Terminate Machines', 'red')
+    color_print('6. Get instances network data from API', 'red')
     selection = input('Your choice:')
 
     deploy = di.Deploy(conf_file_path)
@@ -49,6 +50,8 @@ def print_instances_management_menu(conf_file_path):
     elif selection == '5':
         terminate = ti.Terminate(conf_file_path)
         terminate.terminate()
+    elif selection == '6':
+        deploy.get_aws_network_details_from_api()
 
 
 def print_execution_menu(conf_file_path):

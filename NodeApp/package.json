@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "latest",
-    "formidable": "latest"
+    "formidable": "latest",
+    "python-shell": "latest"
   }
 }

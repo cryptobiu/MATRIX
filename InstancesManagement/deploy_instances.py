@@ -142,7 +142,7 @@ class Deploy:
                         KeyName=keys[idx],
                         MinCount=int(number_of_instances_to_deploy),
                         MaxCount=int(number_of_instances_to_deploy),
-                        SecurityGroups=security_group[idx],
+                        SecurityGroups=[security_group[idx]],
                         InstanceType=machine_type,
                         Placement=
                         {
@@ -286,6 +286,34 @@ class Deploy:
                         private_ip_file.write('party_%s_port=%s\n' % (ip_idx, port_counter))
         else:
             self.get_aws_network_details()
+
+    @staticmethod
+    def get_aws_network_details_from_api():
+        ips = input('Enter IPs addresses separated by comma:')
+        ips_splitted = ips.split(',')
+
+        print(os.getcwd())
+        print('**************')
+
+        with open('../InstancesConfigurations/parties.conf', 'r') as origin_file:
+            parties = origin_file.readlines()
+
+        number_of_parties = len(parties) // 2
+        del parties[number_of_parties:len(parties)]
+
+        new_parties = copy.deepcopy(parties)
+        for idx in range(len(ips_splitted)):
+            new_parties.append('party_%s_ip=%s\n' % (str(number_of_parties + idx),
+                               ips_splitted[idx]))
+
+        # insert ports numbers after insert ips addresses in the right places
+
+        for idx2 in range(len(new_parties)):
+            new_parties.append('party_%s_port=8000\n' % idx2)
+
+        # write data to file
+        with open('../InstancesConfigurations/partiesNew.conf', 'w+') as new_file:
+            new_file.writelines(new_parties)
 
     @staticmethod
     def check_running_instances(region, machine_type):
