@@ -29,6 +29,12 @@ exports.prepareOnline = function (req, res) {
         pyshell.send('6');
         // send to python shell the online users ips
         pyshell.send(fields['IPs']);
+        // entr to execution menu
+        pyshell.send('2');
+        // insert the configuration file
+        pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
+        //install experiment at aws machines
+        pyshell.send('1');
         // exit python shell
         pyshell.send('4');
 
@@ -44,11 +50,21 @@ exports.prepareOnline = function (req, res) {
 };
 
 exports.isReadyForPoll = function (req, res) {
-    spawn('python3', []);
+    // var timer = ms => new Promise( r => setTimeout(r, 2000));
+    res.redirect('/polls');
 };
 
 exports.executePoll = function (req, res) {
-    spawn('python3', []);
+    // init python shell
+        var pyshell = new PythonShell('../main.py', options);
+        // enter to Deploy instances menu
+        pyshell.send('2');
+        // insert the configuration file
+        pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
+        // invoke get_aws_network_details_from_api
+        pyshell.send('3');
+        // exit python shell
+        pyshell.send('4');
 };
 
 exports.isPollFinished = function (req, res) {

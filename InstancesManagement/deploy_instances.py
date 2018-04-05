@@ -312,7 +312,7 @@ class Deploy:
             new_parties.append('party_%s_port=8000\n' % idx2)
 
         # write data to file
-        with open('../InstancesConfigurations/partiesNew.conf', 'w+') as new_file:
+        with open('../InstancesConfigurations/parties.conf', 'w+') as new_file:
             new_file.writelines(new_parties)
 
     @staticmethod

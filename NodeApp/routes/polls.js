@@ -1,6 +1,6 @@
-const express = require('express');
-const router = express.Router();
-const polls_controller = require('./../controllers/pollsControllers');
+var express = require('express');
+var router = express.Router();
+var polls_controller = require('./../controllers/pollsControllers');
 
 router.get('/', function (req, res) {
     res.render('polls', { title: 'Polls' });
@@ -28,12 +28,13 @@ router.get('/configuration', function (req, res) {
 });
 
 router.get('/isReadyForPoll', function (req, res) {
-    // polls_controller.isReadyForPoll(req, res);
-    res.render('isReadyForPoll', { title: 'Poll ready?' })
+    // res.render('isReadyForPoll', { title: 'Poll ready?' })
+    polls_controller.isReadyForPoll(req, res);
 });
 
 router.get('/executePoll', function (req, res) {
-    res.render('executePoll', { title: 'Poll execution' })
+    // res.render('executePoll', { title: 'Poll execution' })
+    polls_controller.executePoll(req, res);
 });
 
 router.get('/isPollFinished', function (req, res) {
