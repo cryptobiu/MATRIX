@@ -17,9 +17,9 @@ exports.prepareOnline = function (req, res) {
         var numberOfOnlineParties =  fields['numberOfOnlineParties'];
         var numberOfOfflineParties =  fields['numberOfOfflineParties'];
         var ips = fields['IPs'];
-        res.session.PollName = pollName;
-        res.session.NumberOfOnlineParties = numberOfOnlineParties;
-        res.session.NumberOfOfflineParties = numberOfOfflineParties;
+        req.session.PollName = pollName;
+        req.session.NumberOfOnlineParties = numberOfOnlineParties;
+        req.session.NumberOfOfflineParties = numberOfOfflineParties;
 
         // // init python shell
         // var pyshell = new PythonShell('../main.py', options);
@@ -76,7 +76,7 @@ exports.isReadyForPoll = function (req, res) {
 
 exports.isReadyForPollLoop= function(req, res){
   var numberOfOnline_servers = this.isReadyForPoll(req, res);
-  var numberOfOnlineParties = req.session.getPropertyValue('NumberOfOnlineParties');
+  var numberOfOnlineParties = req.session.NumberOfOnlineParties;
 
   while(numberOfOnline_servers < numberOfOnlineParties)
   {
