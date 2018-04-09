@@ -21,31 +21,31 @@ exports.prepareOnline = function (req, res) {
         req.session.NumberOfOnlineParties = numberOfOnlineParties;
         req.session.NumberOfOfflineParties = numberOfOfflineParties;
 
-        // // init python shell
-        // var pyshell = new PythonShell('../main.py', options);
-        // // enter to Deploy instances menu
-        // pyshell.send('1');
-        // // insert the configuration file
-        // pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
-        // // invoke get_aws_network_details_from_api
-        // pyshell.send('6');
-        // // send to python shell the online users ips
-        // pyshell.send(ips);
-        // // entr to execution menu
-        // pyshell.send('2');
-        // // insert the configuration file
-        // pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
-        // //install experiment at aws machines
-        // pyshell.send('1');
-        // // exit python shell
-        // pyshell.send('4');
-        //
-        // pyshell.end(function (err, code, signal) {
-        //     if(err) throw err;
-        //     console.log('The exit code was: ' + code);
-        //     console.log('The exit signal was: ' + signal);
-        //     console.log('finished');
-        // });
+        // init python shell
+        var pyshell = new PythonShell('../main.py', options);
+        // enter to Deploy instances menu
+        pyshell.send('1');
+        // insert the configuration file
+        pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
+        // invoke get_aws_network_details_from_api
+        pyshell.send('6');
+        // send to python shell the online users ips
+        pyshell.send(ips);
+        // entr to execution menu
+        pyshell.send('2');
+        // insert the configuration file
+        pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
+        //install experiment at aws machines
+        pyshell.send('1');
+        // exit python shell
+        pyshell.send('4');
+
+        pyshell.end(function (err, code, signal) {
+            if(err) throw err;
+            console.log('The exit code was: ' + code);
+            console.log('The exit signal was: ' + signal);
+            console.log('finished');
+        });
         res.redirect('/polls');
     });
 };
