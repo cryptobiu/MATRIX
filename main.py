@@ -35,6 +35,7 @@ def print_instances_management_menu(conf_file_path):
     color_print('4. Get instances network data', 'red')
     color_print('5. Terminate Machines', 'red')
     color_print('6. Get instances network data from API', 'red')
+    color_print('7. Check running instances from API', 'red')
     selection = input('Your choice:')
 
     deploy = di.Deploy(conf_file_path)
@@ -52,6 +53,8 @@ def print_instances_management_menu(conf_file_path):
         terminate.terminate()
     elif selection == '6':
         deploy.get_aws_network_details_from_api()
+    elif selection == '7':
+        deploy.check_running_instances()
 
 
 def print_execution_menu(conf_file_path):

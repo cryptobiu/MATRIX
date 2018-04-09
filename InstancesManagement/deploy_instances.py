@@ -100,7 +100,7 @@ class Deploy:
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
 
-            number_of_instances_to_deploy = self.check_running_instances(regions[idx][:-1], machine_type)
+            number_of_instances_to_deploy = self.check_running_spot_instances(regions[idx][:-1], machine_type)
             if idx < number_duplicated_servers:
                 number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
             else:
@@ -198,7 +198,12 @@ class Deploy:
                     reservations_len = len(response['Reservations'][res_idx]['Instances'])
                     for reserve_idx in range(reservations_len):
                         if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running':
-                            instances_ids.append(response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceId'])
+                            instances_ids.append(response['Reservations']
+                                                 [res_idx]['Instances'][reserve_idx]['InstanceId'])
+
+            # delete MATRIX server from instances ids
+            if 'i-06146d4b39e3c79fb' in instances_ids:
+                instances_ids.remove('i-06146d4b39e3c79fb')
 
             # check if InstancesConfigurations dir exists
             if os.path.isdir('%s/InstancesConfigurations' % os.getcwd()) == 'False':
@@ -287,13 +292,10 @@ class Deploy:
         else:
             self.get_aws_network_details()
 
-    @staticmethod
-    def get_aws_network_details_from_api():
+    def get_aws_network_details_from_api(self):
+        self.get_aws_network_details()
         ips = input('Enter IPs addresses separated by comma:')
         ips_splitted = ips.split(',')
-
-        print(os.getcwd())
-        print('**************')
 
         with open('../InstancesConfigurations/parties.conf', 'r') as origin_file:
             parties = origin_file.readlines()
@@ -315,8 +317,32 @@ class Deploy:
         with open('../InstancesConfigurations/parties.conf', 'w+') as new_file:
             new_file.writelines(new_parties)
 
+        # copy file to assets directory
+        os.rename('../InstancesConfigurations/parties.conf', 'public/assets')
+
+        # create circuit according to number of parties
+        number_of_gates = 1000000
+        number_of_mult_gates = 1000000
+        depth = 20
+        number_of_parties += len(ips_splitted)
+        number_of_inputs = 1000 // number_of_parties
+        number_of_outputs = 50
+        output_one = 'true'  # true - only first party gets output. False - all parties get inputs
+
+        os.system('java -jar ../InstancesConfigurations/GenerateArythmeticCircuitForDepthAndGates.jar '
+                  '%s %s %s %s %s %s %s' % (number_of_gates, number_of_mult_gates, depth, number_of_parties,
+                                            number_of_inputs, number_of_outputs, output_one))
+        if output_one == 'true':
+            os.rename('../InstancesConfigurations/%sG_%sMG_%sIn_%sOut_%sD_OutputOne%sP.txt'
+                      % (number_of_gates, number_of_mult_gates, number_of_inputs, number_of_outputs,
+                         depth, number_of_parties), 'public/assets')
+        else:
+            os.rename('../InstancesConfigurations/%sG_%sMG_%sIn_%sOut_%sD_OutputAll%sP.txt'
+                      % (number_of_gates, number_of_mult_gates, number_of_inputs, number_of_outputs,
+                         depth, number_of_parties), 'public/assets')
+
     @staticmethod
-    def check_running_instances(region, machine_type):
+    def check_running_spot_instances(region, machine_type):
 
         instances_ids = list()
         instances_count = 0
@@ -339,3 +365,21 @@ class Deploy:
                 instances_count += 1
 
         return instances_count
+
+    def check_running_instances(self):
+        with open(self.config_file_path) as data_file:
+            data = json.load(data_file)
+        regions = list(data['regions'].values())
+        ready_instances = 0
+        for idx in range(len(regions)):
+            client = boto3.client('ec2', region_name=regions[idx][:-1])
+            response = client.describe_instances()
+            for res_idx in range(len(response['Reservations'])):
+                reservations_len = len(response['Reservations'][res_idx]['Instances'])
+                for reserve_idx in range(reservations_len):
+                    if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running' and \
+                            not response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceId'] == \
+                            'i-06146d4b39e3c79fb':
+                        ready_instances += 1
+
+        print('**Number of ready instances : %s**' % ready_instances)
