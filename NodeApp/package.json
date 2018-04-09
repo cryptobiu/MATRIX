@@ -12,6 +12,7 @@
     "express": "latest",
     "formidable": "latest",
     "python-shell": "latest",
-    "express-session": "latest"
+    "express-session": "latest",
+    "pug": "latest"
   }
 }

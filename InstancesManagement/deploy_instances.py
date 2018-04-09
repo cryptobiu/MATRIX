@@ -383,3 +383,4 @@ class Deploy:
                         ready_instances += 1
 
         print('**Number of ready instances : %s**' % ready_instances)
+        return ready_instances

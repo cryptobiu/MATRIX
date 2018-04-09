@@ -33,12 +33,17 @@ router.get('/isReadyForPoll', function (req, res) {
     res.render('isReadyForPoll', { title: 'Poll ready?' })
 });
 
+router.get('/preExecutePoll', function (req, res) {
+    res.locals.executePoll = polls_controller.executePoll(req, res);
+    res.render('preExecutePoll', { title: 'Poll execution' })
+});
+
 router.get('/executePoll', function (req, res) {
     res.render('executePoll', { title: 'Poll execution' })
 });
 
 router.get('/isPollFinished', function (req, res) {
-    res.render('isReadyForPoll', { title: 'Poll Status for Execution' })
+    res.render('isPollFinished', { title: 'Poll Status for Execution' })
 });
 
 

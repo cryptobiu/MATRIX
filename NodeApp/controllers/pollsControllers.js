@@ -96,7 +96,3 @@ exports.executePoll = function (req, res) {
         // exit python shell
         pyshell.send('4');
 };
-
-exports.isPollFinished = function (req, res) {
-
-};
