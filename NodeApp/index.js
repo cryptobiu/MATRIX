@@ -17,11 +17,6 @@ app.engine('pug', require('pug').__express)
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.use(function(err, req, res) {
-  console.error(err.stack);
-  res.statusCode(500).send('Something broke!');
-});
-
 app.listen(8080, function () {
     console.log('App listening on port 8080!');
 });
