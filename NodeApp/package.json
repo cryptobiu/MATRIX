@@ -11,6 +11,7 @@
   "dependencies": {
     "express": "latest",
     "formidable": "latest",
-    "python-shell": "latest"
+    "python-shell": "latest",
+    "express-session": "latest"
   }
 }

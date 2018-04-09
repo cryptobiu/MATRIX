@@ -2,4 +2,7 @@ extends layout
 
 block content
   h3 #{title}
-  p When the machines will be ready tou will redirect to the polls main page
+  p When the machines will be ready you will be moved to the polls execution main page
+  script.
+    var isReadyForPoll = !{isReadyForPoll}
+    window.location.href='/polls/executePoll';

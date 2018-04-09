@@ -28,13 +28,13 @@ router.get('/configuration', function (req, res) {
 });
 
 router.get('/isReadyForPoll', function (req, res) {
-    // res.render('isReadyForPoll', { title: 'Poll ready?' })
-    polls_controller.isReadyForPoll(req, res);
+    // res.locals pass data to the pug view
+    res.locals.isReadyForPoll = polls_controller.isReadyForPollLoop(req, res);
+    res.render('isReadyForPoll', { title: 'Poll ready?' })
 });
 
 router.get('/executePoll', function (req, res) {
-    // res.render('executePoll', { title: 'Poll execution' })
-    polls_controller.executePoll(req, res);
+    res.render('executePoll', { title: 'Poll execution' })
 });
 
 router.get('/isPollFinished', function (req, res) {
