@@ -7,4 +7,5 @@ __pycache__/
 *.jar
 *.xlsx
 InstancesConfigurations/*
+NodeApp/node_modules
 
