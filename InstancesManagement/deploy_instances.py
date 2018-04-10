@@ -206,7 +206,7 @@ class Deploy:
                 instances_ids.remove('i-06146d4b39e3c79fb')
 
             # check if InstancesConfigurations dir exists
-            if os.path.isdir('%s/InstancesConfigurations' % os.getcwd()) == 'False':
+            if not os.path.isdir('%s/InstancesConfigurations' % os.getcwd()):
                 os.makedirs('%s/InstancesConfigurations' % os.getcwd())
 
             # save instance_ids for experiment termination
