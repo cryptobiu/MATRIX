@@ -4,8 +4,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 .idea/
-*.jar
 *.xlsx
-InstancesConfigurations/*
+InstancesConfigurations/instances_ids_us-east-1
+InstancesConfigurations/public_ips
+InstancesConfigurations/parties.conf
 NodeApp/node_modules
 
