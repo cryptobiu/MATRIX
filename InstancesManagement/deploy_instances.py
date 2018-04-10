@@ -320,8 +320,8 @@ class Deploy:
             new_file.writelines(new_parties)
 
         # copy file to assets directory
-            os.rename('%s/InstancesConfigurations/parties.conf' % os.getcwd(),
-                      '%s/NodeApp/public/assets/parties.conf' % os.getcwd())
+        # os.rename('%s/InstancesConfigurations/parties.conf' % os.getcwd(),
+        #           '%s/NodeApp/public/assets/parties.conf' % os.getcwd())
         # create circuit according to number of parties
         number_of_gates = 1000000
         number_of_mult_gates = 1000000
@@ -332,19 +332,18 @@ class Deploy:
         output_one = 'true'  # true - only first party gets output. False - all parties get inputs
 
         os.system('java -jar %s/InstancesConfigurations/GenerateArythmeticCircuitForDepthAndGates.jar '
-                  '%s %s %s %s %s %s %s' % (os.getcwd(), number_of_gates, number_of_mult_gates, depth, number_of_parties,
-                                            number_of_inputs, number_of_outputs, output_one))
+                  '%s %s %s %s %s %s %s' % (os.getcwd(), number_of_gates, number_of_mult_gates, depth,
+                                            number_of_parties, number_of_inputs, number_of_outputs, output_one))
         if output_one == 'true':
             file_name = '%sG_%sMG_%sIn_%sOut_%sD_OutputOne%sP.txt' % (number_of_gates, number_of_mult_gates,
-                                                                      number_of_inputs, number_of_outputs,depth,
+                                                                      number_of_inputs, number_of_outputs, depth,
                                                                       number_of_parties)
             os.rename('%s/%s' % (os.getcwd(), file_name), '%s/NodeApp/public/assets/%s' % (os.getcwd(), file_name))
         else:
             file_name = '%sG_%sMG_%sIn_%sOut_%sD_OutputAll%sP.txt' % (number_of_gates, number_of_mult_gates,
-                                                                      number_of_inputs, number_of_outputs,
-                                                                      depth, number_of_parties)
-            os.rename('%s/%s'
-                      % (os.getcwd(), file_name), '%s/NodeApppublic/assets/%s' % (os.getcwd(), file_name))
+                                                                      number_of_inputs, number_of_outputs, depth,
+                                                                      number_of_parties)
+            os.rename('%s/%s' % (os.getcwd(), file_name), '%s/NodeApp/public/assets/%s' % (os.getcwd(), file_name))
 
     @staticmethod
     def check_running_spot_instances(region, machine_type):
