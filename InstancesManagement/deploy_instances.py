@@ -3,6 +3,7 @@ import json
 import time
 import copy
 import boto3
+import shutil
 import botocore
 from random import shuffle
 from datetime import datetime
@@ -81,7 +82,7 @@ class Deploy:
             number_duplicated_servers = 0
             spot_request = data['isSpotRequest']
 
-        with open('GlobalConfigurations/conf.json') as gc_file:
+        with open('%s/GlobalConfigurations/conf.json' % os.getcwd()) as gc_file:
             global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
             keys = list(global_config['keys'].values())
             security_group = list(global_config['securityGroups'].values())
@@ -158,7 +159,7 @@ class Deploy:
 
     @staticmethod
     def create_parties_files_multi_regions():
-        with open('InstancesConfigurations/parties.conf', 'r') as origin_file:
+        with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'r') as origin_file:
             parties = origin_file.readlines()
 
         number_of_parties = len(parties) // 2
@@ -168,7 +169,7 @@ class Deploy:
             new_parties[idx] = 'party_%s_ip=0.0.0.0\n' % idx
 
             # write data to file
-            with open('InstancesConfigurations/parties%s.conf' % idx, 'w+') as new_file:
+            with open('%s/InstancesConfigurations/parties%s.conf' % (os.getcwd(), idx), 'w+') as new_file:
                 new_file.writelines(new_parties)
 
     def get_aws_network_details(self):
@@ -210,7 +211,7 @@ class Deploy:
                 os.makedirs('%s/InstancesConfigurations' % os.getcwd())
 
             # save instance_ids for experiment termination
-            with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'a+') as ids_file:
+            with open('%s/InstancesConfigurations/instances_ids_%s' % (os.getcwd(), regions[idx][:-1]), 'a+') as ids_file:
                 for instance_idx in range(len(instances_ids)):
                     ids_file.write('%s\n' % instances_ids[instance_idx])
                 ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
@@ -227,7 +228,7 @@ class Deploy:
             shuffle(public_ip_address)
 
         print('Parties network configuration')
-        with open('InstancesConfigurations/parties.conf', 'w+') as private_ip_file:
+        with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'w+') as private_ip_file:
             if len(regions) > 1:
                 for public_idx in range(len(public_ip_address)):
                     print('party_%s_ip=%s' % (public_idx, public_ip_address[public_idx]))
@@ -262,7 +263,7 @@ class Deploy:
 
         number_of_parties = max(list(data['numOfParties'].values()))
         if 'local' in regions:
-            with open('InstancesConfigurations/parties.conf', 'w+') as private_ip_file:
+            with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'w+') as private_ip_file:
                 for ip_idx in range(len(number_of_parties)):
                     private_ip_file.write('party_%s_ip=127.0.0.1\n' % ip_idx)
                     public_ip_address.append('127.0.0.1')
@@ -274,14 +275,14 @@ class Deploy:
 
         elif 'servers' in regions:
             server_file = input('Enter your server file configuration: ')
-            os.system('mv %s InstancesConfigurations/public_ips' % server_file)
+            os.system('mv %s %s/InstancesConfigurations/public_ips' % (os.getcwd(), server_file))
 
             server_ips = []
-            with open('InstancesConfigurations/public_ips', 'r+') as server_ips_file:
+            with open('%s/InstancesConfigurations/public_ips' % os.getcwd(), 'r+') as server_ips_file:
                 for line in server_ips_file:
                     server_ips.append(line)
 
-                with open('InstancesConfigurations/parties.conf', 'w+') as private_ip_file:
+                with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'w+') as private_ip_file:
                     for ip_idx in range(len(server_ips)):
                         print('party_%s_ip=%s' % (ip_idx, server_ips[ip_idx]))
                         private_ip_file.write('party_%s_ip=127.0.0.1' % ip_idx)
@@ -293,11 +294,12 @@ class Deploy:
             self.get_aws_network_details()
 
     def get_aws_network_details_from_api(self):
+
         self.get_aws_network_details()
         ips = input('Enter IPs addresses separated by comma:')
         ips_splitted = ips.split(',')
 
-        with open('../InstancesConfigurations/parties.conf', 'r') as origin_file:
+        with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'r') as origin_file:
             parties = origin_file.readlines()
 
         number_of_parties = len(parties) // 2
@@ -314,12 +316,12 @@ class Deploy:
             new_parties.append('party_%s_port=8000\n' % idx2)
 
         # write data to file
-        with open('../InstancesConfigurations/parties.conf', 'w+') as new_file:
+        with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'w+') as new_file:
             new_file.writelines(new_parties)
 
         # copy file to assets directory
-        os.rename('../InstancesConfigurations/parties.conf', 'public/assets')
-
+            os.rename('%s/InstancesConfigurations/parties.conf' % os.getcwd(),
+                      '%s/NodeApp/public/assets/parties.conf' % os.getcwd())
         # create circuit according to number of parties
         number_of_gates = 1000000
         number_of_mult_gates = 1000000
@@ -329,17 +331,20 @@ class Deploy:
         number_of_outputs = 50
         output_one = 'true'  # true - only first party gets output. False - all parties get inputs
 
-        os.system('java -jar ../InstancesConfigurations/GenerateArythmeticCircuitForDepthAndGates.jar '
-                  '%s %s %s %s %s %s %s' % (number_of_gates, number_of_mult_gates, depth, number_of_parties,
+        os.system('java -jar %s/InstancesConfigurations/GenerateArythmeticCircuitForDepthAndGates.jar '
+                  '%s %s %s %s %s %s %s' % (os.getcwd(), number_of_gates, number_of_mult_gates, depth, number_of_parties,
                                             number_of_inputs, number_of_outputs, output_one))
         if output_one == 'true':
-            os.rename('../InstancesConfigurations/%sG_%sMG_%sIn_%sOut_%sD_OutputOne%sP.txt'
-                      % (number_of_gates, number_of_mult_gates, number_of_inputs, number_of_outputs,
-                         depth, number_of_parties), 'public/assets')
+            file_name = '%sG_%sMG_%sIn_%sOut_%sD_OutputOne%sP.txt' % (number_of_gates, number_of_mult_gates,
+                                                                      number_of_inputs, number_of_outputs,depth,
+                                                                      number_of_parties)
+            os.rename('%s/%s' % (os.getcwd(), file_name), '%s/NodeApp/public/assets/%s' % (os.getcwd(), file_name))
         else:
-            os.rename('../InstancesConfigurations/%sG_%sMG_%sIn_%sOut_%sD_OutputAll%sP.txt'
-                      % (number_of_gates, number_of_mult_gates, number_of_inputs, number_of_outputs,
-                         depth, number_of_parties), 'public/assets')
+            file_name = '%sG_%sMG_%sIn_%sOut_%sD_OutputAll%sP.txt' % (number_of_gates, number_of_mult_gates,
+                                                                      number_of_inputs, number_of_outputs,
+                                                                      depth, number_of_parties)
+            os.rename('%s/%s'
+                      % (os.getcwd(), file_name), '%s/NodeApppublic/assets/%s' % (os.getcwd(), file_name))
 
     @staticmethod
     def check_running_spot_instances(region, machine_type):
