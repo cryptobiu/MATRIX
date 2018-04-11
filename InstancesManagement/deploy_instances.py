@@ -338,12 +338,12 @@ class Deploy:
             file_name = '%sG_%sMG_%sIn_%sOut_%sD_OutputOne%sP.txt' % (number_of_gates, number_of_mult_gates,
                                                                       number_of_inputs, number_of_outputs, depth,
                                                                       number_of_parties)
-            os.rename('%s/%s' % (os.getcwd(), file_name), '%s/NodeApp/public/assets/%s' % (os.getcwd(), file_name))
+            os.rename('%s/%s' % (os.getcwd(), file_name), '%s/public/assets/%s' % (os.getcwd(), file_name))
         else:
             file_name = '%sG_%sMG_%sIn_%sOut_%sD_OutputAll%sP.txt' % (number_of_gates, number_of_mult_gates,
                                                                       number_of_inputs, number_of_outputs, depth,
                                                                       number_of_parties)
-            os.rename('%s/%s' % (os.getcwd(), file_name), '%s/NodeApp/public/assets/%s' % (os.getcwd(), file_name))
+            os.rename('%s/%s' % (os.getcwd(), file_name), '%s/public/assets/%s' % (os.getcwd(), file_name))
 
     @staticmethod
     def check_running_spot_instances(region, machine_type):
