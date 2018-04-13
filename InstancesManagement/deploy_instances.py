@@ -329,21 +329,15 @@ class Deploy:
         number_of_parties += len(ips_splitted)
         number_of_inputs = 1000 // number_of_parties
         number_of_outputs = 50
-        output_one = 'true'  # true - only first party gets output. False - all parties get inputs
-
         os.system('java -jar %s/InstancesConfigurations/GenerateArythmeticCircuitForDepthAndGates.jar '
-                  '%s %s %s %s %s %s %s' % (os.getcwd(), number_of_gates, number_of_mult_gates, depth,
-                                            number_of_parties, number_of_inputs, number_of_outputs, output_one))
-        if output_one == 'true':
-            file_name = '%sG_%sMG_%sIn_%sOut_%sD_OutputOne%sP.txt' % (number_of_gates, number_of_mult_gates,
-                                                                      number_of_inputs, number_of_outputs, depth,
-                                                                      number_of_parties)
-            os.rename('%s/%s' % (os.getcwd(), file_name), '%s/public/assets/%s' % (os.getcwd(), file_name))
-        else:
-            file_name = '%sG_%sMG_%sIn_%sOut_%sD_OutputAll%sP.txt' % (number_of_gates, number_of_mult_gates,
-                                                                      number_of_inputs, number_of_outputs, depth,
-                                                                      number_of_parties)
-            os.rename('%s/%s' % (os.getcwd(), file_name), '%s/public/assets/%s' % (os.getcwd(), file_name))
+                  '%s %s %s %s %s %s true' % (os.getcwd(), number_of_gates, number_of_mult_gates, depth,
+                                            number_of_parties, number_of_inputs, number_of_outputs))
+
+        file_name = '%sG_%sMG_%sIn_%sOut_%sD_OutputOne%sP.txt' % (number_of_gates, number_of_mult_gates,
+                                                                  number_of_inputs, number_of_outputs, depth,
+                                                                  number_of_parties)
+
+        os.rename('%s/%s' % (os.getcwd(), file_name), '%s/public/assets/%s' % (os.getcwd(), file_name))
 
     @staticmethod
     def check_running_spot_instances(region, machine_type):
