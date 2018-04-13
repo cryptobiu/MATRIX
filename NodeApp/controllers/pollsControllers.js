@@ -31,13 +31,16 @@ exports.prepareOnline = function (req, res) {
         pyshell.send('6');
         // send to python shell the online users ips
         pyshell.send(ips);
-        // entr to execution menu
-        pyshell.send('2');
-        // insert the configuration file
-        pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
-        //install experiment at aws machines
-        pyshell.send('1');
-        // exit python shell
+        // enter to execution menu
+        if (numberOfOfflineParties > 0)
+        {
+            pyshell.send('2');
+            // insert the configuration file
+            pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
+            //install experiment at aws machines
+            pyshell.send('1');
+            // exit python shell
+        }
         pyshell.send('4');
 
         pyshell.end(function (err, code, signal) {

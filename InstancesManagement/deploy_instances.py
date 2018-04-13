@@ -320,8 +320,8 @@ class Deploy:
             new_file.writelines(new_parties)
 
         # copy file to assets directory
-        # os.rename('%s/InstancesConfigurations/parties.conf' % os.getcwd(),
-        #           '%s/NodeApp/public/assets/parties.conf' % os.getcwd())
+        os.rename('%s/InstancesConfigurations/parties.conf' % os.getcwd(),
+                  '%s/public/assets/parties.conf' % os.getcwd())
         # create circuit according to number of parties
         number_of_gates = 1000000
         number_of_mult_gates = 1000000
