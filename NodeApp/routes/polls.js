@@ -20,7 +20,13 @@ router.get('/parties', function (req, res) {
 });
 
 router.get('/circuit', function (req, res) {
-    res.download('public/assets/1000000G_1000000MG_200In_50Out_20D_OutputOne5P.txt')
+    var numberOfOnline = req.session.NumberOfOnlineParties;
+    var numberOfOffline = req.session.NumberOfOfflineParties;
+    var numberOfParties = parseInt(numberOfOnline) + parseInt(numberOfOffline);
+    var inputs = Math.floor(1000 / numberOfParties);
+    var fileName = '1000000G_1000000MG_' + parseInt(inputs) + 'In_50Out_20D_' +
+        'OutputOne' + parseInt(numberOfParties) + 'P.txt' ;
+    res.download('public/assets/'+ fileName);
 });
 
 router.get('/configuration', function (req, res) {
