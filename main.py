@@ -36,6 +36,7 @@ def print_instances_management_menu(conf_file_path):
     color_print('5. Terminate Machines', 'red')
     color_print('6. Get instances network data from API', 'red')
     color_print('7. Check running instances from API', 'red')
+    color_print('8. Convert parties file to RTI format', 'red')
     selection = input('Your choice:')
 
     deploy = di.Deploy(conf_file_path)
@@ -47,7 +48,7 @@ def print_instances_management_menu(conf_file_path):
     elif selection == '3':
         deploy.create_security_group()
     elif selection == '4':
-        deploy.get_network_details()
+        deploy.get_network_details(9000, 'Parties_gfp.txt')
     elif selection == '5':
         terminate = ti.Terminate(conf_file_path)
         terminate.terminate()
@@ -55,6 +56,8 @@ def print_instances_management_menu(conf_file_path):
         deploy.get_aws_network_details_from_api()
     elif selection == '7':
         deploy.check_running_instances()
+    elif selection == '8':
+        deploy.convert_parties_file_to_rti()
 
 
 def print_execution_menu(conf_file_path):

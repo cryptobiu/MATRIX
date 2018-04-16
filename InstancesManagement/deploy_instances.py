@@ -158,8 +158,8 @@ class Deploy:
         print('Finished to deploy machines')
 
     @staticmethod
-    def create_parties_files_multi_regions():
-        with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'r') as origin_file:
+    def create_parties_files_multi_regions(file_name):
+        with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'r') as origin_file:
             parties = origin_file.readlines()
 
         number_of_parties = len(parties) // 2
@@ -172,7 +172,7 @@ class Deploy:
             with open('%s/InstancesConfigurations/parties%s.conf' % (os.getcwd(), idx), 'w+') as new_file:
                 new_file.writelines(new_parties)
 
-    def get_aws_network_details(self):
+    def get_aws_network_details(self, port_number=8000, file_name='parties.conf'):
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
             regions = list(data['regions'].values())
@@ -228,7 +228,7 @@ class Deploy:
             shuffle(public_ip_address)
 
         print('Parties network configuration')
-        with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'w+') as private_ip_file:
+        with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'w+') as private_ip_file:
             if len(regions) > 1:
                 for public_idx in range(len(public_ip_address)):
                     print('party_%s_ip=%s' % (public_idx, public_ip_address[public_idx]))
@@ -238,7 +238,7 @@ class Deploy:
                     print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
                     private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
 
-            port_number = 8000
+            # port_number = 8000
 
             for port_idx in range(len(public_ip_address)):
                 print('party_%s_port=%s' % (port_idx, port_number))
@@ -252,9 +252,9 @@ class Deploy:
 
         # create party file for each instance
         if len(regions) > 1:
-            self.create_parties_files_multi_regions()
+            self.create_parties_files_multi_regions(file_name)
 
-    def get_network_details(self):
+    def get_network_details(self, port_counter=8000, file_name='parties.conf'):
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
             regions = list(data['regions'].values())
@@ -263,12 +263,12 @@ class Deploy:
 
         number_of_parties = max(list(data['numOfParties'].values()))
         if 'local' in regions:
-            with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'w+') as private_ip_file:
+            with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'w+') as private_ip_file:
                 for ip_idx in range(len(number_of_parties)):
                     private_ip_file.write('party_%s_ip=127.0.0.1\n' % ip_idx)
                     public_ip_address.append('127.0.0.1')
 
-                port_counter = 8000
+                # port_counter = 8000
                 for ip_idx in range(len(number_of_parties)):
                     private_ip_file.write('party_%s_port=%s\n' % (ip_idx, port_counter))
                     port_counter += 100
@@ -282,16 +282,16 @@ class Deploy:
                 for line in server_ips_file:
                     server_ips.append(line)
 
-                with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'w+') as private_ip_file:
+                with open('%s/InstancesConfigurations/%s' % (os.getcwd(),file_name), 'w+') as private_ip_file:
                     for ip_idx in range(len(server_ips)):
                         print('party_%s_ip=%s' % (ip_idx, server_ips[ip_idx]))
                         private_ip_file.write('party_%s_ip=127.0.0.1' % ip_idx)
 
-                    port_counter = 8000
+                    # port_counter = 8000
                     for ip_idx in range(len(server_ips)):
                         private_ip_file.write('party_%s_port=%s\n' % (ip_idx, port_counter))
         else:
-            self.get_aws_network_details()
+            self.get_aws_network_details(port_counter, file_name)
 
     def get_aws_network_details_from_api(self):
 
@@ -382,3 +382,19 @@ class Deploy:
 
         print('**Number of ready instances : %s**' % ready_instances)
         return ready_instances
+
+    @staticmethod
+    def convert_parties_file_to_rti():
+        with open('InstancesConfigurations/parties.conf', 'r') as origin_file:
+            origin_data = origin_file.readlines()
+            origin_data = origin_data[:len(origin_data) // 2]
+            ips_addresses = ''
+            for item in origin_data:
+                ips_addresses += '%s,' % item[item.index('=')+1:len(item)-2]
+            ips_addresses = ips_addresses[:-1]
+
+        with open('InstancesConfigurations/parties.conf', 'w+') as new_file:
+            new_file.write(ips_addresses)
+
+
+
