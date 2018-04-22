@@ -110,11 +110,11 @@ def run_protocol(config_file, args):
 
                         for coordinator_val in coordinator_args:
                             coordinator_values_str += '%s ' % coordinator_val
-
+                        sudo('killall -9 %s; exit 0' % coordinator_executable)
                         run('./%s %s' % (coordinator_executable, coordinator_values_str))
 
                     else:
-                        time.sleep(61)
+                        time.sleep(31)
                         run('./%s %s' % (executable_name, values_str))
 
 

@@ -177,6 +177,7 @@ class Deploy:
             data = json.load(data_file)
             regions = list(data['regions'].values())
             is_spot_request = data['isSpotRequest']
+            coordinator_exists = 'coordinatorConfig' in data
 
         instances_ids = []
         public_ip_address = []
@@ -211,7 +212,8 @@ class Deploy:
                 os.makedirs('%s/InstancesConfigurations' % os.getcwd())
 
             # save instance_ids for experiment termination
-            with open('%s/InstancesConfigurations/instances_ids_%s' % (os.getcwd(), regions[idx][:-1]), 'a+') as ids_file:
+            with open('%s/InstancesConfigurations/instances_ids_%s' % (os.getcwd(), regions[idx][:-1]), 'a+') \
+                    as ids_file:
                 for instance_idx in range(len(instances_ids)):
                     ids_file.write('%s\n' % instances_ids[instance_idx])
                 ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
@@ -234,6 +236,9 @@ class Deploy:
                     print('party_%s_ip=%s' % (public_idx, public_ip_address[public_idx]))
                     private_ip_file.write('party_%s_ip=%s\n' % (public_idx, public_ip_address[public_idx]))
             else:
+                if coordinator_exists == 'True':
+                    del private_ip_address[0]
+
                 for private_idx in range(len(private_ip_address)):
                     print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
                     private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
@@ -249,6 +254,7 @@ class Deploy:
             with open('InstancesConfigurations/public_ips', 'w+') as public_ip_file:
                 for public_idx in range(len(public_ip_address)):
                     public_ip_file.write('%s\n' % public_ip_address[public_idx])
+
 
         # create party file for each instance
         if len(regions) > 1:

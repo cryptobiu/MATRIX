@@ -12,4 +12,6 @@ NodeApp/InstancesConfigurations/instances_ids_us-east-1
 NodeApp/InstancesConfigurations/public_ips
 NodeApp/InstancesConfigurations/parties.conf
 NodeApp/node_modules
+InstancesConfigurations/Parties_gf2n.txt
+InstancesConfigurations/Parties_gfp.txt
 
