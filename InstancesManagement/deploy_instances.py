@@ -3,7 +3,6 @@ import json
 import time
 import copy
 import boto3
-import shutil
 import botocore
 from random import shuffle
 from datetime import datetime
@@ -243,7 +242,6 @@ class Deploy:
                     print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
                     private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
 
-            # port_number = 8000
 
             for port_idx in range(len(public_ip_address)):
                 print('party_%s_port=%s' % (port_idx, port_number))
@@ -254,7 +252,6 @@ class Deploy:
             with open('InstancesConfigurations/public_ips', 'w+') as public_ip_file:
                 for public_idx in range(len(public_ip_address)):
                     public_ip_file.write('%s\n' % public_ip_address[public_idx])
-
 
         # create party file for each instance
         if len(regions) > 1:
@@ -337,7 +334,7 @@ class Deploy:
         number_of_outputs = 50
         os.system('java -jar %s/InstancesConfigurations/GenerateArythmeticCircuitForDepthAndGates.jar '
                   '%s %s %s %s %s %s true' % (os.getcwd(), number_of_gates, number_of_mult_gates, depth,
-                                            number_of_parties, number_of_inputs, number_of_outputs))
+                                              number_of_parties, number_of_inputs, number_of_outputs))
 
         file_name = '%sG_%sMG_%sIn_%sOut_%sD_OutputOne%sP.txt' % (number_of_gates, number_of_mult_gates,
                                                                   number_of_inputs, number_of_outputs, depth,

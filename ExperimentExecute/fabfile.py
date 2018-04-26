@@ -98,9 +98,12 @@ def run_protocol(config_file, args):
 
             sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
 
+            if protocol_name == 'MPCFromSD':
+                values_str = values_str.replace('AesInputs0.txt', 'AesInputs%s.txt' % str(party_id))
+
             with warn_only():
                 if external_protocol == 'False':
-                    run('./%s -i %s %s' % (executable_name, party_id, values_str))
+                    run('./%s -partyID %s %s' % (executable_name, party_id, values_str))
 
                 else:
                     if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
