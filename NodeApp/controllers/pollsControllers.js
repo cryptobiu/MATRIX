@@ -66,6 +66,15 @@ exports.saveIpAddress = function (req, res) {
     pyshell.send('6');
     // send to python shell the online users ips
     pyshell.send(ip);
+
+    pyshell.end(function (err, code, signal) {
+            if(err) throw err;
+            console.log('The exit code was: ' + code);
+            console.log('The exit signal was: ' + signal);
+            console.log('finished');
+        });
+    res.redirect('/polls');
+
 };
 
 exports.isReadyForPoll = function (req, res) {
