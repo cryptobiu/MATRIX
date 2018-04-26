@@ -312,6 +312,15 @@ class Deploy:
             new_parties.append('party_%s_ip=%s\n' % (str(number_of_parties + idx),
                                ips_splitted[idx]))
 
+        # reverse the list that android device will be first
+
+        new_parties = list(reversed(new_parties))
+
+        # fix the indices of parties_ids
+        for reverse_idx in range(len(new_parties)):
+            new_parties[reverse_idx].replace('party_%s_ip' % (len(new_parties) - reverse_idx),
+                                             'party_%s_ip' % reverse_idx)
+
         # insert ports numbers after insert ips addresses in the right places
 
         for idx2 in range(len(new_parties)):

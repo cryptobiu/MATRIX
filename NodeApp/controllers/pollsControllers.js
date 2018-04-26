@@ -66,6 +66,7 @@ exports.saveIpAddress = function (req, res) {
     pyshell.send('6');
     // send to python shell the online users ips
     pyshell.send(ip);
+    pyshell.send('4');
 
     pyshell.end(function (err, code, signal) {
             if(err) throw err;
