@@ -25,12 +25,11 @@ router.get('/parties', function (req, res) {
 });
 
 router.get('/circuit', function (req, res) {
-    var numberOfOnline = req.session.NumberOfOnlineParties;
-    var numberOfOffline = req.session.NumberOfOfflineParties;
-    var numberOfParties = parseInt(numberOfOnline) + parseInt(numberOfOffline);
-    var inputs = Math.floor(1000 / numberOfParties);
-    var fileName = '1000G_1000MG_' + inputs.toString() + 'In_50Out_20D_' +
-        'OutputOne' + numberOfParties.toString() + 'P.txt' ;
+    //var numberOfOnline = req.session.NumberOfOnlineParties;
+    //var numberOfOffline = req.session.NumberOfOfflineParties;
+    //var numberOfParties = parseInt(numberOfOnline) + parseInt(numberOfOffline);
+    //var inputs = Math.floor(1000 / numberOfParties);
+    var fileName = '1000G_1000MG_333In_50Out_10D_OutputOne3P.txt' ;
     res.download('public/assets/'+ fileName);
 });
 
