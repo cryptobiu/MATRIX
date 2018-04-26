@@ -29,7 +29,7 @@ router.get('/circuit', function (req, res) {
     var numberOfOffline = req.session.NumberOfOfflineParties;
     var numberOfParties = parseInt(numberOfOnline) + parseInt(numberOfOffline);
     var inputs = Math.floor(1000 / numberOfParties);
-    var fileName = '1000000G_1000000MG_' + inputs.toString() + 'In_50Out_20D_' +
+    var fileName = '1000G_1000MG_' + inputs.toString() + 'In_50Out_20D_' +
         'OutputOne' + numberOfParties.toString() + 'P.txt' ;
     res.download('public/assets/'+ fileName);
 });
