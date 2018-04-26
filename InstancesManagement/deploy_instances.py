@@ -325,10 +325,10 @@ class Deploy:
         os.rename('%s/InstancesConfigurations/parties.conf' % os.getcwd(),
                   '%s/public/assets/parties.conf' % os.getcwd())
         # create circuit according to number of parties
-        number_of_gates = 1000000
-        number_of_mult_gates = 1000000
+        number_of_gates = 1000
+        number_of_mult_gates = 1000
         depth = 20
-        number_of_parties = len(new_parties)
+        number_of_parties = 3
         number_of_inputs = 1000 // number_of_parties
         number_of_outputs = 50
         os.system('java -jar %s/InstancesConfigurations/GenerateArythmeticCircuitForDepthAndGates.jar '
