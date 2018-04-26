@@ -242,7 +242,6 @@ class Deploy:
                     print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
                     private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
 
-
             for port_idx in range(len(public_ip_address)):
                 print('party_%s_port=%s' % (port_idx, port_number))
                 private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_number))
@@ -329,7 +328,7 @@ class Deploy:
         number_of_gates = 1000000
         number_of_mult_gates = 1000000
         depth = 20
-        number_of_parties += len(ips_splitted)
+        number_of_parties = len(new_parties)
         number_of_inputs = 1000 // number_of_parties
         number_of_outputs = 50
         os.system('java -jar %s/InstancesConfigurations/GenerateArythmeticCircuitForDepthAndGates.jar '
