@@ -53,6 +53,21 @@ exports.prepareOnline = function (req, res) {
     });
 };
 
+exports.saveIpAddress = function (req, res) {
+    var ip = req.params.ip;
+
+    // init python shell
+    var pyshell = new PythonShell('../main.py', options);
+    // enter to Deploy instances menu
+    pyshell.send('1');
+    // insert the configuration file
+    pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
+    // invoke get_aws_network_details_from_api
+    pyshell.send('6');
+    // send to python shell the online users ips
+    pyshell.send(ip);
+};
+
 exports.isReadyForPoll = function (req, res) {
     var pyshell = new PythonShell('../main.py', options);
 
@@ -89,13 +104,13 @@ exports.isReadyForPollLoop= function(req, res){
 
 exports.executePoll = function (req, res) {
     // init python shell
-        var pyshell = new PythonShell('../main.py', options);
-        // enter to Deploy instances menu
-        pyshell.send('2');
-        // insert the configuration file
-        pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
-        // invoke get_aws_network_details_from_api
-        pyshell.send('3');
-        // exit python shell
-        pyshell.send('4');
+    var pyshell = new PythonShell('../main.py', options);
+    // enter to Deploy instances menu
+    pyshell.send('2');
+    // insert the configuration file
+    pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
+    // invoke get_aws_network_details_from_api
+    pyshell.send('3');
+    // exit python shell
+    pyshell.send('4');
 };

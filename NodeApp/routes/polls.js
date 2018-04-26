@@ -11,6 +11,11 @@ router.get('/prepareOnline', function (req, res) {
     // polls_controller.prepareOnline(req, res);
 });
 
+router.get('/prepareOnline/:ip', function (req, res) {
+    // res.render('prepareOnline', { title: 'Prepare for Online' })
+    polls_controller.saveIpAddress(req, res);
+});
+
 router.post('/prepareOnline', function (req, res) {
     polls_controller.prepareOnline(req, res);
 });
