@@ -36,7 +36,8 @@ def print_instances_management_menu(conf_file_path):
     color_print('5. Terminate Machines', 'red')
     color_print('6. Get instances network data from API', 'red')
     color_print('7. Check running instances from API', 'red')
-    color_print('8. Convert parties file to RTI format', 'red')
+    color_print('8. Start instances from API', 'red')
+    color_print('9. Convert parties file to RTI format', 'red')
     selection = input('Your choice:')
 
     deploy = di.Deploy(conf_file_path)
@@ -57,6 +58,8 @@ def print_instances_management_menu(conf_file_path):
     elif selection == '7':
         deploy.check_running_instances()
     elif selection == '8':
+        deploy.start_instances()
+    elif selection == '9':
         deploy.convert_parties_file_to_rti()
 
 
@@ -64,9 +67,10 @@ def print_execution_menu(conf_file_path):
     color_print('Choose task to be executed:', 'yellow')
     color_print('0. Preform pre process operations', 'yellow')
     color_print('1. Install Experiment', 'yellow')
-    color_print('2. Update Experiment:', 'yellow')
-    color_print('3. Execute Experiment:', 'yellow')
-    color_print('4. Update libscapi:', 'yellow')
+    color_print('2. Update Experiment', 'yellow')
+    color_print('3. Execute Experiment', 'yellow')
+    color_print('4. Update libscapi', 'yellow')
+    color_print('5. Check if poll completed', 'yellow')
     selection = input('Your choice:')
 
     ee = e2e.E2E(conf_file_path)

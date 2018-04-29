@@ -1,5 +1,7 @@
 var formidable = require('formidable');
 var PythonShell = require('python-shell');
+var url = require('url');
+var sleep = require('sleep');
 var options = {
     mode:'text',
     pythonPath: '/usr/bin/python3.5',
@@ -22,25 +24,25 @@ exports.prepareOnline = function (req, res) {
         req.session.NumberOfOfflineParties = numberOfOfflineParties;
 
         // init python shell
-        var pyshell = new PythonShell('../main.py', options);
-        // enter to Deploy instances menu
-        pyshell.send('1');
+        var pyshell = new PythonShell('main.py', options);
+
+        if (numberOfOfflineParties > 0)
+        {
+            // enter to Deploy instances menu
+            pyshell.send('1')
+            // insert the configuration file
+            pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
+            // deploy instances
+            pyshell.send('1');
+        }
+
         // insert the configuration file
-        pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
+        pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
         // invoke get_aws_network_details_from_api
         pyshell.send('6');
         // send to python shell the online users ips
         pyshell.send(ips);
         // enter to execution menu
-        if (numberOfOfflineParties > 0)
-        {
-            pyshell.send('2');
-            // insert the configuration file
-            pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
-            //install experiment at aws machines
-            pyshell.send('1');
-            // exit python shell
-        }
         pyshell.send('4');
 
         pyshell.end(function (err, code, signal) {
@@ -53,19 +55,62 @@ exports.prepareOnline = function (req, res) {
     });
 };
 
+exports.prepareOnlineAPI = function (req, res) {
+    var queryData = url.parse(req.url, true).query;
+    var numberOfOnline = queryData.nonline;
+    var numberOfOffline = queryData.noffline;
+
+    req.session.NumberOfOnlineParties = numberOfOnline;
+    req.session.NumberOfOfflineParties = numberOfOffline;
+    if(!isNaN(numberOfOffline) && numberOfOffline > 0)
+    {
+        var pyshell = new PythonShell('main.py', options);
+        // enter to Deploy instances menu
+        pyshell.send('1');
+        // enter configuration file
+        pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
+        // send deploy instances command
+        pyshell.send('1');
+        sleep.msleep(240000)
+
+        // enter to execute menu
+        pyshell.send('2');
+        // enter configuration file
+        pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
+        // update libscapi
+        pyshell.send('4');
+        pyshell.send('dev')
+        // enter configuration file
+        pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
+        // install experiment on the offline parties
+        pyshell.send('1');
+        //exit
+        pyshell.send('4');
+
+        pyshell.end(function (err, code, signal) {
+            if(err) throw err;
+            console.log('The exit code was: ' + code);
+            console.log('The exit signal was: ' + signal);
+            console.log('finished');
+        });
+    }
+    res.redirect('/polls')
+};
+
 exports.saveIpAddress = function (req, res) {
     var ip = req.params.ip;
 
     // init python shell
-    var pyshell = new PythonShell('../main.py', options);
+    var pyshell = new PythonShell('main.py', options);
     // enter to Deploy instances menu
     pyshell.send('1');
     // insert the configuration file
-    pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
+    pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
     // invoke get_aws_network_details_from_api
     pyshell.send('6');
     // send to python shell the online users ips
     pyshell.send(ip);
+    //exit
     pyshell.send('4');
 
     pyshell.end(function (err, code, signal) {
@@ -79,12 +124,12 @@ exports.saveIpAddress = function (req, res) {
 };
 
 exports.isReadyForPoll = function (req, res) {
-    var pyshell = new PythonShell('../main.py', options);
+    var pyshell = new PythonShell('main.py', options);
 
     // enter to Deploy instances menu
     pyshell.send('1');
     // insert the configuration file
-    pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
+    pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
     // invoke check_running_instances
     pyshell.send('7');
     // exit python shell
@@ -114,13 +159,81 @@ exports.isReadyForPollLoop= function(req, res){
 
 exports.executePoll = function (req, res) {
     // init python shell
-    var pyshell = new PythonShell('../main.py', options);
+    var pyshell = new PythonShell('main.py', options);
     // enter to Deploy instances menu
     pyshell.send('2');
     // insert the configuration file
-    pyshell.send('../NodeApp/public/assets/Config_SecretSharing.json');
-    // invoke get_aws_network_details_from_api
+    pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
+    // invoke execute_poll
     pyshell.send('3');
     // exit python shell
     pyshell.send('4');
+
+    pyshell.end(function (err, code, signal) {
+            if(err) throw err;
+            console.log('The exit code was: ' + code);
+            console.log('The exit signal was: ' + signal);
+            console.log('finished');
+        });
 };
+
+exports.executePollAPI = function (req, res){
+    var nOffline = req.session.NumberOfOfflineParties;
+    var isReady = this.isReadyForPoll(req, res);
+    while(nOffline < isReady)
+    {
+        isReady = this.isReadyForPoll(req, res);
+    }
+
+    // when the offline parties are ready, execute the poll
+
+     // init python shell
+    var pyshell = new PythonShell('main.py', options);
+    // enter to Deploy instances menu
+    pyshell.send('2');
+    // insert the configuration file
+    pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
+    // invoke execute_poll
+    pyshell.send('3');
+    // exit python shell
+    pyshell.send('4');
+
+    pyshell.end(function (err, code, signal) {
+            if(err) throw err;
+            console.log('The exit code was: ' + code);
+            console.log('The exit signal was: ' + signal);
+            console.log('finished');
+        });
+};
+
+exports.isPollCompleted = function (req, res) {
+     // init python shell
+    var pyshell = new PythonShell('main.py', options);
+    // enter to Deploy instances menu
+    pyshell.send('2');
+    // insert the configuration file
+    pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
+    // invoke if poll is finished
+    pyshell.send('5');
+    // exit python shell
+    pyshell.stdout.on('data', function (data) {
+    // received a message sent from the Python script (a simple "print" statement)
+        if(data.toString() === 'True')
+        {
+            res.redirect(200, 'polls/');
+        }
+        else
+        {
+            res.redirect(204, 'polls/');
+        }
+    });
+    pyshell.send('4');
+
+    pyshell.end(function (err, code, signal) {
+            if(err) throw err;
+            console.log('The exit code was: ' + code);
+            console.log('The exit signal was: ' + signal);
+            console.log('finished');
+        });
+
+}

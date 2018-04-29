@@ -54,3 +54,6 @@ class E2E:
     def update_libscapi():
         branch = input('Enter libscapi branch to update from:')
         os.system('fab -f ExperimentExecute/fabfile.py update_libscapi:%s --parallel --no-pty' % branch)
+
+    def check_if_poll_completed(self):
+        pass

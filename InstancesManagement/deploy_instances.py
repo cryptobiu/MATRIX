@@ -332,7 +332,7 @@ class Deploy:
 
         # copy file to assets directory
         os.rename('%s/InstancesConfigurations/parties.conf' % os.getcwd(),
-                  '%s/public/assets/parties.conf' % os.getcwd())
+                  '%s/NodeApp/public/assets/parties.conf' % os.getcwd())
         # create circuit according to number of parties
         number_of_gates = 1000
         number_of_mult_gates = 1000
@@ -348,7 +348,7 @@ class Deploy:
                                                                   number_of_inputs, number_of_outputs, depth,
                                                                   number_of_parties)
 
-        os.rename('%s/%s' % (os.getcwd(), file_name), '%s/public/assets/%s' % (os.getcwd(), file_name))
+        os.rename('%s/%s' % (os.getcwd(), file_name), '%s/NodeApp/public/assets/%s' % (os.getcwd(), file_name))
 
     @staticmethod
     def check_running_spot_instances(region, machine_type):
@@ -393,6 +393,17 @@ class Deploy:
 
         print('**Number of ready instances : %s**' % ready_instances)
         return ready_instances
+
+    def start_instances(self):
+        with open(self.config_file_path) as data_file:
+            data = json.load(data_file)
+            regions = list(data['regions'].values())
+        for idx in range(len(regions)):
+            client = boto3.client('ec2', region_name=regions[idx][:-1])
+            with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r') as instance_file:
+                instances = [line.strip() for line in instance_file]
+            response = client.start_instances(InstanceIds=instances)
+
 
     @staticmethod
     def convert_parties_file_to_rti():
