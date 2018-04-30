@@ -8,7 +8,8 @@ from os.path import expanduser
 env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
-env.key_filename = [expanduser('~/Keys/Matrixuseast1.pem')]
+env.key_filename = [expanduser('~/Keys/Matrixuseast1.pem'), expanduser('~/Keys/Matrixapsouth1.pem'),
+                    expanduser('~/Keys/Matrixeuwest2.pem')]
 
 
 @task
