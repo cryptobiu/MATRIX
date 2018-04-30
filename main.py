@@ -49,7 +49,7 @@ def print_instances_management_menu(conf_file_path):
     elif selection == '3':
         deploy.create_security_group()
     elif selection == '4':
-        deploy.get_network_details(9000, 'Parties_gfp.txt')
+        deploy.get_network_details()
     elif selection == '5':
         terminate = ti.Terminate(conf_file_path)
         terminate.terminate()

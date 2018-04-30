@@ -11,7 +11,8 @@ from elasticsearch import Elasticsearch
 class Elastic:
     def __init__(self, conf_file):
         self.config_file_path = conf_file
-        self.es = Elasticsearch('my_server', use_ssl=True, ca_certs=certifi.where())
+        self.es = Elasticsearch('https://search-escryptobiu-fyopgg3zepk6dtda4zerc53apy.us-east-1.es.amazonaws.com/',
+                                use_ssl=True, ca_certs=certifi.where())
 
     def delete_index(self, index_name):
         self.es.indices.delete(index_name)
@@ -21,7 +22,7 @@ class Elastic:
             {
                 'mappings':
                 {
-                    'cpu':
+                    'memoryresults':
                     {
                         'properties':
                             {
@@ -33,10 +34,10 @@ class Elastic:
                     }
                 }
             }
-        self.es.indices.create(index='cpuresults', body=request_body)
+        self.es.indices.create(index='memoryresults', body=request_body)
 
-    def upload_data(self):
-        results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
+    def upload_data(self, analysis_type, results_path):
+
         with open(self.config_file_path) as data_file:
             data = json.load(data_file, object_pairs_hook=OrderedDict)
             raw_configurations = list(data['configurations'].values())[0].split('@')
@@ -46,7 +47,7 @@ class Elastic:
             raw_configurations.insert(0, 'protocolName')
 
         dts = datetime.utcnow()
-        results_files = glob('%s/*cpu*.json' % results_path)
+        results_files = glob('%s/*%s*.json' % (results_path, analysis_type))
         for results_file in results_files:
             config_values = basename(results_file).split('*')
             config_values[-1] = config_values[-1][:-5]
@@ -67,4 +68,12 @@ class Elastic:
                     doc[data[task_idx]['name']] = val / float(number_of_iterations)
                 doc['executionTime'] = dts
 
-                self.es.index(index='%sresults' % analyzed_parameter, doc_type=analyzed_parameter, body=doc)
+                self.es.index(index='%sresults' % analyzed_parameter, doc_type='%sresults' % analyzed_parameter,
+                              body=doc)
+
+    def upload_data(self):
+        results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
+        self.upload_data('cpu', results_path)
+        self.upload_data('commReceived', results_path)
+        self.upload_data('commSent', results_path)
+        self.upload_data('memory', results_path)
