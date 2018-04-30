@@ -190,8 +190,7 @@ class Deploy:
             if is_spot_request == 'True':
                 response = client.describe_spot_instance_requests()
                 for req_idx in range(len(response['SpotInstanceRequests'])):
-                    if response['SpotInstanceRequests'][req_idx]['State'] == 'active' or \
-                            response['SpotInstanceRequests'][req_idx]['State'] == 'open':
+                    if response['SpotInstanceRequests'][req_idx]['State'] == 'active':
                         instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
             else:
                 response = client.describe_instances()
