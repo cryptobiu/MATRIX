@@ -114,6 +114,42 @@ def manipulate_spdz2_networking():
         json.dump(json_data, new_json_file, indent=2)
 
 
+def manipulate_spdz2_networking_multi_region():
+    # write the public ips
+    public_ips_file = 'InstancesConfigurations/public_ips'
+    with open(public_ips_file, 'r') as ips_file:
+        origin_data = ips_file.readlines()
+        coordinator_ip = origin_data[-1]
+        origin_data.insert(0, coordinator_ip)
+        del origin_data[-1]
+    os.remove(public_ips_file)
+    with open(public_ips_file, 'w+') as new_ips_file:
+        new_ips_file.writelines(origin_data)
+
+    # write gf2n parties file
+    for party_idx in range(0, 50):
+        os.makedirs('InstancesConfigurations/multi_regions/party%s' % party_idx)
+        f1_name = 'InstancesConfigurations/parties%s.conf' % party_idx
+        f2_name = 'InstancesConfigurations/multi_regions/party%s/Parties_gf2n.txt' % party_idx
+        copyfile(f1_name, f2_name)
+
+    # write gfp parties file
+    for party_idx in range(0, 50):
+        with open('InstancesConfigurations/parties%s.conf' % party_idx, 'r') as parties_file:
+            parties_data = parties_file.readlines()
+            parties_data = [port.replace('8000', '9000') for port in parties_data]
+            with open('InstancesConfigurations/multi_regions/party%s/Parties_gfp.txt' % party_idx, 'w+') as gfp_file:
+                gfp_file.writelines(parties_data)
+
+
+def create_inputs_for_mpcfromsd():
+    with open(expanduser('~/MPCFromSD/inputs9.txt')) as input_file:
+        inputs = input_file.readlines()
+        for i in range(10, 128):
+            with open(expanduser('~/MPCFromSD/inputs%s.txt' % i), 'w+') as new_input:
+                new_input.writelines(inputs)
+
+
 task_name = sys.argv[1]
 
 if task_name == '1':
@@ -124,5 +160,9 @@ elif task_name == '3':
     install_spdz_stations()
 elif task_name == '4':
     manipulate_spdz2_networking()
+elif task_name == '5':
+    manipulate_spdz2_networking_multi_region()
+elif task_name == '6':
+    create_inputs_for_mpcfromsd()
 else:
     raise ValueError('Invalid choice')

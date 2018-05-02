@@ -8,8 +8,7 @@ from os.path import expanduser
 env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
-env.key_filename = [expanduser('~/Keys/Matrixuseast1.pem'), expanduser('~/Keys/Matrixapsouth1.pem'),
-                    expanduser('~/Keys/Matrixeuwest2.pem')]
+env.key_filename = [expanduser('~/Keys/matrix.pem')]
 
 
 @task
@@ -89,37 +88,39 @@ def run_protocol(config_file, args):
                 run('tar -xf *.tar.gz')
             party_id = env.hosts.index(env.host)
 
-            if len(regions) > 1:
-                put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                run('mv parties%s.conf parties.conf' % party_id)
-            else:
-                put('InstancesConfigurations/*arties*', run('pwd'))
-
             sudo('killall -9 %s; exit 0' % executable_name)
+            put('InstancesConfigurations/*arties*', run('pwd'))
 
             sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
 
             if protocol_name == 'MPCFromSD':
                 values_str = values_str.replace('inputs0.txt', 'inputs%s.txt' % str(party_id))
 
-            with warn_only():
-                if external_protocol == 'False':
-                    run('./%s -partyID %s %s' % (executable_name, party_id, values_str))
+            # with warn_only():
+            if external_protocol == 'False':
+                run('./%s -partyID %s %s' % (executable_name, party_id, values_str))
+
+            else:
+                if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
+                    coordinator_executable = data['coordinatorExecutable']
+                    coordinator_args = data['coordinatorConfig'].split('@')
+                    coordinator_values_str = ''
+
+                    for coordinator_val in coordinator_args:
+                        coordinator_values_str += '%s ' % coordinator_val
+                    sudo('killall -9 %s; exit 0' % coordinator_executable)
+                    run('./%s %s' % (coordinator_executable, coordinator_values_str))
 
                 else:
-                    if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
-                        coordinator_executable = data['coordinatorExecutable']
-                        coordinator_args = data['coordinatorConfig'].split('@')
-                        coordinator_values_str = ''
-
-                        for coordinator_val in coordinator_args:
-                            coordinator_values_str += '%s ' % coordinator_val
-                        sudo('killall -9 %s; exit 0' % coordinator_executable)
-                        run('./%s %s' % (coordinator_executable, coordinator_values_str))
-
+                    time.sleep(31)
+                    if len(regions) > 1:
+                        put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
+                        put('InstancesConfigurations/multi_regions/party%s/*' % (party_id - 1), run('pwd'))
+                        run('mv parties%s.conf parties.conf' % party_id)
                     else:
-                        time.sleep(31)
-                        run('./%s %s' % (executable_name, values_str))
+                        put('InstancesConfigurations/*arties*', run('pwd'))
+
+                    run('./%s %s' % (executable_name, values_str))
 
 
 @task

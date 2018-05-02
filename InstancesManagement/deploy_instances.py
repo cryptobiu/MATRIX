@@ -177,6 +177,7 @@ class Deploy:
             regions = list(data['regions'].values())
             is_spot_request = data['isSpotRequest']
             coordinator_exists = 'coordinatorConfig' in data
+            instance_type = data['aWSInstType']
 
         instances_ids = []
         public_ip_address = []
@@ -188,22 +189,17 @@ class Deploy:
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
             if is_spot_request == 'True':
-                response = client.describe_spot_instance_requests()
-                for req_idx in range(len(response['SpotInstanceRequests'])):
-                    if response['SpotInstanceRequests'][req_idx]['State'] == 'active':
-                        instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
-            else:
-                response = client.describe_instances()
-                for res_idx in range(len(response['Reservations'])):
-                    reservations_len = len(response['Reservations'][res_idx]['Instances'])
-                    for reserve_idx in range(reservations_len):
-                        if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running':
-                            instances_ids.append(response['Reservations']
-                                                 [res_idx]['Instances'][reserve_idx]['InstanceId'])
+                response = client.describe_instances(Filters=[{'Name': 'instance-lifecycle', 'Values': ['spot']},
+                                                              {'Name': 'instance-type', 'Values': [instance_type]}])
 
-            # delete MATRIX server from instances ids
-            if 'i-06146d4b39e3c79fb' in instances_ids:
-                instances_ids.remove('i-06146d4b39e3c79fb')
+            else:
+                response = client.describe_instances(Filters=[{'Name': 'instance-type', 'Values': [instance_type]}])
+            for res_idx in range(len(response['Reservations'])):
+                reservations_len = len(response['Reservations'][res_idx]['Instances'])
+                for reserve_idx in range(reservations_len):
+                    if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running':
+                        private_ip_address.append(response['Reservations'][2]['Instances'][reserve_idx]
+                                                  ['NetworkInterfaces'][0]['PrivateIpAddress'])
 
             # check if InstancesConfigurations dir exists
             if not os.path.isdir('%s/InstancesConfigurations' % os.getcwd()):
@@ -220,8 +216,8 @@ class Deploy:
                 for inst in instances:
                     if inst.id in instances_ids:
                         public_ip_address.append(inst.public_ip_address)
-                        if len(regions) == 1:
-                            private_ip_address.append(inst.private_ip_address)
+                        # if len(regions) == 1:
+                        #     private_ip_address.append(inst.private_ip_address)
 
         # rearrange the list that the ips from the same regions will not be followed
         if len(regions) > 1:
