@@ -1,12 +1,12 @@
 {
   "amis":
   {
-    "region_0": "ami-94dc3de9"
+    "region_0": "ami-c9d66db6"
   },
   "protocol":"MPCFromSD",
   "numOfParties":
   {
-    "size_0":20
+    "size_0":48
   },
   "gitAddress": "https://github.com/cryptobiu/MPCFromSD.git",
   "aWSInstType": "t2.medium",
@@ -14,13 +14,13 @@
   "executableName": "MPCFromSD",
   "configurations":
   {
-    "conf_0": "-numParties@20@-partiesFile@parties.conf@-numThreads@10@-l@8@-circuitFile@NigelAes20Parties.txt@-inputFile@AesInputs0.txt@-internalIterationsNumber@1"
+    "conf_0": "-numParties@48@-partiesFile@parties.conf@-numThreads@47@-l@16@-r@600@-h@16@-circuitFile@auction-48-32-scapi.txt@-inputFile@inputs0.txt@-internalIterationsNumber@1@-selectCommitteesOnly@false@-B@3"
   },
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
-  "isSpotRequest": "True",
+  "isSpotRequest": "False",
   "gitBranch": "master",
-  "IsPublished": "True",
+  "IsPublished": "False",
   "isExternal": "False",
   "regions":
   {
