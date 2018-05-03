@@ -198,8 +198,11 @@ class Deploy:
                 reservations_len = len(response['Reservations'][res_idx]['Instances'])
                 for reserve_idx in range(reservations_len):
                     if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running':
-                        private_ip_address.append(response['Reservations'][2]['Instances'][reserve_idx]
+                        private_ip_address.append(response['Reservations'][res_idx]['Instances'][reserve_idx]
                                                   ['NetworkInterfaces'][0]['PrivateIpAddress'])
+                        instances_ids.append(response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceId'])
+                        public_ip_address.append(response['Reservations'][res_idx]
+                                                 ['Instances'][reserve_idx]['PublicIpAddress'])
 
             # check if InstancesConfigurations dir exists
             if not os.path.isdir('%s/InstancesConfigurations' % os.getcwd()):
@@ -210,14 +213,6 @@ class Deploy:
                     as ids_file:
                 for instance_idx in range(len(instances_ids)):
                     ids_file.write('%s\n' % instances_ids[instance_idx])
-                ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
-                instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
-
-                for inst in instances:
-                    if inst.id in instances_ids:
-                        public_ip_address.append(inst.public_ip_address)
-                        # if len(regions) == 1:
-                        #     private_ip_address.append(inst.private_ip_address)
 
         # rearrange the list that the ips from the same regions will not be followed
         if len(regions) > 1:
