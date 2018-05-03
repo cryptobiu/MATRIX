@@ -198,18 +198,26 @@ class Deploy:
                 reservations_len = len(response['Reservations'][res_idx]['Instances'])
                 for reserve_idx in range(reservations_len):
                     if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running':
+
                         private_ip_address.append(response['Reservations'][res_idx]['Instances'][reserve_idx]
                                                   ['NetworkInterfaces'][0]['PrivateIpAddress'])
                         instances_ids.append(response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceId'])
                         public_ip_address.append(response['Reservations'][res_idx]
                                                  ['Instances'][reserve_idx]['PublicIpAddress'])
 
+            if '10.0.0.6' in private_ip_address:
+                private_ip_address.remove('10.0.0.6')
+            if 'i-06146d4b39e3c79fb' in instances_ids:
+                instances_ids.remove('i-06146d4b39e3c79fb')
+            if '35.171.69.162' in public_ip_address:
+                public_ip_address.remove('35.171.69.162')
+
             # check if InstancesConfigurations dir exists
             if not os.path.isdir('%s/InstancesConfigurations' % os.getcwd()):
                 os.makedirs('%s/InstancesConfigurations' % os.getcwd())
 
             # save instance_ids for experiment termination
-            with open('%s/InstancesConfigurations/instances_ids_%s' % (os.getcwd(), regions[idx][:-1]), 'a+') \
+            with open('%s/InstancesConfigurations/instances_ids_%s' % (os.getcwd(), regions[idx][:-1]), 'w+') \
                     as ids_file:
                 for instance_idx in range(len(instances_ids)):
                     ids_file.write('%s\n' % instances_ids[instance_idx])
@@ -394,7 +402,6 @@ class Deploy:
                 instances = [line.strip() for line in instance_file]
             response = client.start_instances(InstanceIds=instances)
 
-
     @staticmethod
     def convert_parties_file_to_rti():
         with open('InstancesConfigurations/parties.conf', 'r') as origin_file:
@@ -408,5 +415,24 @@ class Deploy:
         with open('InstancesConfigurations/parties.conf', 'w+') as new_file:
             new_file.write(ips_addresses)
 
+    def change_instance_types(self):
+        with open(self.config_file_path) as data_file:
+            data = json.load(data_file)
+            regions = list(data['regions'].values())
+        for idx in range(len(regions)):
+            with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r') as instance_file:
+                instances = [line.strip() for line in instance_file]
+            client = boto3.client('ec2', region_name=regions[idx][:-1])
+            client.stop_instances(InstanceIds=instances)
+            waiter = client.get_waiter('instance_stopped')
+            waiter.wait(InstanceIds=instances)
+
+            for instance_idx in range(len(instances)):
+                # Change the instance type
+                client.modify_instance_attribute(InstanceId=instances[instance_idx],
+                                                 Attribute='instanceType', Value='c5.xlarge')
+
+            # Start the instance
+            client.start_instances(InstanceIds=instances)
 
 

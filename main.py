@@ -33,11 +33,12 @@ def print_instances_management_menu(conf_file_path):
     color_print('2. Create Key pair(s)', 'red')
     color_print('3. Create security group(s)', 'red')
     color_print('4. Get instances network data', 'red')
-    color_print('5. Terminate Machines', 'red')
-    color_print('6. Get instances network data from API', 'red')
-    color_print('7. Check running instances from API', 'red')
-    color_print('8. Start instances from API', 'red')
-    color_print('9. Convert parties file to RTI format', 'red')
+    color_print('5. Terminate machines', 'red')
+    color_print('6. Change machines types', 'red')
+    color_print('7. Get instances network data from API', 'red')
+    color_print('8. Check running instances from API', 'red')
+    color_print('9. Start instances from API', 'red')
+    color_print('10. Convert parties file to RTI format', 'red')
     selection = input('Your choice:')
 
     deploy = di.Deploy(conf_file_path)
@@ -54,12 +55,14 @@ def print_instances_management_menu(conf_file_path):
         terminate = ti.Terminate(conf_file_path)
         terminate.terminate()
     elif selection == '6':
-        deploy.get_aws_network_details_from_api()
+        deploy.change_instance_types()
     elif selection == '7':
-        deploy.check_running_instances()
+        deploy.get_aws_network_details_from_api()
     elif selection == '8':
-        deploy.start_instances()
+        deploy.check_running_instances()
     elif selection == '9':
+        deploy.start_instances()
+    elif selection == '10':
         deploy.convert_parties_file_to_rti()
 
 
