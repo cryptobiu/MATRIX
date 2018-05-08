@@ -1,14 +1,10 @@
 {
   "keys":
   {
-    "key_0":"Matrixapsouth1",
-    "key_1":"Matrixeuwest2",
-    "key_2":"Matrixuseast1"
+    "key_0":"Matrixuseast1"
   },
   "securityGroups":
   {
-    "securityGroup_0":"MatrixSGapsouth1",
-    "securityGroup_1":"MatrixSGeuwest2",
-    "securityGroup_2":"MatrixSGuseast1"
+    "securityGroup_0":"MatrixSGuseast1"
   }
 }

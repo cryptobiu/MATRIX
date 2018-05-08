@@ -1,0 +1,98 @@
+{
+  "region_0":
+  {
+    "region_name": "us-east-1",
+    "ami": "ami-774fce08",
+    "name": "N.Virginia"
+  },
+  "region_1":
+  {
+    "region_name": "us-east-2",
+    "ami": "ami-c9310cac",
+    "name": "Ohio"
+  },
+  "region_2":
+  {
+    "region_name": "us-west-1",
+    "ami": "ami-62829d02",
+    "name": "N.California"
+  },
+  "region_3":
+  {
+    "region_name": "us-west-2",
+    "ami": "ami-4f166737",
+    "name": "Oregon"
+  },
+  "region_4":
+  {
+    "region_name": "ap-south-1",
+    "ami": "ami-401a3a2f",
+    "name": "Mumbai"
+  },
+  "region_5":
+  {
+    "region_name": "ap-northeast-2",
+    "ami": "ami-7609a018",
+    "name": "Seoul"
+  },
+  "region_6":
+  {
+    "region_name": "ap-southeast-1",
+    "ami": "ami-1f22517c",
+    "name": "Singapore"
+  },
+  "region_7":
+  {
+    "region_name": "ap-southeast-2",
+    "ami": "ami-fc1bcc9e",
+    "name": "Sydney"
+  },
+  "region_8":
+  {
+    "region_name": "ap-northeast-1",
+    "ami": "ami-78bd5507",
+    "name": "Tokyo"
+  },
+  "region_9":
+  {
+    "region_name": "ca-central-1",
+    "ami": "ami-d88404bc",
+    "name": "Canada"
+  },
+  "region_10":
+  {
+    "region_name": "eu-central-1",
+    "ami": "ami-8cae8c67",
+    "name": "Frankfurt"
+  },
+  "region_11":
+  {
+    "region_name": "ca-central-1",
+    "ami": "ami-d88404bc",
+    "name": "Canada"
+  },
+  "region_12":
+  {
+    "region_name": "eu-west-1",
+    "ami": "ami-1b5b6f62",
+    "name": "Ireland"
+  },
+  "region_13":
+  {
+    "region_name": "eu-west-2",
+    "ami": "ami-bb1dffdc",
+    "name": "London"
+  },
+  "region_14":
+  {
+    "region_name": "eu-west-3",
+    "ami": "ami-749e2f09",
+    "name": "Paris"
+  },
+  "region_15":
+  {
+    "region_name": "sa-east-1",
+    "ami": "ami-2699c44a",
+    "name": "Sao Paulo"
+  }
+}
