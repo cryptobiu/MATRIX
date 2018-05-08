@@ -67,29 +67,23 @@
   },
   "region_11":
   {
-    "region_name": "ca-central-1",
-    "ami": "ami-d88404bc",
-    "name": "Canada"
-  },
-  "region_12":
-  {
     "region_name": "eu-west-1",
     "ami": "ami-1b5b6f62",
     "name": "Ireland"
   },
-  "region_13":
+  "region_12":
   {
     "region_name": "eu-west-2",
     "ami": "ami-bb1dffdc",
     "name": "London"
   },
-  "region_14":
+  "region_13":
   {
     "region_name": "eu-west-3",
     "ami": "ami-749e2f09",
     "name": "Paris"
   },
-  "region_15":
+  "region_14":
   {
     "region_name": "sa-east-1",
     "ami": "ami-2699c44a",
