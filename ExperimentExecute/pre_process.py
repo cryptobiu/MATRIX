@@ -150,6 +150,15 @@ def create_inputs_for_mpcfromsd():
                 new_input.writelines(inputs)
 
 
+def create_inputs_for_statistics():
+    inputs_size = [400000, 200000, 133332, 100000, 80000, 66666, 57142, 50000, 44444, 40000, 36362, 33332, 30768, 28570,
+                   26666]
+    for idx in range(len(inputs_size)):
+        with open(expanduser('~/Secret-Sharing/inputs%s.txt' % inputs_size[idx]), 'w+') as input_file:
+            for idx2 in range(inputs_size[idx]):
+                input_file.write('1\n')
+
+
 task_name = sys.argv[1]
 
 if task_name == '1':
@@ -164,5 +173,7 @@ elif task_name == '5':
     manipulate_spdz2_networking_multi_region()
 elif task_name == '6':
     create_inputs_for_mpcfromsd()
+elif task_name == '7':
+    create_inputs_for_statistics()
 else:
     raise ValueError('Invalid choice')

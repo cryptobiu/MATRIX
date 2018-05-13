@@ -11,7 +11,7 @@ class Terminate:
     def terminate(self):
         with open(self.config_file_path) as data_file:
                 data = json.load(data_file)
-                regions = list(data['regions'].values())
+                regions = list(data['regions.json'].values())
 
         for idx in range(len(regions)):
             with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r+') as ids_file:

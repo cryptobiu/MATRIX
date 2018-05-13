@@ -42,7 +42,7 @@ class Analyze:
         protocol_name = conf_data['protocol']
         users = list(conf_data['emails'].values())
         configurations = list(conf_data['configurations'].values())
-        regions = list(conf_data['regions'].values())
+        regions = list(conf_data['regions.json'].values())
         address_me = 'biu.cyber.experiments@gmail.com'
         me = 'BIU Cyber Experiments <biu.cyber.experiments@gmail.com>'
 
@@ -63,7 +63,7 @@ class Analyze:
             for val in vals:
                 values_str += '%s ' % val
             message_body += '%s\n' % values_str
-        # write all regions to mail
+        # write all regions.json to mail
         message_body += 'The region(s) the experiment executed are:\n\n'
         for region in regions:
             message_body += '%s\n' % region

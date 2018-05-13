@@ -18,7 +18,7 @@ class Deploy:
     def create_key_pair(self, number_of_parties):
         with open(self.config_file_path) as regions_file:
             data = json.load(regions_file, object_pairs_hook=OrderedDict)
-            regions = list(data['regions'].values())
+            regions = list(data['regions.json'].values())
 
         for regions_idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[regions_idx][:-1])
@@ -40,7 +40,7 @@ class Deploy:
     def create_security_group(self):
         with open(self.config_file_path) as regions_file:
             data = json.load(regions_file, object_pairs_hook=OrderedDict)
-            regions = list(data['regions'].values())
+            regions = list(data['regions.json'].values())
 
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
@@ -80,6 +80,7 @@ class Deploy:
             regions = list(data['regions'].values())
             number_duplicated_servers = 0
             spot_request = data['isSpotRequest']
+            protocol_name = data['protocol']
 
         with open('%s/GlobalConfigurations/conf.json' % os.getcwd()) as gc_file:
             global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
@@ -147,7 +148,15 @@ class Deploy:
                         Placement=
                         {
                             'AvailabilityZone': regions[idx],
-                        }
+                        },
+                        TagSpecifications=[{
+                                            'ResourceType': 'instance',
+                                            'Tags':
+                                                [{
+                                                    'Key': 'Name',
+                                                    'Value': protocol_name
+                                                }]
+                                            }]
                     )
 
         print('Waiting for the images to be deployed..')
@@ -178,6 +187,7 @@ class Deploy:
             is_spot_request = data['isSpotRequest']
             coordinator_exists = 'coordinatorConfig' in data
             instance_type = data['aWSInstType']
+            protocol_name = data['protocol']
 
         instances_ids = []
         public_ip_address = []
@@ -190,22 +200,23 @@ class Deploy:
             client = boto3.client('ec2', region_name=regions[idx][:-1])
             if is_spot_request == 'True':
                 response = client.describe_instances(Filters=[{'Name': 'instance-lifecycle', 'Values': ['spot']},
-                                                              {'Name': 'instance-type', 'Values': [instance_type]}])
+                                                              {'Name': 'instance-type', 'Values': [instance_type]},
+                                                              {'Name': 'tag:Name', 'Values': protocol_name}])
 
             else:
-                response = client.describe_instances(Filters=[{'Name': 'instance-type', 'Values': [instance_type]}])
+                response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [protocol_name]}])
             for res_idx in range(len(response['Reservations'])):
                 reservations_len = len(response['Reservations'][res_idx]['Instances'])
                 for reserve_idx in range(reservations_len):
                     if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running':
-
-                        private_ip_address.append(response['Reservations'][res_idx]['Instances'][reserve_idx]
-                                                  ['NetworkInterfaces'][0]['PrivateIpAddress'])
+                        if len(regions) == 1:
+                            private_ip_address.append(response['Reservations'][res_idx]['Instances'][reserve_idx]
+                                                      ['NetworkInterfaces'][0]['PrivateIpAddress'])
                         instances_ids.append(response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceId'])
                         public_ip_address.append(response['Reservations'][res_idx]
                                                  ['Instances'][reserve_idx]['PublicIpAddress'])
 
-            if '10.0.0.6' in private_ip_address:
+            if len(regions) == 1 and '10.0.0.6' in private_ip_address:
                 private_ip_address.remove('10.0.0.6')
             if 'i-06146d4b39e3c79fb' in instances_ids:
                 instances_ids.remove('i-06146d4b39e3c79fb')
@@ -222,7 +233,7 @@ class Deploy:
                 for instance_idx in range(len(instances_ids)):
                     ids_file.write('%s\n' % instances_ids[instance_idx])
 
-        # rearrange the list that the ips from the same regions will not be followed
+        # rearrange the list that the ips from the same regions.json will not be followed
         if len(regions) > 1:
             shuffle(public_ip_address)
 
@@ -376,7 +387,7 @@ class Deploy:
     def check_running_instances(self):
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
-        regions = list(data['regions'].values())
+        regions = list(data['regions.json'].values())
         ready_instances = 0
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
@@ -395,7 +406,7 @@ class Deploy:
     def start_instances(self):
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
-            regions = list(data['regions'].values())
+            regions = list(data['regions.json'].values())
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
             with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r') as instance_file:
@@ -418,7 +429,7 @@ class Deploy:
     def change_instance_types(self):
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
-            regions = list(data['regions'].values())
+            regions = list(data['regions.json'].values())
         for idx in range(len(regions)):
             with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r') as instance_file:
                 instances = [line.strip() for line in instance_file]
@@ -435,4 +446,20 @@ class Deploy:
             # Start the instance
             client.start_instances(InstanceIds=instances)
 
+    def change_instance_disk_size(self):
+        with open(self.config_file_path) as data_file:
+            data = json.load(data_file)
+            regions = list(data['regions.json'].values())
+            protocol_name = data['protocol']
 
+        for idx in range(len(regions)):
+            client = boto3.client('ec2', region_name=regions[idx][:-1])
+            response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [protocol_name]}])
+            instances_ids = []
+
+            for res_idx in range(len(response['Reservations'])):
+                reservations_len = len(response['Reservations'][res_idx]['Instances'])
+                for reserve_idx in range(reservations_len):
+                    instances_ids.append(response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceId'])
+
+            client.stop_instances(InstanceIds=instances_ids)

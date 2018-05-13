@@ -21,8 +21,6 @@ def pre_process(working_directory, task_idx):
 
 @task
 def install_git_project(git_branch, working_directory, git_address, external, install_script):
-
-    run('rm -rf rti_connext_dds-5.3.0/doc rti_connext_dds-5.3.0/RTIInstallFiles/ %s' % working_directory)
     if external == 'True':
         put('ExternalProtocols/%s' % install_script, run('pwd'))
         sudo('chmod +x %s' % install_script)
@@ -32,17 +30,16 @@ def install_git_project(git_branch, working_directory, git_address, external, in
         if not exists('%s' % working_directory):
             run('git clone %s' % git_address)
 
-        with cd('%s' % working_directory):
-            run('git checkout %s ' % git_branch)
-            if exists('%s/CMakeLists.txt' % working_directory):
-                sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
-                run('cmake .')
-            run('make')
+    with cd('%s' % working_directory):
+        run('git checkout %s ' % git_branch)
+        if exists('%s/CMakeLists.txt' % working_directory):
+            sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
+            run('cmake .')
+        run('make')
 
 
 @task
 def update_git_project(working_directory):
-
     with cd('%s' % working_directory):
         run('git pull')
 
@@ -83,13 +80,10 @@ def run_protocol(config_file, args):
                 values_str += '%s ' % val
 
         with cd(working_directory):
-            # run('cp ../rti_connext_dds-5.3.0/rti_license.dat .')
-            if exists('*.tar.gz'):
-                run('tar -xf *.tar.gz')
+            if exists('*.7z'):
+                run('7z e *.7z')
             party_id = env.hosts.index(env.host)
-
             sudo('killall -9 %s; exit 0' % executable_name)
-            put('InstancesConfigurations/*arties*', run('pwd'))
 
             sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
 
@@ -98,6 +92,11 @@ def run_protocol(config_file, args):
 
             # with warn_only():
             if external_protocol == 'False':
+                if len(regions) > 1:
+                    put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
+                    run('mv parties%s.conf parties.conf' % party_id)
+                else:
+                    put('InstancesConfigurations/parties.conf', run('pwd'))
                 run('./%s -partyID %s %s' % (executable_name, party_id, values_str))
 
             else:
@@ -127,4 +126,3 @@ def run_protocol(config_file, args):
 def collect_results(results_server_directory, results_local_directory):
     local('mkdir -p %s' % results_local_directory)
     get('%s/*.json' % results_server_directory, results_local_directory)
-

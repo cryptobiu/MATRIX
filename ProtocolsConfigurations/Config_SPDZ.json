@@ -3,7 +3,7 @@
   {
     "region_0": "ami-401a3a2f",
     "region_1": "ami-f6f01291",
-    "region_2": "ami-c9d66db6"
+    "region_2": "ami-774fce08"
   },
   "protocol": "SPDZ",
   "numOfParties": {

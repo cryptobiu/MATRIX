@@ -5,14 +5,11 @@ __pycache__/
 *$py.class
 .idea/
 *.xlsx
-InstancesConfigurations/instances_ids_us-east-1
-InstancesConfigurations/instances_ids_ap-south-1
-InstancesConfigurations/instances_ids_eu-west-2
+InstancesConfigurations/instances_ids_*
 InstancesConfigurations/public_ips
-InstancesConfigurations/parties.conf
-NodeApp/InstancesConfigurations/instances_ids_us-east-1
+InstancesConfigurations/parties*.conf
 NodeApp/InstancesConfigurations/public_ips
-NodeApp/InstancesConfigurations/parties.conf
+NodeApp/InstancesConfigurations/parties*.conf
 NodeApp/node_modules
 InstancesConfigurations/Parties_gf2n.txt
 InstancesConfigurations/Parties_gfp.txt
