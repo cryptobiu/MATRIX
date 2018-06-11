@@ -76,16 +76,13 @@ class Deploy:
             machine_type = data['aWSInstType']
             price_bids = data['aWWSBidPrice']
             number_of_parties = list(data['numOfParties'].values())
-            amis_id = list(data['amis'].values())
             regions = list(data['regions'].values())
             number_duplicated_servers = 0
             spot_request = data['isSpotRequest']
             protocol_name = data['protocol']
 
-        with open('%s/GlobalConfigurations/conf.json' % os.getcwd()) as gc_file:
+        with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
             global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
-            keys = list(global_config['keys'].values())
-            security_group = list(global_config['securityGroups'].values())
 
         if len(regions) > 1:
             number_of_instances = max(number_of_parties) // len(regions)
@@ -109,7 +106,7 @@ class Deploy:
 
             print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
                   'valid until : %s' % (regions[idx], number_of_instances_to_deploy,
-                                        amis_id[idx], machine_type, str(new_date)))
+                                        global_config[regions[idx[:-1]]["ami"]], machine_type, str(new_date)))
 
             if number_of_instances_to_deploy > 0:
                 if spot_request == 'True':
@@ -125,9 +122,9 @@ class Deploy:
                                 ValidUntil=new_date,
                                 LaunchSpecification=
                                 {
-                                    'ImageId': amis_id[idx],
-                                    'KeyName': keys[idx],
-                                    'SecurityGroups': [security_group[idx]],
+                                    'ImageId': global_config[regions[idx[:-1]]["ami"]],
+                                    'KeyName': global_config[regions[idx[:-1]]["key"]],
+                                    'SecurityGroups': global_config[regions[idx[:-1]]["securityGroup"]],
                                     'InstanceType': machine_type,
                                     'Placement':
                                         {
@@ -139,11 +136,11 @@ class Deploy:
                         print(e.response['Error']['Message'].upper())
                 else:
                     client.run_instances(
-                        ImageId=amis_id[idx],
-                        KeyName=keys[idx],
+                        ImageId=global_config[regions[idx[:-1]]["ami"]],
+                        KeyName=global_config[regions[idx[:-1]]["key"]],
                         MinCount=int(number_of_instances_to_deploy),
                         MaxCount=int(number_of_instances_to_deploy),
-                        SecurityGroups=[security_group[idx]],
+                        SecurityGroups=global_config[regions[idx[:-1]]["securityGroup"]],
                         InstanceType=machine_type,
                         Placement=
                         {
@@ -152,11 +149,11 @@ class Deploy:
                         TagSpecifications=[{
                                             'ResourceType': 'instance',
                                             'Tags':
-                                                [{
+                                            [{
                                                     'Key': 'Name',
                                                     'Value': protocol_name
-                                                }]
                                             }]
+                                        }]
                     )
 
         print('Waiting for the images to be deployed..')
@@ -170,17 +167,38 @@ class Deploy:
         with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'r') as origin_file:
             parties = origin_file.readlines()
 
-        number_of_parties = len(parties) // 2
+        number_of_parties = len(parties)
 
         for idx in range(number_of_parties):
             new_parties = copy.deepcopy(parties)
-            new_parties[idx] = 'party_%s_ip=0.0.0.0\n' % idx
+            new_parties[idx] = '0.0.0.0:8000\n'
 
             # write data to file
             with open('%s/InstancesConfigurations/parties%s.conf' % (os.getcwd(), idx), 'w+') as new_file:
                 new_file.writelines(new_parties)
 
-    def get_aws_network_details(self, port_number=8000, file_name='parties.conf'):
+    def create_parties_file(self, ip_addresses, port_counter, file_name, new_format=False, number_of_regions=1):
+
+        print('Parties network configuration')
+        with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'w+') as private_ip_file:
+            if new_format == 'False':
+                for party_idx in range(len(ip_addresses)):
+                    print('party_%s_ip=%s' % (party_idx, ip_addresses[party_idx]))
+                    private_ip_file.write('party_%s_ip=%s\n' % (party_idx, ip_addresses[party_idx]))
+
+                for port_idx in range(len(ip_addresses)):
+                    print('party_%s_port=%s' % (port_idx, port_counter))
+                    private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_counter))
+
+            else:
+                for party_idx in range(len(ip_addresses)):
+                    private_ip_file.write('%s:8000\n' % ip_addresses[party_idx])
+
+        # create party file for each instance
+        if len(number_of_regions) > 1:
+            self.create_parties_files_multi_regions(file_name)
+
+    def get_aws_network_details(self, port_counter, file_name, new_format=False):
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
             regions = list(data['regions'].values())
@@ -191,9 +209,7 @@ class Deploy:
 
         instances_ids = []
         public_ip_address = []
-
-        if len(regions) == 1:
-            private_ip_address = []
+        private_ip_address = []
 
         # get the spot instances ids
         for idx in range(len(regions)):
@@ -205,6 +221,8 @@ class Deploy:
 
             else:
                 response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [protocol_name]}])
+
+            # Extract instances ids
             for res_idx in range(len(response['Reservations'])):
                 reservations_len = len(response['Reservations'][res_idx]['Instances'])
                 for reserve_idx in range(reservations_len):
@@ -216,13 +234,6 @@ class Deploy:
                         public_ip_address.append(response['Reservations'][res_idx]
                                                  ['Instances'][reserve_idx]['PublicIpAddress'])
 
-            if len(regions) == 1 and '10.0.0.6' in private_ip_address:
-                private_ip_address.remove('10.0.0.6')
-            if 'i-06146d4b39e3c79fb' in instances_ids:
-                instances_ids.remove('i-06146d4b39e3c79fb')
-            if '35.171.69.162' in public_ip_address:
-                public_ip_address.remove('35.171.69.162')
-
             # check if InstancesConfigurations dir exists
             if not os.path.isdir('%s/InstancesConfigurations' % os.getcwd()):
                 os.makedirs('%s/InstancesConfigurations' % os.getcwd())
@@ -233,27 +244,15 @@ class Deploy:
                 for instance_idx in range(len(instances_ids)):
                     ids_file.write('%s\n' % instances_ids[instance_idx])
 
+        if coordinator_exists == 'True':
+            del private_ip_address[0]
+
         # rearrange the list that the ips from the same regions.json will not be followed
         if len(regions) > 1:
             shuffle(public_ip_address)
-
-        print('Parties network configuration')
-        with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'w+') as private_ip_file:
-            if len(regions) > 1:
-                for public_idx in range(len(public_ip_address)):
-                    print('party_%s_ip=%s' % (public_idx, public_ip_address[public_idx]))
-                    private_ip_file.write('party_%s_ip=%s\n' % (public_idx, public_ip_address[public_idx]))
-            else:
-                if coordinator_exists == 'True':
-                    del private_ip_address[0]
-
-                for private_idx in range(len(private_ip_address)):
-                    print('party_%s_ip=%s' % (private_idx, private_ip_address[private_idx]))
-                    private_ip_file.write('party_%s_ip=%s\n' % (private_idx, private_ip_address[private_idx]))
-
-            for port_idx in range(len(public_ip_address)):
-                print('party_%s_port=%s' % (port_idx, port_number))
-                private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_number))
+            self.create_parties_file(public_ip_address, port_counter, file_name, new_format, len(regions))
+        else:
+            self.create_parties_file(private_ip_address, port_counter, file_name,  new_format, len(regions))
 
         # write public ips to file for fabric
         if 'local' in regions or 'server' not in regions:
@@ -261,29 +260,19 @@ class Deploy:
                 for public_idx in range(len(public_ip_address)):
                     public_ip_file.write('%s\n' % public_ip_address[public_idx])
 
-        # create party file for each instance
-        if len(regions) > 1:
-            self.create_parties_files_multi_regions(file_name)
-
     def get_network_details(self, port_counter=8000, file_name='parties.conf'):
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
             regions = list(data['regions'].values())
 
-        public_ip_address = []
-
         number_of_parties = max(list(data['numOfParties'].values()))
         if 'local' in regions:
-            with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'w+') as private_ip_file:
-                for ip_idx in range(len(number_of_parties)):
-                    private_ip_file.write('party_%s_ip=127.0.0.1\n' % ip_idx)
-                    public_ip_address.append('127.0.0.1')
+            public_ip_address = []
+            for ip_idx in range(len(number_of_parties)):
+                public_ip_address.append('127.0.0.1')
+            self.create_parties_file(public_ip_address, False)
 
-                # port_counter = 8000
-                for ip_idx in range(len(number_of_parties)):
-                    private_ip_file.write('party_%s_port=%s\n' % (ip_idx, port_counter))
-                    port_counter += 100
-
+        # read servers configuration
         elif 'servers' in regions:
             server_file = input('Enter your server file configuration: ')
             os.system('mv %s %s/InstancesConfigurations/public_ips' % (os.getcwd(), server_file))
@@ -292,17 +281,10 @@ class Deploy:
             with open('%s/InstancesConfigurations/public_ips' % os.getcwd(), 'r+') as server_ips_file:
                 for line in server_ips_file:
                     server_ips.append(line)
+            self.create_parties_file(server_ips, False)
 
-                with open('%s/InstancesConfigurations/%s' % (os.getcwd(),file_name), 'w+') as private_ip_file:
-                    for ip_idx in range(len(server_ips)):
-                        print('party_%s_ip=%s' % (ip_idx, server_ips[ip_idx]))
-                        private_ip_file.write('party_%s_ip=127.0.0.1' % ip_idx)
-
-                    # port_counter = 8000
-                    for ip_idx in range(len(server_ips)):
-                        private_ip_file.write('party_%s_port=%s\n' % (ip_idx, port_counter))
         else:
-            self.get_aws_network_details(port_counter, file_name)
+            self.get_aws_network_details(port_counter, file_name, False)
 
     def get_aws_network_details_from_api(self):
 
@@ -407,11 +389,25 @@ class Deploy:
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
             regions = list(data['regions.json'].values())
+
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
             with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r') as instance_file:
                 instances = [line.strip() for line in instance_file]
-            response = client.start_instances(InstanceIds=instances)
+
+            client.start_instances(InstanceIds=instances)
+
+    def stop_instances(self):
+        with open(self.config_file_path) as data_file:
+            data = json.load(data_file)
+            regions = list(data['regions.json'].values())
+
+        for idx in range(len(regions)):
+            client = boto3.client('ec2', region_name=regions[idx][:-1])
+            with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r') as instance_file:
+                instances = [line.strip() for line in instance_file]
+
+            client.stop_instances(InstanceIds=instances)
 
     @staticmethod
     def convert_parties_file_to_rti():
@@ -429,7 +425,7 @@ class Deploy:
     def change_instance_types(self):
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
-            regions = list(data['regions.json'].values())
+            regions = list(data['regions'].values())
         for idx in range(len(regions)):
             with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r') as instance_file:
                 instances = [line.strip() for line in instance_file]
@@ -441,7 +437,7 @@ class Deploy:
             for instance_idx in range(len(instances)):
                 # Change the instance type
                 client.modify_instance_attribute(InstanceId=instances[instance_idx],
-                                                 Attribute='instanceType', Value='c5.xlarge')
+                                                 Attribute='instanceType', Value='c4.large')
 
             # Start the instance
             client.start_instances(InstanceIds=instances)

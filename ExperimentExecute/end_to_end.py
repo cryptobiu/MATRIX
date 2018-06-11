@@ -1,6 +1,5 @@
 import os
 import json
-import datetime
 from collections import OrderedDict
 
 
@@ -32,12 +31,6 @@ class E2E:
             git_branch = data['gitBranch']
             os.system('fab -f ExperimentExecute/fabfile.py install_git_project:%s,%s,%s,%s,%s --parallel --no-pty'
                       % (git_branch, working_directory, git_address, external_protocol, ''))
-
-    def update_experiment(self):
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file, object_pairs_hook=OrderedDict)
-        working_directory = data['workingDirectory']
-        os.system('fab -f ExperimentExecute/fabfile.py update_git_project:%s --parallel --no-pty' % working_directory)
 
     def execute_experiment(self):
         with open(self.config_file_path) as data_file:

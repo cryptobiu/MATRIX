@@ -21,6 +21,7 @@ def pre_process(working_directory, task_idx):
 
 @task
 def install_git_project(git_branch, working_directory, git_address, external, install_script):
+    run('rm -rf Secret-Sharing')
     if external == 'True':
         put('ExternalProtocols/%s' % install_script, run('pwd'))
         sudo('chmod +x %s' % install_script)
@@ -31,22 +32,10 @@ def install_git_project(git_branch, working_directory, git_address, external, in
             run('git clone %s' % git_address)
 
     with cd('%s' % working_directory):
+        run('git pull')
         run('git checkout %s ' % git_branch)
         if exists('%s/CMakeLists.txt' % working_directory):
             sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
-            run('cmake .')
-        run('make')
-
-
-@task
-def update_git_project(working_directory):
-    with cd('%s' % working_directory):
-        run('git pull')
-
-        if exists('%s/CMakeLists.txt' % working_directory):
-            with settings(warn_only=True):
-                run('make clean')
-                sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
             run('cmake .')
         run('make')
 
@@ -82,6 +71,10 @@ def run_protocol(config_file, args):
         with cd(working_directory):
             if exists('*.7z'):
                 run('7z e *.7z')
+
+            with warn_only():
+                run('rm *.log')
+
             party_id = env.hosts.index(env.host)
             sudo('killall -9 %s; exit 0' % executable_name)
 
@@ -126,3 +119,23 @@ def run_protocol(config_file, args):
 def collect_results(results_server_directory, results_local_directory):
     local('mkdir -p %s' % results_local_directory)
     get('%s/*.json' % results_server_directory, results_local_directory)
+
+
+@task
+def get_logs(working_directory):
+    local('mkdir -p logs')
+    get('%s/*.log' % working_directory, expanduser('~/MATRIX/logs'))
+
+
+@task
+def update_acp_protocol():
+    with cd('ACP'):
+        run('git pull https://github.com/cryptobiu/ACP')
+        with cd('comm_client'):
+            run('cmake .')
+            run('make')
+
+
+@task
+def kill_process(process_name):
+    sudo('killall -9 %s' % process_name)

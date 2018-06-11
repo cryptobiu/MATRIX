@@ -1,8 +1,4 @@
 {
-  "amis":
-  {
-    "region_0": "ami-774fce08"
-  },
   "protocol":"LowCostConstantRoundShortKeysMPC",
   "numOfParties":
   {
