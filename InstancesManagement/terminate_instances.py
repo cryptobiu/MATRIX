@@ -1,7 +1,5 @@
-import os
 import boto3
 import json
-import glob
 from InstancesManagement import deploy_instances
 
 
@@ -22,4 +20,3 @@ class Terminate:
 
             client = boto3.client('ec2', region_name=region_name)
             client.terminate_instances(InstanceIds=instances)
-
