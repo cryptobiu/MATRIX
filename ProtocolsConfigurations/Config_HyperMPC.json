@@ -1,14 +1,14 @@
 {
-  "protocol":"PerfectSecureMPC",
+  "protocol":"HyperMPC",
   "numOfParties":
   {
     "size_0":250
   },
-  "gitAddress": "https://github.com/cryptobiu/Secret-Sharing.git",
+  "gitAddress": "https://github.com/cryptobiu/HyperMPC.git",
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.031",
   "network": "LAN",
-  "executableName": "Secret_Sharing",
+  "executableName": "HyperMPC",
   "configurations":
   {
     "conf_0": "-partiesNumber@1000@-inputFile@inputsSalary0.txt@-outputFile@output.txt@-circuitFile@ArythmeticVarianceFor3InputsAnd1000Parties.txt@-fieldType@ZpMersenne@-partiesFile@parties.conf@-internalIterationsNumber@1@-NG@1"
@@ -22,10 +22,9 @@
   "regions":
   {
     "region_0":"eu-west-2a",
-    "region_1":"ap-south-1a",
-    "region_2":"us-east-1a"
+    "region_1":"ap-south-1a"
   },
-  "workingDirectory": "~/Secret-Sharing",
+  "workingDirectory": "~/HyperMPC",
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
   "emails":
   {
