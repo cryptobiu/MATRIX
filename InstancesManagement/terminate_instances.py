@@ -2,6 +2,7 @@ import os
 import boto3
 import json
 import glob
+from InstancesManagement import deploy_instances
 
 
 class Terminate:
@@ -10,22 +11,15 @@ class Terminate:
 
     def terminate(self):
         with open(self.config_file_path) as data_file:
-                data = json.load(data_file)
-                regions = list(data['regions.json'].values())
+            data = json.load(data_file)
+            regions = list(data['regions'].values())
+            machines_name = data['protocol']
 
         for idx in range(len(regions)):
-            with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r+') as ids_file:
-                instances_ids = ids_file.readlines()
+            region_name = regions[idx][:-1]
 
-            instances_ids = [x.strip() for x in instances_ids]
-            client = boto3.client('ec2', region_name=regions[idx][:-1])
-            client.terminate_instances(InstanceIds=instances_ids)
+            instances = deploy_instances.Deploy.describe_instances(region_name, machines_name)
 
-        instances_ids_files = glob.glob('InstancesConfigurations/instances_ids*')
-        if len(instances_ids_files) > 0:
-            for f in instances_ids_files:
-                try:
-                    os.remove(f)
-                except OSError:
-                    pass
+            client = boto3.client('ec2', region_name=region_name)
+            client.terminate_instances(InstanceIds=instances)
 

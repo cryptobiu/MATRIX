@@ -238,12 +238,6 @@ class Deploy:
             if not os.path.isdir('%s/InstancesConfigurations' % os.getcwd()):
                 os.makedirs('%s/InstancesConfigurations' % os.getcwd())
 
-            # save instance_ids for experiment termination
-            with open('%s/InstancesConfigurations/instances_ids_%s' % (os.getcwd(), regions[idx][:-1]), 'w+') \
-                    as ids_file:
-                for instance_idx in range(len(instances_ids)):
-                    ids_file.write('%s\n' % instances_ids[instance_idx])
-
         if coordinator_exists == 'True':
             del private_ip_address[0]
 
@@ -352,7 +346,7 @@ class Deploy:
 
         for req_idx in range(len(response['SpotInstanceRequests'])):
             if (response['SpotInstanceRequests'][req_idx]['State'] == 'active' or
-                            response['SpotInstanceRequests'][req_idx]['State'] == 'open')\
+                response['SpotInstanceRequests'][req_idx]['State'] == 'open')\
                     and response['SpotInstanceRequests'][req_idx]['LaunchSpecification']['InstanceType'] \
                     == machine_type:
                 instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
@@ -365,6 +359,19 @@ class Deploy:
                 instances_count += 1
 
         return instances_count
+
+    @staticmethod
+    def describe_instances(region_name, machines_name):
+        client = boto3.client('ec2', region_name=region_name)
+        response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [machines_name]}])
+        instances = []
+
+        for res_idx in range(len(response['Reservations'])):
+            reservations_len = len(response['Reservations'][res_idx]['Instances'])
+            for reserve_idx in range(reservations_len):
+                instances.append(response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceId'])
+
+        return instances
 
     def check_running_instances(self):
         with open(self.config_file_path) as data_file:
@@ -389,24 +396,26 @@ class Deploy:
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
             regions = list(data['regions.json'].values())
+            machines_name = data['protocol']
 
         for idx in range(len(regions)):
-            client = boto3.client('ec2', region_name=regions[idx][:-1])
-            with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r') as instance_file:
-                instances = [line.strip() for line in instance_file]
+            region_name = regions[idx][:-1]
+            instances = self.describe_instances(region_name, machines_name)
 
+            client = boto3.client('ec2', region_name=region_name)
             client.start_instances(InstanceIds=instances)
 
     def stop_instances(self):
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
             regions = list(data['regions.json'].values())
+            machines_name = data['protocol']
 
         for idx in range(len(regions)):
-            client = boto3.client('ec2', region_name=regions[idx][:-1])
-            with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r') as instance_file:
-                instances = [line.strip() for line in instance_file]
+            region_name = regions[idx][:-1]
+            instances = self.describe_instances(region_name, machines_name)
 
+            client = boto3.client('ec2', region_name=region_name)
             client.stop_instances(InstanceIds=instances)
 
     @staticmethod
@@ -426,10 +435,13 @@ class Deploy:
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
             regions = list(data['regions'].values())
+            protocol_name = data['protocol']
+
         for idx in range(len(regions)):
-            with open('InstancesConfigurations/instances_ids_%s' % regions[idx][:-1], 'r') as instance_file:
-                instances = [line.strip() for line in instance_file]
-            client = boto3.client('ec2', region_name=regions[idx][:-1])
+            region_name = regions[idx][:-1]
+            instances = self.describe_instances(region_name, protocol_name)
+
+            client = boto3.client('ec2', region_name=region_name)
             client.stop_instances(InstanceIds=instances)
             waiter = client.get_waiter('instance_stopped')
             waiter.wait(InstanceIds=instances)
@@ -441,21 +453,3 @@ class Deploy:
 
             # Start the instance
             client.start_instances(InstanceIds=instances)
-
-    def change_instance_disk_size(self):
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file)
-            regions = list(data['regions.json'].values())
-            protocol_name = data['protocol']
-
-        for idx in range(len(regions)):
-            client = boto3.client('ec2', region_name=regions[idx][:-1])
-            response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [protocol_name]}])
-            instances_ids = []
-
-            for res_idx in range(len(response['Reservations'])):
-                reservations_len = len(response['Reservations'][res_idx]['Instances'])
-                for reserve_idx in range(reservations_len):
-                    instances_ids.append(response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceId'])
-
-            client.stop_instances(InstanceIds=instances_ids)
