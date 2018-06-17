@@ -21,7 +21,6 @@ def pre_process(working_directory, task_idx):
 
 @task
 def install_git_project(git_branch, working_directory, git_address, external, install_script):
-    run('rm -rf Secret-Sharing')
     if external == 'True':
         put('ExternalProtocols/%s' % install_script, run('pwd'))
         sudo('chmod +x %s' % install_script)

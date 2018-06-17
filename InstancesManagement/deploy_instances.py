@@ -106,7 +106,7 @@ class Deploy:
 
             print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
                   'valid until : %s' % (regions[idx], number_of_instances_to_deploy,
-                                        global_config[regions[idx[:-1]]["ami"]], machine_type, str(new_date)))
+                                        global_config[regions[idx][:-1]]["ami"], machine_type, str(new_date)))
 
             if number_of_instances_to_deploy > 0:
                 if spot_request == 'True':
@@ -122,9 +122,9 @@ class Deploy:
                                 ValidUntil=new_date,
                                 LaunchSpecification=
                                 {
-                                    'ImageId': global_config[regions[idx[:-1]]["ami"]],
-                                    'KeyName': global_config[regions[idx[:-1]]["key"]],
-                                    'SecurityGroups': global_config[regions[idx[:-1]]["securityGroup"]],
+                                    'ImageId': global_config[regions[idx][:-1]]["ami"],
+                                    'KeyName': global_config[regions[idx][:-1]]["key"],
+                                    'SecurityGroups': [global_config[regions[idx][:-1]]["securityGroup"]],
                                     'InstanceType': machine_type,
                                     'Placement':
                                         {
@@ -136,11 +136,11 @@ class Deploy:
                         print(e.response['Error']['Message'].upper())
                 else:
                     client.run_instances(
-                        ImageId=global_config[regions[idx[:-1]]["ami"]],
-                        KeyName=global_config[regions[idx[:-1]]["key"]],
+                        ImageId=global_config[regions[idx][:-1]]["ami"],
+                        KeyName=global_config[regions[idx][:-1]]["key"],
                         MinCount=int(number_of_instances_to_deploy),
                         MaxCount=int(number_of_instances_to_deploy),
-                        SecurityGroups=global_config[regions[idx[:-1]]["securityGroup"]],
+                        SecurityGroups=[global_config[regions[idx][:-1]]["securityGroup"]],
                         InstanceType=machine_type,
                         Placement=
                         {
@@ -181,7 +181,7 @@ class Deploy:
 
         print('Parties network configuration')
         with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'w+') as private_ip_file:
-            if new_format == 'False':
+            if not new_format:
                 for party_idx in range(len(ip_addresses)):
                     print('party_%s_ip=%s' % (party_idx, ip_addresses[party_idx]))
                     private_ip_file.write('party_%s_ip=%s\n' % (party_idx, ip_addresses[party_idx]))
@@ -195,7 +195,7 @@ class Deploy:
                     private_ip_file.write('%s:8000\n' % ip_addresses[party_idx])
 
         # create party file for each instance
-        if len(number_of_regions) > 1:
+        if number_of_regions > 1:
             self.create_parties_files_multi_regions(file_name)
 
     def get_aws_network_details(self, port_counter, file_name, new_format=False):
