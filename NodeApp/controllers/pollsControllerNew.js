@@ -34,7 +34,7 @@ exports.registerToPoll = function (req, res) {
     let clientIp = req.params.ip;
     let type = req.params.type;
 
-    let client = redis.createClient(6379, "35.171.69.162");
+    let client = redis.createClient();
 
     // insert ip address to addresses table
     client.lpush('addresses', clientIp);
