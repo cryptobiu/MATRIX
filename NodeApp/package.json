@@ -14,6 +14,7 @@
     "python-shell": "latest",
     "express-session": "latest",
     "pug": "latest",
-    "sleep": "latest"
+    "sleep": "latest",
+    "redis": "latest"
   }
 }

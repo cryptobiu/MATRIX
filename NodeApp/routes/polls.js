@@ -1,9 +1,26 @@
-var express = require('express');
-var router = express.Router();
-var polls_controller = require('./../controllers/pollsControllers');
+const express = require('express');
+const router = express.Router();
+const polls_controller = require('./../controllers/pollsControllers');
+const pollscontrollerNew = require('./../controllers/pollsControllerNew');
 
 router.get('/', function (req, res) {
     res.render('polls', { title: 'Polls' });
+});
+
+router.get('/openForRegistration/:pollName', function (req, res) {
+    pollscontrollerNew.openForRegistration(req, res);
+});
+
+router.get('/registerToPoll/:ip/:type', function (req, res) {
+    pollscontrollerNew.registerToPoll(req, res);
+});
+
+router.get('/getPollParams/:ip', function (req, res) {
+    pollscontrollerNew.getPollsParams(req, res);
+});
+
+router.get('/changePollState/:state', function (req, res) {
+    pollscontrollerNew.changePollState(req, res);
 });
 
 /*
@@ -55,6 +72,10 @@ router.get('/isPollCompleted', function (req, res) {
 
 router.get('/parties', function (req, res) {
     res.download('NodeApp/public/assets/parties.conf')
+});
+
+router.get('/getMyId/:ip', function (req, res) {
+    polls_controller.getMyId(req, res);
 });
 
 router.get('/circuit', function (req, res) {
