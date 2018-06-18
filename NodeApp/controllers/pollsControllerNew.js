@@ -30,7 +30,7 @@ exports.openForRegistration = function (req, res)
 };
 
 exports.registerToPoll = function (req, res) {
-    let pollName = req.session.pollName;
+    let pollName = req.params.pollName;
     let clientIp = req.params.ip;
     let type = req.params.type;
 
