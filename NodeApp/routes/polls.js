@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const polls_controller = require('./../controllers/pollsControllers');
 const pollscontrollerNew = require('./../controllers/pollsControllerNew');
 
 router.get('/', function (req, res) {
@@ -23,48 +22,9 @@ router.get('/changePollState/:state', function (req, res) {
     pollscontrollerNew.changePollState(req, res);
 });
 
-/*
-* Prepare online section - including API calls
-*/
-
-router.get('/prepareOnline', function (req, res) {
-    res.render('prepareOnline', { title: 'Prepare for Online' })
+router.get('/closePollForRegistration', function (req, res) {
+    pollscontrollerNew.closePollForRegistration(req, res);
 });
-
-router.get('/prepareOnlineAPI', function (req, res) {
-    polls_controller.prepareOnlineAPI(req, res);
-});
-
-router.get('/prepareOnline/:ip', function (req, res) {
-    polls_controller.saveIpAddress(req, res);
-});
-
-router.post('/prepareOnline', function (req, res) {
-    polls_controller.prepareOnline(req, res);
-});
-
-/*
-* Execute poll section - including API calls
-*/
-
-router.get('/executePoll', function (req, res) {
-    res.render('executePoll', { title: 'Poll execution' })
-});
-
-router.get('/executePollAPI', function (req, res) {
-    polls_controller.executePollAPI(req, res);
-});
-
-router.get('/isReadyForPoll', function (req, res) {
-    // res.locals pass data to the pug view
-    res.locals.isReadyForPoll = polls_controller.isReadyForPollLoop(req, res);
-    res.render('isReadyForPoll', { title: 'Poll ready?' })
-});
-
-router.get('/isPollCompleted', function (req, res) {
-    polls_controller.isPollCompleted(req, res);
-});
-
 
 /*
 * Download files zone

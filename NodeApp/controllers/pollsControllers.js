@@ -1,59 +1,61 @@
-var formidable = require('formidable');
-var PythonShell = require('python-shell');
-var url = require('url');
-var sleep = require('sleep');
-var options = {
+const formidable = require('formidable');
+const PythonShell = require('python-shell');
+const url = require('url');
+const sleep = require('sleep');
+const fs = require('fs');
+const redis = require('redis');
+const options = {
     mode:'text',
     pythonPath: '/usr/bin/python3.5',
     pythonOptions:['-u']
 };
 
 
-exports.prepareOnline = function (req, res) {
-    var form = new formidable.IncomingForm();
-    form.multiples = true;
-    form.keepExtensions = true;
-
-    form.parse(req, function(err, fields) {
-        var pollName =  fields['name'];
-        var numberOfOnlineParties =  fields['numberOfOnlineParties'];
-        var numberOfOfflineParties =  fields['numberOfOfflineParties'];
-        var ips = fields['IPs'];
-        req.session.PollName = pollName;
-        req.session.NumberOfOnlineParties = numberOfOnlineParties;
-        req.session.NumberOfOfflineParties = numberOfOfflineParties;
-
-        // init python shell
-        var pyshell = new PythonShell('main.py', options);
-
-        if (numberOfOfflineParties > 0)
-        {
-            // enter to Deploy instances menu
-            pyshell.send('1')
-            // insert the configuration file
-            pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
-            // deploy instances
-            pyshell.send('1');
-        }
-
-        // insert the configuration file
-        pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
-        // invoke get_aws_network_details_from_api
-        pyshell.send('6');
-        // send to python shell the online users ips
-        pyshell.send(ips);
-        // enter to execution menu
-        pyshell.send('4');
-
-        pyshell.end(function (err, code, signal) {
-            if(err) throw err;
-            console.log('The exit code was: ' + code);
-            console.log('The exit signal was: ' + signal);
-            console.log('finished');
-        });
-        res.redirect('/polls');
-    });
-};
+// exports.prepareOnline = function (req, res) {
+//     var form = new formidable.IncomingForm();
+//     form.multiples = true;
+//     form.keepExtensions = true;
+//
+//     form.parse(req, function(err, fields) {
+//         var pollName =  fields['name'];
+//         var numberOfOnlineParties =  fields['numberOfOnlineParties'];
+//         var numberOfOfflineParties =  fields['numberOfOfflineParties'];
+//         var ips = fields['IPs'];
+//         req.session.PollName = pollName;
+//         req.session.NumberOfOnlineParties = numberOfOnlineParties;
+//         req.session.NumberOfOfflineParties = numberOfOfflineParties;
+//
+//         // init python shell
+//         var pyshell = new PythonShell('main.py', options);
+//
+//         if (numberOfOfflineParties > 0)
+//         {
+//             // enter to Deploy instances menu
+//             pyshell.send('1')
+//             // insert the configuration file
+//             pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
+//             // deploy instances
+//             pyshell.send('1');
+//         }
+//
+//         // insert the configuration file
+//         pyshell.send('NodeApp/public/assets/Config_SecretSharing.json');
+//         // invoke get_aws_network_details_from_api
+//         pyshell.send('6');
+//         // send to python shell the online users ips
+//         pyshell.send(ips);
+//         // enter to execution menu
+//         pyshell.send('4');
+//
+//         pyshell.end(function (err, code, signal) {
+//             if(err) throw err;
+//             console.log('The exit code was: ' + code);
+//             console.log('The exit signal was: ' + signal);
+//             console.log('finished');
+//         });
+//         res.redirect('/polls');
+//     });
+// };
 
 exports.prepareOnlineAPI = function (req, res) {
     var queryData = url.parse(req.url, true).query;
@@ -236,4 +238,37 @@ exports.isPollCompleted = function (req, res) {
             console.log('finished');
         });
 
-}
+};
+
+exports.getMyId = function (req, res) {
+    var ip = req.params.ip;
+    var filePath = __dirname + '/../public/assets/parties.conf';
+
+    fs.readFile(filePath, 'utf8', function (err, data) {
+        if (err)
+            return console.log(err);
+        var splitedStrings = data.split('\n')
+        for(var idx = 0; idx < splitedStrings.length; idx++)
+        {
+            if(splitedStrings[idx].indexOf(ip) > -1)
+                res.json({'id': idx});
+        }
+    });
+};
+
+exports.getMyProxy = function(req, res)
+{
+    let id = req.params.id;
+    var filePath = __dirname + '/../public/assets/proxies.conf';
+
+    fs.readFile(filePath, 'utf8', function (err, data) {
+        if (err)
+            return console.log(err);
+        var splitedStrings = data.split('\n')
+        res.json({"proxyAddress": splitedStrings[idx]});
+    });
+
+};
+
+//TODO add button for sign for experiments - experiments will be a document in db - contains the circuit the current parties file (including proxy)
+//TODO I need to generate all the proxy using MATRIX
