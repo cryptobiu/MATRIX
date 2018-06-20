@@ -30,7 +30,7 @@ exports.openForRegistration = function (req, res)
 };
 
 exports.registerToPoll = function (req, res) {
-    let pollName = req.session.pollName
+    let pollName = req.session.pollName;
     let clientIp = req.params.ip;
     let type = req.params.type;
 
@@ -49,8 +49,6 @@ exports.registerToPoll = function (req, res) {
 };
 
 exports.getPollsParams = function (req, res) {
-    //cli params +20
-    //link to circuit
     let ip = req.params.ip;
     let jsonData = {};
     let counter = 0;
@@ -63,7 +61,6 @@ exports.getPollsParams = function (req, res) {
             {
                 for(let idx2 = idx + 1; idx2 < 19; idx2+=2)
                 jsonData[data[idx2]] = data[idx2 + 1];
-                break;
             }
         }
     });
@@ -82,8 +79,6 @@ exports.closePollForRegistration = function (req, res) {
     req.session.state = "CLOSED";
     let pollName = req.params.pollName ;
     let client = redis.createClient();
-
-    //retreive # of mobiles
 
     let numberOfMobiles = 0;
     let mobilesIps = [];
@@ -138,6 +133,7 @@ exports.closePollForRegistration = function (req, res) {
             if(error) console.log('Error: ' + error);
             console.log(stdout);
         });
+        sleep(10);
         //copy the circuit to the public path
         let circuitName = 'ArythmeticVarianceFor3InputsAnd' + partiesSize + 'Parties.txt'
         let copyCommand = 'cp ' + __dirname + ' ' + circuitName + ' ' + __dirname + '/../public/assets/';
