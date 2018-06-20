@@ -22,7 +22,7 @@ router.get('/changePollState/:state', function (req, res) {
     pollscontrollerNew.changePollState(req, res);
 });
 
-router.get('/closePollForRegistration', function (req, res) {
+router.get('/closePollForRegistration/:pollName', function (req, res) {
     pollscontrollerNew.closePollForRegistration(req, res);
 });
 
@@ -32,10 +32,6 @@ router.get('/closePollForRegistration', function (req, res) {
 
 router.get('/parties', function (req, res) {
     res.download('NodeApp/public/assets/parties.conf')
-});
-
-router.get('/getMyId/:ip', function (req, res) {
-    polls_controller.getMyId(req, res);
 });
 
 router.get('/circuit', function (req, res) {
