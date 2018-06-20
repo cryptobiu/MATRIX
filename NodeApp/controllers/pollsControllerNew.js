@@ -68,7 +68,7 @@ exports.getPollsParams = function (req, res) {
     let circuitName = 'ArythmeticVarianceFor3InputsAnd' + counter + 'Parties.txt';
     jsonData['circuitFileAddress'] =  __dirname + '/../public/assets/' + circuitName;
 
-    res.write(JSON.stringify(jsonData));
+    res.json(JSON.stringify(jsonData));
 };
 
 exports.changePollState = function (req, res) {
