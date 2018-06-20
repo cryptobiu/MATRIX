@@ -49,25 +49,29 @@ exports.registerToPoll = function (req, res) {
 };
 
 exports.getPollsParams = function (req, res) {
-    //party id
-    //proxy server address
+    //cli params +20
     //link to circuit
     let ip = req.params.ip;
-    let jsonData = {table: []};
+    let jsonData = {};
+    let counter = 0;
     let client = redis.createClient();
-    client.lrange('mappings', 0, -1, function (err, data) {
-        for (let idx = 0; idx < data.length; idx +=3)
+    client.lrange('execution', 0, -1, function (err, data) {
+        for (let idx = 0; idx < data.length; idx+=20)
         {
+            counter++;
             if(data[idx] === ip)
             {
-                jsonData.table.push({'proxyAddress': data[idx + 1], 'partyId': data[idx + 2]})
+                for(let idx2 = idx + 1; idx2 < 19; idx2+=2)
+                jsonData[data[idx2]] = data[idx2 + 1];
                 break;
             }
         }
     });
 
-    let jsonObj = JSON.stringify(jsonData);
-    res.write(jsonObj);
+    let circuitName = 'ArythmeticVarianceFor3InputsAnd' + counter + 'Parties.txt';
+    jsonData['circuitFileAddress'] =  __dirname + '/../public/assets/' + circuitName;
+
+    res.write(JSON.stringify(jsonData));
 };
 
 exports.changePollState = function (req, res) {
@@ -94,10 +98,7 @@ exports.closePollForRegistration = function (req, res) {
                 client.lrem('addresses', 0, mobileIp, function (err) {
                     if(err) console.log("Error removing mobile ip");
                 });
-                //push to mapping table ip proxy _server_address party_id
-                client.rpush('mappings', mobileIp, '34.239.19.87', numberOfMobiles, function (err) {
-                    if(err) console.log("Error pushing data to mapping");
-                });
+
                 mobilesIps.push(mobileIp);
                 numberOfMobiles += 1;
             }
@@ -120,12 +121,15 @@ exports.closePollForRegistration = function (req, res) {
                 fs.appendFileSync(fileName, '34.239.19.87:' + (9000 + idx * 100).toString());
             }
         }
+        let offlineUsers = [];
 
         data.forEach(function (entry) {
-            console.log(entry);
             fs.appendFileSync(fileName, entry + ":8000\n");
             partiesSize += 1;
+            offlineUsers.push(entry);
         });
+
+        partiesSize += numberOfMobiles;
 
         let exec = require('child_process').exec;
         let createCircuit = 'java -jar ' + __dirname + '/../public/assets/GenerateArythmeticCircuitForVariance.jar '
@@ -135,12 +139,32 @@ exports.closePollForRegistration = function (req, res) {
             console.log(stdout);
         });
         //copy the circuit to the public path
-        let copyCommand = 'cp ' + __dirname + ' ArythmeticVarianceFor3InputsAnd' + partiesSize + 'Parties.txt' +
-            ' ' + __dirname + '/../public/assets/';
+        let circuitName = 'ArythmeticVarianceFor3InputsAnd' + partiesSize + 'Parties.txt'
+        let copyCommand = 'cp ' + __dirname + ' ' + circuitName + ' ' + __dirname + '/../public/assets/';
         exec(copyCommand, function (error, stdout) {
             if(error) console.log('Error: ' + error);
             console.log(stdout);
         });
+
+         // for each entry save the exact cli parameters
+
+    for(let mobilesIdx = 0; mobilesIdx < numberOfMobiles; mobilesIdx++)
+    {
+        client.rpush('execution', mobilesIps[mobilesIdx], pollName, '-partyID', mobilesIdx, '-partiesNumber',
+            partiesSize, '-inputFile', 'inputSalary' + mobilesIdx + '.txt', '-outputFile', 'output.txt', '-circuitFile',
+            circuitName, '-proxyAddress', '34.239.19.87', '-fieldType', 'ZpMersenne', '-internalIterationsNumber', '1',
+            '-NG', '1', function (err) {console.log(err)});
+    }
+
+    for(let offlineIdx = 0; offlineIdx < offlineUsers.length; offlineIdx++)
+    {
+        client.rpush('execution', offlineUsers[offlineIdx], pollName, '-partyID', offlineIdx, '-partiesNumber',
+            partiesSize, '-inputFile', 'inputSalary' + offlineIdx + '.txt', '-outputFile', 'output.txt', '-circuitFile',
+            circuitName, '-partiesFile', 'parties.conf', '-fieldType', 'ZpMersenne', '-internalIterationsNumber', '1',
+            '-NG', '1', function (err) {console.log(err)});
+    }
     });
+
+
     res.redirect('/polls')
 };
