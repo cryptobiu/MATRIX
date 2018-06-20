@@ -133,7 +133,7 @@ exports.closePollForRegistration = function (req, res) {
             if(error) console.log('Error: ' + error);
             console.log(stdout);
         });
-        sleep(10);
+        
         //copy the circuit to the public path
         let circuitName = 'ArythmeticVarianceFor3InputsAnd' + partiesSize + 'Parties.txt'
         let copyCommand = 'cp ' + __dirname + ' ' + circuitName + ' ' + __dirname + '/../public/assets/';
