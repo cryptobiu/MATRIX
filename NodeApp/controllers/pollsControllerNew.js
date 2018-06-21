@@ -49,7 +49,7 @@ exports.registerToPoll = function (req, res) {
 };
 
 exports.getPollsParams = function (req, res) {
-    let pollName = req.params.pollName
+    let pollName = req.params.pollName;
     let ip = req.params.ip;
     let jsonData = {};
     let counter = 0;
