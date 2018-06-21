@@ -129,7 +129,7 @@ exports.closePollForRegistration = function (req, res) {
         //     offlineUsers.push(entry);
         // });
 
-        // partiesSize += numberOfMobiles;
+        partiesSize += numberOfMobiles;
 
         let exec = require('child_process').exec;
         let createCircuit = 'java -jar ' + __dirname + '/../public/assets/GenerateArythmeticCircuitForVariance.jar '
