@@ -95,9 +95,9 @@ exports.closePollForRegistration = function (req, res) {
             if (data[idx + 1] === 'online_mobile')
             {
                 let mobileIp = data[idx];
-                client.lrem('addresses', 0, mobileIp, function (err) {
-                    if(err) console.log("Error removing mobile ip");
-                });
+                // client.lrem('addresses', 0, mobileIp, function (err) {
+                //     if(err) console.log("Error removing mobile ip");
+                // });
 
                 mobilesIps.push(mobileIp);
                 numberOfMobiles += 1;
@@ -124,6 +124,7 @@ exports.closePollForRegistration = function (req, res) {
         let offlineUsers = [];
 
         // data.forEach(function (entry) {
+        // TODO continue over number of mobiles becuase they were not deleted
         //     fs.appendFileSync(fileName, entry + ":8000\n");
         //     partiesSize += 1;
         //     offlineUsers.push(entry);
