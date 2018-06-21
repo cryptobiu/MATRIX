@@ -31,13 +31,13 @@ router.get('/closePollForRegistration/:pollName', function (req, res) {
 */
 
 router.get('/parties', function (req, res) {
-    res.download('NodeApp/public/assets/parties.conf')
+    res.download('public/assets/parties.conf')
 });
 
 router.get('/circuit/:circuitName', function (req, res) {
 
     let circuitName = req.params.circuitName;
-    res.download('NodeApp/public/assets/'+ circuitName);
+    res.download('public/assets/'+ circuitName);
 });
 
 router.get('/configuration', function (req, res) {
