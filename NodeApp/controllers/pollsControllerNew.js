@@ -52,7 +52,7 @@ exports.getPollsParams = function (req, res) {
     let pollName = req.params.pollName;
     let ip = req.params.ip;
     let jsonData = {};
-    let counter = 0;
+    let counter = 1;
     let client = redis.createClient();
     client.lrange('execution' + pollName, 0, -1, function (err, data) {
         if(err) console.log(err);
