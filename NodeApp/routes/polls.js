@@ -14,7 +14,7 @@ router.get('/registerToPoll/:pollName/:ip/:type', function (req, res) {
     pollscontrollerNew.registerToPoll(req, res);
 });
 
-router.get('/getPollParams/:ip', function (req, res) {
+router.get('/getPollParams/:pollName/:ip', function (req, res) {
     pollscontrollerNew.getPollsParams(req, res);
 });
 
