@@ -61,7 +61,7 @@ exports.getPollsParams = function (req, res) {
             counter++;
             if(data[idx] === ip)
             {
-                for(let idx2 = idx + 1; idx2 < 19; idx2+=2)
+                for(let idx2 = idx + 2; idx2 < 19; idx2+=2)
                     jsonData[data[idx2]] = data[idx2 + 1];
                 break
             }
