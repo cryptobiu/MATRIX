@@ -49,11 +49,12 @@ exports.registerToPoll = function (req, res) {
 };
 
 exports.getPollsParams = function (req, res) {
+    let pollName = req.params.pollName
     let ip = req.params.ip;
     let jsonData = {};
     let counter = 0;
     let client = redis.createClient();
-    client.lrange('execution', 0, -1, function (err, data) {
+    client.lrange('execution' + pollName, 0, -1, function (err, data) {
         if(err) console.log(err);
         console.log(data.length);
         for (let idx = 0; idx < data.length; idx+=20)
@@ -145,7 +146,7 @@ exports.closePollForRegistration = function (req, res) {
 
     for(let mobilesIdx = 0; mobilesIdx < numberOfMobiles; mobilesIdx++)
     {
-        client.rpush('execution', mobilesIps[mobilesIdx], pollName, 'partyID', mobilesIdx, 'partiesNumber',
+        client.rpush('execution' + pollName, mobilesIps[mobilesIdx], pollName, 'partyID', mobilesIdx, 'partiesNumber',
             partiesSize, 'inputFile', 'inputSalary' + mobilesIdx + '.txt', 'outputFile', 'output.txt', 'circuitFile',
             circuitName, 'proxyAddress', '34.239.19.87', 'fieldType', 'ZpMersenne', 'internalIterationsNumber', '1',
             'NG', '1', function (err) {console.log(err)});
@@ -153,7 +154,7 @@ exports.closePollForRegistration = function (req, res) {
 
     for(let offlineIdx = 0; offlineIdx < offlineUsers.length; offlineIdx++)
     {
-        client.rpush('execution', offlineUsers[offlineIdx], pollName, 'partyID', offlineIdx, 'partiesNumber',
+        client.rpush('execution' + pollName, offlineUsers[offlineIdx], pollName, 'partyID', offlineIdx, 'partiesNumber',
             partiesSize, 'inputFile', 'inputSalary' + offlineIdx + '.txt', 'outputFile', 'output.txt', 'circuitFile',
             circuitName, 'partiesFile', 'parties.conf', 'fieldType', 'ZpMersenne', 'internalIterationsNumber', '1',
             'NG', '1', function (err) {console.log(err)});
