@@ -15,7 +15,8 @@ router.get('/registerToPoll/:pollName/:ip/:type', function (req, res) {
 });
 
 router.get('/getPollParams/:pollName/:ip', function (req, res) {
-    pollscontrollerNew.getPollsParams(req, res);
+    let ip = req.params.ip;
+    res.download('public/assets/' + ip + '.json')
 });
 
 router.get('/changePollState/:state', function (req, res) {
@@ -37,7 +38,7 @@ router.get('/parties', function (req, res) {
 router.get('/circuit/:circuitName', function (req, res) {
 
     let circuitName = req.params.circuitName;
-    res.download('public/assets/'+ circuitName);
+    res.download('public/assets/' + circuitName);
 });
 
 router.get('/configuration', function (req, res) {

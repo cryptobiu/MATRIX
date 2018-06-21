@@ -144,10 +144,25 @@ exports.closePollForRegistration = function (req, res) {
 
     for(let mobilesIdx = 0; mobilesIdx < numberOfMobiles; mobilesIdx++)
     {
-        client.rpush('execution' + pollName, mobilesIps[mobilesIdx], pollName, 'partyID', mobilesIdx, 'partiesNumber',
-            partiesSize, 'inputFile', 'inputSalary' + mobilesIdx + '.txt', 'outputFile', 'output.txt', 'circuitFile',
-            circuitName, 'proxyAddress', '34.239.19.87', 'fieldType', 'ZpMersenne', 'internalIterationsNumber', '1',
-            'NG', '1', function (err) {console.log(err)});
+        let jsonData = {};
+        jsonData['partyID'] = mobilesIdx.toString();
+        jsonData['partiesNumber'] = partiesSize.toString();
+        jsonData['inputFile'] = 'inputSalary' + mobilesIdx + '.txt';
+        jsonData['outputFile'] = 'output.txt';
+        jsonData['circuitFile'] = circuitName;
+        jsonData['proxyAddress'] = '34.239.19.87';
+        jsonData['fieldType'] = 'ZpMersenne';
+        jsonData['internalIterationsNumber'] = '1';
+        jsonData['NG'] = '1';
+        let dataFileName =  __dirname + '/../public/assets/' + mobilesIps[mobilesIdx]+'.json';
+        fs.writeFile(dataFileName, JSON.stringify(jsonData), 'utf8', function (err) {
+            if (err) console.log(err);
+        });
+
+        // client.rpush('execution' + pollName, mobilesIps[mobilesIdx], pollName, 'partyID', mobilesIdx, 'partiesNumber',
+        //     partiesSize, 'inputFile', 'inputSalary' + mobilesIdx + '.txt', 'outputFile', 'output.txt', 'circuitFile',
+        //     circuitName, 'proxyAddress', '34.239.19.87', 'fieldType', 'ZpMersenne', 'internalIterationsNumber', '1',
+        //     'NG', '1', function (err) {console.log(err)});
     }
 
     // for(let offlineIdx = 0; offlineIdx < offlineUsers.length; offlineIdx++)
