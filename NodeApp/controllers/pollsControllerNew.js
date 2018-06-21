@@ -173,7 +173,7 @@ exports.closePollForRegistration = function (req, res) {
     //         'NG', '1', function (err) {console.log(err)});
     // }
 
-        let copyCommand = 'cp ' + __dirname + '../' +  circuitName + ' ' + __dirname + '/../public/assets/';
+        let copyCommand = 'cp ' + __dirname + '/../' +  circuitName + ' ' + __dirname + '/../public/assets/';
         exec(copyCommand, function (error, stdout) {
             if(error) console.log('Error: ' + error);
             console.log(stdout);
