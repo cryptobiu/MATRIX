@@ -138,7 +138,7 @@ exports.closePollForRegistration = function (req, res) {
         });
 
         //copy the circuit to the public path
-        let circuitName = 'ArythmeticVarianceFor3InputsAnd' + partiesSize + 'Parties.txt'
+
 
          // for each entry save the exact cli parameters
 
@@ -172,7 +172,8 @@ exports.closePollForRegistration = function (req, res) {
     //         circuitName, 'partiesFile', 'parties.conf', 'fieldType', 'ZpMersenne', 'internalIterationsNumber', '1',
     //         'NG', '1', function (err) {console.log(err)});
     // }
-    let copyCommand = 'cp ' + __dirname + ' ' + circuitName + ' ' + __dirname + '/../public/assets/';
+        let circuitName = 'ArythmeticVarianceFor3InputsAnd' + partiesSize + 'Parties.txt';
+    let copyCommand = 'cp ' + __dirname + '/' +  circuitName + ' ' + __dirname + '/../public/assets/';
         exec(copyCommand, function (error, stdout) {
             if(error) console.log('Error: ' + error);
             console.log(stdout);
