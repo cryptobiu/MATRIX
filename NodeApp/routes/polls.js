@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const pollscontrollerNew = require('./../controllers/pollsControllerNew');
-const fs = require('fs');
 
 router.get('/', function (req, res) {
     res.render('polls', { title: 'Polls' });
@@ -39,10 +38,7 @@ router.get('/parties', function (req, res) {
 router.get('/circuit/:circuitName', function (req, res) {
 
     let circuitName = req.params.circuitName;
-    fs.readFile('public/assets/'+circuitName, 'utf8', function (error, data) {
-    if (error) throw error;
-    res.write(data.toString());
-});
+    res.download('public/assets/' + circuitName);
 });
 
 router.get('/configuration', function (req, res) {
