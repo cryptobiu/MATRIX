@@ -145,18 +145,18 @@ exports.closePollForRegistration = function (req, res) {
 
     for(let mobilesIdx = 0; mobilesIdx < numberOfMobiles; mobilesIdx++)
     {
-        client.rpush('execution', mobilesIps[mobilesIdx], pollName, '-partyID', mobilesIdx, '-partiesNumber',
-            partiesSize, '-inputFile', 'inputSalary' + mobilesIdx + '.txt', '-outputFile', 'output.txt', '-circuitFile',
-            circuitName, '-proxyAddress', '34.239.19.87', '-fieldType', 'ZpMersenne', '-internalIterationsNumber', '1',
-            '-NG', '1', function (err) {console.log(err)});
+        client.rpush('execution', mobilesIps[mobilesIdx], pollName, 'partyID', mobilesIdx, 'partiesNumber',
+            partiesSize, 'inputFile', 'inputSalary' + mobilesIdx + '.txt', 'outputFile', 'output.txt', 'circuitFile',
+            circuitName, 'proxyAddress', '34.239.19.87', 'fieldType', 'ZpMersenne', 'internalIterationsNumber', '1',
+            'NG', '1', function (err) {console.log(err)});
     }
 
     for(let offlineIdx = 0; offlineIdx < offlineUsers.length; offlineIdx++)
     {
-        client.rpush('execution', offlineUsers[offlineIdx], pollName, '-partyID', offlineIdx, '-partiesNumber',
-            partiesSize, '-inputFile', 'inputSalary' + offlineIdx + '.txt', '-outputFile', 'output.txt', '-circuitFile',
-            circuitName, '-partiesFile', 'parties.conf', '-fieldType', 'ZpMersenne', '-internalIterationsNumber', '1',
-            '-NG', '1', function (err) {console.log(err)});
+        client.rpush('execution', offlineUsers[offlineIdx], pollName, 'partyID', offlineIdx, 'partiesNumber',
+            partiesSize, 'inputFile', 'inputSalary' + offlineIdx + '.txt', 'outputFile', 'output.txt', 'circuitFile',
+            circuitName, 'partiesFile', 'parties.conf', 'fieldType', 'ZpMersenne', 'internalIterationsNumber', '1',
+            'NG', '1', function (err) {console.log(err)});
     }
     let copyCommand = 'cp ' + __dirname + ' ' + circuitName + ' ' + __dirname + '/../public/assets/';
         exec(copyCommand, function (error, stdout) {
