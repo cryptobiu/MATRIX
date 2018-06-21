@@ -52,14 +52,12 @@ exports.getPollsParams = function (req, res) {
     let pollName = req.params.pollName;
     let ip = req.params.ip;
     let jsonData = {};
-    let counter = 1;
     let client = redis.createClient();
     client.lrange('execution' + pollName, 0, -1, function (err, data) {
         if(err) console.log(err);
         console.log(data.length);
         for (let idx = 0; idx < data.length; idx+=20)
         {
-            counter++;
             if(data[idx] === ip)
             {
                 for(let idx2 = idx + 2; idx2 < 19; idx2+=2)
@@ -67,8 +65,7 @@ exports.getPollsParams = function (req, res) {
                 break
             }
         }
-        let circuitName = 'ArythmeticVarianceFor3InputsAnd' + counter + 'Parties.txt';
-        jsonData['circuitFileAddress'] =  'http://35.171.69.162/polls/circuit/' + circuitName;
+        jsonData['circuitFileAddress'] =  'http://35.171.69.162/polls/circuit/';
 
         res.json(jsonData);
     });
