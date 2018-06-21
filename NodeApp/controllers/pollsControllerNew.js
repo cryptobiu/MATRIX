@@ -92,9 +92,9 @@ exports.closePollForRegistration = function (req, res) {
         if (err) console.log('Error retrieve poll data');
         for (idx = 0; idx < data.length; idx += 2)
         {
-            if (data[idx] === 'online_mobile')
+            if (data[idx + 1] === 'online_mobile')
             {
-                let mobileIp = data[idx + 1];
+                let mobileIp = data[idx];
                 client.lrem('addresses', 0, mobileIp, function (err) {
                     if(err) console.log("Error removing mobile ip");
                 });
@@ -123,17 +123,17 @@ exports.closePollForRegistration = function (req, res) {
         }
         let offlineUsers = [];
 
-        data.forEach(function (entry) {
-            fs.appendFileSync(fileName, entry + ":8000\n");
-            partiesSize += 1;
-            offlineUsers.push(entry);
-        });
+        // data.forEach(function (entry) {
+        //     fs.appendFileSync(fileName, entry + ":8000\n");
+        //     partiesSize += 1;
+        //     offlineUsers.push(entry);
+        // });
 
-        partiesSize += numberOfMobiles;
+        // partiesSize += numberOfMobiles;
 
         let exec = require('child_process').exec;
         let createCircuit = 'java -jar ' + __dirname + '/../public/assets/GenerateArythmeticCircuitForVariance.jar '
-            + partiesSize + ' 3';
+            + partiesSize.toString() + ' 3';
         exec(createCircuit, function (error, stdout){
             if(error) console.log('Error: ' + error);
             console.log(stdout);
@@ -152,13 +152,13 @@ exports.closePollForRegistration = function (req, res) {
             'NG', '1', function (err) {console.log(err)});
     }
 
-    for(let offlineIdx = 0; offlineIdx < offlineUsers.length; offlineIdx++)
-    {
-        client.rpush('execution' + pollName, offlineUsers[offlineIdx], pollName, 'partyID', offlineIdx, 'partiesNumber',
-            partiesSize, 'inputFile', 'inputSalary' + offlineIdx + '.txt', 'outputFile', 'output.txt', 'circuitFile',
-            circuitName, 'partiesFile', 'parties.conf', 'fieldType', 'ZpMersenne', 'internalIterationsNumber', '1',
-            'NG', '1', function (err) {console.log(err)});
-    }
+    // for(let offlineIdx = 0; offlineIdx < offlineUsers.length; offlineIdx++)
+    // {
+    //     client.rpush('execution' + pollName, offlineUsers[offlineIdx], pollName, 'partyID', offlineIdx, 'partiesNumber',
+    //         partiesSize, 'inputFile', 'inputSalary' + offlineIdx + '.txt', 'outputFile', 'output.txt', 'circuitFile',
+    //         circuitName, 'partiesFile', 'parties.conf', 'fieldType', 'ZpMersenne', 'internalIterationsNumber', '1',
+    //         'NG', '1', function (err) {console.log(err)});
+    // }
     let copyCommand = 'cp ' + __dirname + ' ' + circuitName + ' ' + __dirname + '/../public/assets/';
         exec(copyCommand, function (error, stdout) {
             if(error) console.log('Error: ' + error);
