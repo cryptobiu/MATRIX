@@ -92,18 +92,13 @@ exports.closePollForRegistration = function (req, res) {
             if (data[idx + 1] === 'online_mobile')
             {
                 let mobileIp = data[idx];
-                // client.lrem('addresses', 0, mobileIp, function (err) {
-                //     if(err) console.log("Error removing mobile ip");
-                // });
-
                 mobilesIps.push(mobileIp);
                 numberOfMobiles += 1;
             }
         }
     });
 
-    let partiesSize = 0;
-    client.lrange('addresses', 0, -1, function (err, data) {
+    client.lrange('addresses', numberOfMobiles, -1, function (err, data) {
         if (err) console.log('Error retrieve addresses');
 
         //write addresses to file
@@ -111,23 +106,26 @@ exports.closePollForRegistration = function (req, res) {
         //delete file if exists
         fs.unlink(fileName, function (err) {console.log(err)});
 
+        //write the proxy addresses
+
         if(numberOfMobiles > 0)
         {
             for(let idx = 0; idx < numberOfMobiles; idx++)
             {
-                fs.appendFileSync(fileName, '34.239.19.87:' + (9000 + idx * 100).toString());
+                fs.appendFileSync(fileName, '34.239.19.87:' + (9000 + idx * 100).toString() + '\n');
             }
         }
-        let offlineUsers = [];
 
-        // data.forEach(function (entry) {
-        // TODO continue over number of mobiles becuase they were not deleted
-        //     fs.appendFileSync(fileName, entry + ":8000\n");
-        //     partiesSize += 1;
-        //     offlineUsers.push(entry);
-        // });
+        //write the offline parties
+        let numberOfOfflines = 0;
+        let offlineIps = [];
+        data.forEach(function (entry) {
+            offlineIps.push(entry);
+            fs.appendFileSync(fileName, entry + ':8000\n');
+            numberOfOfflines++;
+        });
 
-        partiesSize += numberOfMobiles;
+        let partiesSize = numberOfMobiles + numberOfOfflines;
 
         let exec = require('child_process').exec;
         let createCircuit = 'java -jar ' + __dirname + '/../public/assets/GenerateArythmeticCircuitForVariance.jar '
@@ -140,8 +138,7 @@ exports.closePollForRegistration = function (req, res) {
         //copy the circuit to the public path
     let circuitName = 'ArythmeticVarianceFor3InputsAnd' + partiesSize + 'Parties.txt';
 
-         // for each entry save the exact cli parameters
-
+    // extract cli parameters for online users
     for(let mobilesIdx = 0; mobilesIdx < numberOfMobiles; mobilesIdx++)
     {
         let jsonData = {};
@@ -158,29 +155,33 @@ exports.closePollForRegistration = function (req, res) {
         fs.writeFile(dataFileName, JSON.stringify(jsonData), 'utf8', function (err) {
             if (err) console.log(err);
         });
-
-        // client.rpush('execution' + pollName, mobilesIps[mobilesIdx], pollName, 'partyID', mobilesIdx, 'partiesNumber',
-        //     partiesSize, 'inputFile', 'inputSalary' + mobilesIdx + '.txt', 'outputFile', 'output.txt', 'circuitFile',
-        //     circuitName, 'proxyAddress', '34.239.19.87', 'fieldType', 'ZpMersenne', 'internalIterationsNumber', '1',
-        //     'NG', '1', function (err) {console.log(err)});
     }
 
-    // for(let offlineIdx = 0; offlineIdx < offlineUsers.length; offlineIdx++)
-    // {
-    //     client.rpush('execution' + pollName, offlineUsers[offlineIdx], pollName, 'partyID', offlineIdx, 'partiesNumber',
-    //         partiesSize, 'inputFile', 'inputSalary' + offlineIdx + '.txt', 'outputFile', 'output.txt', 'circuitFile',
-    //         circuitName, 'partiesFile', 'parties.conf', 'fieldType', 'ZpMersenne', 'internalIterationsNumber', '1',
-    //         'NG', '1', function (err) {console.log(err)});
-    // }
+    // extract cli parameters for offline users
+    for(let offlineIdx = 0; offlineIdx < numberOfOfflines; offlineIdx++)
+    {
+        let jsonData = {};
+        jsonData['partyID'] = offlineIdx.toString();
+        jsonData['partiesNumber'] = partiesSize.toString();
+        jsonData['inputFile'] = 'inputSalary' + offlineIdx + '.txt';
+        jsonData['outputFile'] = 'output.txt';
+        jsonData['circuitFile'] = 'http://35.171.69.162/polls/circuit/' + circuitName;
+        jsonData['partiesFile'] = 'http://35.171.69.162/polls/parties/';
+        jsonData['fieldType'] = 'ZpMersenne';
+        jsonData['internalIterationsNumber'] = '1';
+        jsonData['NG'] = '1';
+        let dataFileName =  __dirname + '/../public/assets/' + offlineIps[offlineIdx]+'.json';
+        fs.writeFile(dataFileName, JSON.stringify(jsonData), 'utf8', function (err) {
+            if (err) console.log(err);
+        });
+    }
+
 
         let copyCommand = 'cp ' + __dirname + '/../' +  circuitName + ' ' + __dirname + '/../public/assets/';
-        exec(copyCommand, function (error, stdout) {
+        exec(copyCommand, function (error) {
             if(error) console.log('Error: ' + error);
-            console.log(stdout);
         });
     });
-
-
 
     res.redirect('/polls')
 };
