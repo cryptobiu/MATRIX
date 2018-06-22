@@ -20,12 +20,10 @@ const options = {
 
 exports.openForRegistration = function (req, res)
 {
-    if(isNaN(req.session.state))
-    {
-        req.session.state = "OPEN";
-        req.session.pollName = req.params.pollName;
-    }
-
+    let client = redis.createClient();
+    client.del('addresses', function (err) {
+        console.log(err);
+    });
     res.redirect('/polls');
 };
 
