@@ -82,6 +82,7 @@ exports.closePollForRegistration = function (req, res) {
 
     let numberOfMobiles = 0;
     let mobilesIps = [];
+    let ips = []
     let idx = 0;
     client.lrange(pollName, 0, -1, function (err, data) {
         if (err) console.log('Error retrieve poll data');
@@ -90,8 +91,15 @@ exports.closePollForRegistration = function (req, res) {
             if (data[idx + 1] === 'online_mobile')
             {
                 let mobileIp = data[idx];
-                mobilesIps.push(mobileIp);
-                numberOfMobiles += 1;
+                let port = 9000 + numberOfMobiles;
+                ips.push(mobileIp + ':' + port.toString());
+                numberOfMobiles++;
+            }
+
+            else if (data[idx + 1] === 'offline')
+            {
+                let offlineIp = data[idx];
+                ips.push(offlineIp + ':8000');
             }
         }
     });
@@ -104,77 +112,43 @@ exports.closePollForRegistration = function (req, res) {
         //delete file if exists
         fs.unlink(fileName, function (err) {console.log(err)});
 
-        //write the proxy addresses
-
-        if(numberOfMobiles > 0)
+        for(let idx = 0; idx < ips.length; idx++)
         {
-            for(let idx = 0; idx < numberOfMobiles; idx++)
-            {
-                fs.appendFileSync(fileName, '34.239.19.87:' + (9000 + idx * 100).toString() + '\n');
-            }
+            fs.appendFileSync(fileName, ips[idx] + '\n');
         }
 
-        //write the offline parties
-        let numberOfOfflines = 0;
-        let offlineIps = [];
-        data.forEach(function (entry) {
-            offlineIps.push(entry);
-            fs.appendFileSync(fileName, entry + ':8000\n');
-            numberOfOfflines++;
-        });
-
-        let partiesSize = numberOfMobiles + numberOfOfflines;
+        let partiesSize = ips.length;
 
         let exec = require('child_process').exec;
         let createCircuit = 'java -jar ' + __dirname + '/../public/assets/GenerateArythmeticCircuitForVariance.jar '
-            + partiesSize.toString() + ' 3';
+            + partiesSize.toString() + ' 1';
         exec(createCircuit, function (error, stdout){
             if(error) console.log('Error: ' + error);
             console.log(stdout);
         });
 
         //copy the circuit to the public path
-    let circuitName = 'ArythmeticVarianceFor3InputsAnd' + partiesSize + 'Parties.txt';
+    let circuitName = 'ArythmeticVarianceFor1InputsAnd' + partiesSize + 'Parties.txt';
 
     // extract cli parameters for online users
-    for(let mobilesIdx = 0; mobilesIdx < numberOfMobiles; mobilesIdx++)
+    for(let ipsIdx = 0; ipsIdx < ips.length; ipsIdx++)
     {
         let jsonData = {};
-        jsonData['partyID'] = mobilesIdx.toString();
+        jsonData['partyID'] = ipsIdx.toString();
         jsonData['partiesNumber'] = partiesSize.toString();
-        jsonData['inputFile'] = 'inputSalary' + mobilesIdx + '.txt';
+        jsonData['inputFile'] = 'inputSalary' + ipsIdx + '.txt';
         jsonData['outputFile'] = 'output.txt';
         jsonData['circuitFile'] = 'http://35.171.69.162/polls/circuit/' + circuitName;
         jsonData['proxyAddress'] = '34.239.19.87';
-        jsonData['fieldType'] = 'ZpMersenne';
-        jsonData['internalIterationsNumber'] = '1';
-        jsonData['NG'] = '1';
-        let dataFileName =  __dirname + '/../public/assets/' + mobilesIps[mobilesIdx]+'.json';
-        fs.writeFile(dataFileName, JSON.stringify(jsonData), 'utf8', function (err) {
-            if (err) console.log(err);
-        });
-    }
-
-    // extract cli parameters for offline users
-    for(let offlineIdx = 0; offlineIdx < numberOfOfflines; offlineIdx++)
-    {
-        let jsonData = {};
-        jsonData['partyID'] = offlineIdx.toString();
-        jsonData['partiesNumber'] = partiesSize.toString();
-        jsonData['inputFile'] = 'inputSalary' + offlineIdx + '.txt';
-        jsonData['outputFile'] = 'output.txt';
-        jsonData['circuitFile'] = 'http://35.171.69.162/polls/circuit/' + circuitName;
         jsonData['partiesFile'] = 'http://35.171.69.162/polls/parties/';
         jsonData['fieldType'] = 'ZpMersenne';
         jsonData['internalIterationsNumber'] = '1';
         jsonData['NG'] = '1';
-        let dataFileName =  __dirname + '/../public/assets/' + offlineIps[offlineIdx]+'.json';
+        let dataFileName =  __dirname + '/../public/assets/' + ips[ipsIdx].split(':')[0]+'.json';
         fs.writeFile(dataFileName, JSON.stringify(jsonData), 'utf8', function (err) {
             if (err) console.log(err);
         });
     }
-
-
         let copyCommand = 'cp ' + __dirname + '/../' +  circuitName + ' ' + __dirname + '/../public/assets/';
         exec(copyCommand, function (error) {
             if(error) console.log('Error: ' + error);
