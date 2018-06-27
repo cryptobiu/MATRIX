@@ -1,14 +1,5 @@
-const formidable = require('formidable');
-const PythonShell = require('python-shell');
-const url = require('url');
-const sleep = require('sleep');
 const fs = require('fs');
 const redis = require('redis');
-const options = {
-    mode:'text',
-    pythonPath: '/usr/bin/python3.5',
-    pythonOptions:['-u']
-};
 
 /*
 * State has 4 values:
@@ -81,8 +72,7 @@ exports.closePollForRegistration = function (req, res) {
     let client = redis.createClient();
 
     let numberOfMobiles = 0;
-    let mobilesIps = [];
-    let ips = []
+    let ips = [];
     let idx = 0;
     client.lrange(pollName, 0, -1, function (err, data) {
         if (err) console.log('Error retrieve poll data');
@@ -90,9 +80,8 @@ exports.closePollForRegistration = function (req, res) {
         {
             if (data[idx + 1] === 'online_mobile')
             {
-                let mobileIp = data[idx];
                 let port = 9000 + numberOfMobiles;
-                ips.push(mobileIp + ':' + port.toString());
+                ips.push('127.0.0.1' + ':' + port.toString());
                 numberOfMobiles++;
             }
 
@@ -141,7 +130,7 @@ exports.closePollForRegistration = function (req, res) {
         jsonData['circuitFile'] = 'http://35.171.69.162/polls/circuit/' + circuitName;
         jsonData['proxyAddress'] = '34.239.19.87';
         jsonData['partiesFile'] = 'http://35.171.69.162/polls/parties/';
-        jsonData['fieldType'] = 'ZpMersenne';
+        jsonData['fieldType'] = 'GF2_8LookupTable';
         jsonData['internalIterationsNumber'] = '1';
         jsonData['NG'] = '1';
         let dataFileName =  __dirname + '/../public/assets/' + ips[ipsIdx].split(':')[0]+'.json';

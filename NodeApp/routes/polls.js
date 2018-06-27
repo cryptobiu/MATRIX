@@ -1,17 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const pollscontrollerNew = require('./../controllers/pollsControllerNew');
+const pollscontroller = require('../controllers/pollsController');
 
 router.get('/', function (req, res) {
     res.render('polls', { title: 'Polls' });
 });
 
 router.get('/openForRegistration/:pollName', function (req, res) {
-    pollscontrollerNew.openForRegistration(req, res);
+    pollscontroller.openForRegistration(req, res);
 });
 
 router.get('/registerToPoll/:pollName/:ip/:type', function (req, res) {
-    pollscontrollerNew.registerToPoll(req, res);
+    pollscontroller.registerToPoll(req, res);
 });
 
 router.get('/getPollParams/:pollName/:ip', function (req, res) {
@@ -20,11 +20,11 @@ router.get('/getPollParams/:pollName/:ip', function (req, res) {
 });
 
 router.get('/changePollState/:state', function (req, res) {
-    pollscontrollerNew.changePollState(req, res);
+    pollscontroller.changePollState(req, res);
 });
 
 router.get('/closePollForRegistration/:pollName', function (req, res) {
-    pollscontrollerNew.closePollForRegistration(req, res);
+    pollscontroller.closePollForRegistration(req, res);
 });
 
 /*

@@ -11,7 +11,7 @@ from elasticsearch import Elasticsearch
 class Elastic:
     def __init__(self, conf_file):
         self.config_file_path = conf_file
-        self.es = Elasticsearch('https://search-escryptobiu-fyopgg3zepk6dtda4zerc53apy.us-east-1.es.amazonaws.com/',
+        self.es = Elasticsearch('localhost:',
                                 use_ssl=True, ca_certs=certifi.where())
 
     def delete_index(self, index_name):
@@ -68,10 +68,10 @@ class Elastic:
                     doc[data[task_idx]['name']] = val / float(number_of_iterations)
                 doc['executionTime'] = dts
 
-                self.es.index(index='%sresults' % analyzed_parameter, doc_type='%sresults' % analyzed_parameter,
+                self.es.index(index='%sresults' % analyzed_parameter, doc_type='%s' % analyzed_parameter,
                               body=doc)
 
-    def upload_data(self):
+    def upload_all_data(self):
         results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
         self.upload_data('cpu', results_path)
         self.upload_data('commReceived', results_path)

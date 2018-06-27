@@ -40,6 +40,7 @@ def print_instances_management_menu(conf_file_path):
     color_print('9. Check running instances from API', 'red')
     color_print('10. Start instances from API', 'red')
     color_print('11. Convert parties file to RTI format', 'red')
+    color_print('12. Sign Offline users', 'red')
     selection = input('Your choice:')
 
     deploy = di.Deploy(conf_file_path)
@@ -67,6 +68,8 @@ def print_instances_management_menu(conf_file_path):
         deploy.start_instances()
     elif selection == '11':
         deploy.convert_parties_file_to_rti()
+    elif selection == '12':
+        deploy.sign_offline_users()
 
 
 def print_execution_menu(conf_file_path):
@@ -109,7 +112,7 @@ def print_analysis_menu(conf_file_path):
         a.analyze_all()
     elif selection == '4':
         e = ue.Elastic(conf_file_path)
-        e.upload_data()
+        e.upload_all_data()
 
 
 def main():

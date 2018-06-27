@@ -1,8 +1,10 @@
 import os
+import glob
 import json
 import time
 import copy
 import boto3
+import redis
 import botocore
 from random import shuffle
 from datetime import datetime
@@ -408,7 +410,7 @@ class Deploy:
     def stop_instances(self):
         with open(self.config_file_path) as data_file:
             data = json.load(data_file)
-            regions = list(data['regions.json'].values())
+            regions = list(data['regions'].values())
             machines_name = data['protocol']
 
         for idx in range(len(regions)):
@@ -453,3 +455,24 @@ class Deploy:
 
             # Start the instance
             client.start_instances(InstanceIds=instances)
+
+    @staticmethod
+    def sign_offline_users():
+        ips = set()
+        parties_files = glob.glob('%s/InstancesConfigurations/parties*.conf' % os.getcwd())
+        for file in parties_files:
+            with open(file, 'r') as pf:
+                lines = [line.strip() for line in pf]
+                for line in lines:
+                    ips.add(line)
+
+        r = redis.StrictRedis(host='35.171.69.162')
+
+        for ip in ips:
+            r.rpush('addresses', ip)
+            r.rpush('HyperMPC', 'offline_user', ip)
+
+    @staticmethod
+    def deploy_proxies():
+        number_of_proxies = input('Number of proxies:')
+        os.system('fab -f ExperimentExecute/fabfile.py deploy_proxy:%s' % number_of_proxies)

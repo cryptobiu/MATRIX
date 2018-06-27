@@ -138,3 +138,20 @@ def update_acp_protocol():
 @task
 def kill_process(process_name):
     sudo('killall -9 %s' % process_name)
+
+
+@task
+def deploy_proxy(number_of_proxies):
+    # set hosts to be proxy server
+    env.host = ['34.239.19.87']
+
+    # kill all existing proxies
+    with warn_only():
+        sudo('killall -9 cct_proxy')
+
+    with cd('ACP/cct_proxy'):
+        put('NodeApp/public/assets/parties.conf', run('pwd'))
+        with open('NodeApp/public/assets/parties.conf') as parties_file:
+            number_of_peers = len(parties_file.readlines())
+            run('./run_multiple_proxies %s %s' % ((int(number_of_proxies) - 1), number_of_peers))
+
