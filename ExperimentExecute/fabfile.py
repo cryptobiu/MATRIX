@@ -71,9 +71,11 @@ def run_protocol(config_file, args):
             if exists('*.7z'):
                 run('7z e *.7z')
 
-            with warn_only():
-                run('rm *.log')
-
+            if not exists('logs'):
+                run('mkdir -p logs')
+            else:
+                run('rm logs/*')
+                
             party_id = env.hosts.index(env.host)
             sudo('killall -9 %s; exit 0' % executable_name)
 
@@ -123,7 +125,7 @@ def collect_results(results_server_directory, results_local_directory):
 @task
 def get_logs(working_directory):
     local('mkdir -p logs')
-    get('%s/*.log' % working_directory, expanduser('~/MATRIX/logs'))
+    get('%s/logs/*.log' % working_directory, expanduser('~/MATRIX/logs'))
 
 
 @task
