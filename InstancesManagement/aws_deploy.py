@@ -1,46 +1,43 @@
 import os
 import json
 import time
-import copy
 import boto3
 import botocore
+
 from random import shuffle
 from datetime import datetime
 from os.path import expanduser
 from botocore import exceptions
 from collections import OrderedDict
 
+from InstancesManagement.deploy import DeployCP
 
-class Deploy:
+
+class AmazonCP(DeployCP):
     def __init__(self, conf_file):
-        self.config_file_path = conf_file
+        super(AmazonCP, self).__init__(conf_file)
 
-    def create_key_pair(self, number_of_parties):
-        with open(self.config_file_path) as regions_file:
-            data = json.load(regions_file, object_pairs_hook=OrderedDict)
-            regions = list(data['regions.json'].values())
+    def create_key_pair(self):
+        regions = list(self.conf['regions.json'].values())
 
         for regions_idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[regions_idx][:-1])
             keys = client.describe_key_pairs()
             number_of_current_keys = len(keys['KeyPairs'])
-            for idx in range(number_of_parties):
-                try:
-                    key_idx = idx + number_of_current_keys + 1
-                    key_pair = client.create_key_pair(KeyName='Matrix%s-%s'
-                                                              % (regions[regions_idx].replace('-', '')[:-1], key_idx))
-                    key_name = key_pair['KeyName']
-                    with open(expanduser('~/Keys/%s' % key_name), 'w+') as key_file:
-                        key_file.write(key_pair['KeyMaterial'])
-                except botocore.exceptions.EndpointConnectionError as e:
-                    print(e.response['Error']['Message'].upper())
-                except botocore.exceptions.ClientError as e:
-                    print(e.response['Error']['Message'].upper())
+            try:
+                key_idx = number_of_current_keys + 1
+                key_pair = client.create_key_pair(KeyName='Matrix%s-%s'
+                                                          % (regions[regions_idx].replace('-', '')[:-1], key_idx))
+                key_name = key_pair['KeyName']
+                with open(expanduser('~/Keys/%s' % key_name), 'w+') as key_file:
+                    key_file.write(key_pair['KeyMaterial'])
+            except botocore.exceptions.EndpointConnectionError as e:
+                print(e.response['Error']['Message'].upper())
+            except botocore.exceptions.ClientError as e:
+                print(e.response['Error']['Message'].upper())
 
     def create_security_group(self):
-        with open(self.config_file_path) as regions_file:
-            data = json.load(regions_file, object_pairs_hook=OrderedDict)
-            regions = list(data['regions.json'].values())
+        regions = list(self.conf['regions.json'].values())
 
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
@@ -71,15 +68,13 @@ class Deploy:
         return prices['SpotPriceHistory'][0]['SpotPrice']
 
     def deploy_instances(self):
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file, object_pairs_hook=OrderedDict)
-            machine_type = data['aWSInstType']
-            price_bids = data['aWWSBidPrice']
-            number_of_parties = list(data['numOfParties'].values())
-            regions = list(data['regions'].values())
-            number_duplicated_servers = 0
-            spot_request = data['isSpotRequest']
-            protocol_name = data['protocol']
+        machine_type = self.conf['aWSInstType']
+        price_bids = self.conf['aWWSBidPrice']
+        number_of_parties = list(self.conf['numOfParties'].values())
+        regions = list(self.conf['regions'].values())
+        number_duplicated_servers = 0
+        spot_request = self.conf['isSpotRequest']
+        protocol_name = self.conf['protocol']
 
         with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
             global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
@@ -98,7 +93,7 @@ class Deploy:
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
 
-            number_of_instances_to_deploy = self.check_running_spot_instances(regions[idx][:-1], machine_type)
+            number_of_instances_to_deploy = self.check_running_instances(regions[idx][:-1], machine_type)
             if idx < number_duplicated_servers:
                 number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
             else:
@@ -162,50 +157,12 @@ class Deploy:
 
         print('Finished to deploy machines')
 
-    @staticmethod
-    def create_parties_files_multi_regions(file_name):
-        with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'r') as origin_file:
-            parties = origin_file.readlines()
-
-        number_of_parties = len(parties)
-
-        for idx in range(number_of_parties):
-            new_parties = copy.deepcopy(parties)
-            new_parties[idx] = '0.0.0.0:8000\n'
-
-            # write data to file
-            with open('%s/InstancesConfigurations/parties%s.conf' % (os.getcwd(), idx), 'w+') as new_file:
-                new_file.writelines(new_parties)
-
-    def create_parties_file(self, ip_addresses, port_counter, file_name, new_format=True, number_of_regions=1):
-
-        print('Parties network configuration')
-        with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'w+') as private_ip_file:
-            if not new_format:
-                for party_idx in range(len(ip_addresses)):
-                    print('party_%s_ip=%s' % (party_idx, ip_addresses[party_idx]))
-                    private_ip_file.write('party_%s_ip=%s\n' % (party_idx, ip_addresses[party_idx]))
-
-                for port_idx in range(len(ip_addresses)):
-                    print('party_%s_port=%s' % (port_idx, port_counter))
-                    private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_counter))
-
-            else:
-                for party_idx in range(len(ip_addresses)):
-                    private_ip_file.write('%s:8000\n' % ip_addresses[party_idx])
-
-        # create party file for each instance
-        if number_of_regions > 1:
-            self.create_parties_files_multi_regions(file_name)
-
     def get_aws_network_details(self, port_counter, file_name, new_format=True):
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file)
-            regions = list(data['regions'].values())
-            is_spot_request = data['isSpotRequest']
-            coordinator_exists = 'coordinatorConfig' in data
-            instance_type = data['aWSInstType']
-            protocol_name = data['protocol']
+        regions = list(self.conf['regions'].values())
+        is_spot_request = self.conf['isSpotRequest']
+        coordinator_exists = 'coordinatorConfig' in self.conf
+        instance_type = self.conf['aWSInstType']
+        protocol_name = self.conf['protocol']
 
         instances_ids = []
         public_ip_address = []
@@ -255,11 +212,9 @@ class Deploy:
                     public_ip_file.write('%s\n' % public_ip_address[public_idx])
 
     def get_network_details(self, port_counter=8000, file_name='parties.conf'):
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file)
-            regions = list(data['regions'].values())
+        regions = list(self.conf['regions'].values())
 
-        number_of_parties = max(list(data['numOfParties'].values()))
+        number_of_parties = max(list(self.conf['numOfParties'].values()))
         if 'local' in regions:
             public_ip_address = []
             for ip_idx in range(len(number_of_parties)):
@@ -280,90 +235,15 @@ class Deploy:
         else:
             self.get_aws_network_details(port_counter, file_name, True)
 
-    def get_aws_network_details_from_api(self):
-
-        self.get_aws_network_details()
-        ips = input('Enter IPs addresses separated by comma:')
-        ips_splitted = ips.split(',')
-
-        with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'r') as origin_file:
-            parties = origin_file.readlines()
-
-        number_of_parties = len(parties) // 2
-        del parties[number_of_parties:len(parties)]
-
-        new_parties = copy.deepcopy(parties)
-        for idx in range(len(ips_splitted)):
-            new_parties.append('party_%s_ip=%s\n' % (str(number_of_parties + idx),
-                               ips_splitted[idx]))
-
-        # reverse the list that android device will be first
-
-        new_parties = list(reversed(new_parties))
-
-        # fix the indices of parties_ids
-        for reverse_idx in range(len(new_parties)):
-            new_parties[reverse_idx].replace('party_%s_ip' % (len(new_parties) - reverse_idx),
-                                             'party_%s_ip' % reverse_idx)
-
-        # insert ports numbers after insert ips addresses in the right places
-
-        for idx2 in range(len(new_parties)):
-            new_parties.append('party_%s_port=8000\n' % idx2)
-
-        # write data to file
-        with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'w+') as new_file:
-            new_file.writelines(new_parties)
-
-        # copy file to assets directory
-        os.rename('%s/InstancesConfigurations/parties.conf' % os.getcwd(),
-                  '%s/NodeApp/public/assets/parties.conf' % os.getcwd())
-        # create circuit according to number of parties
-        number_of_gates = 1000
-        number_of_mult_gates = 1000
-        depth = 20
-        number_of_parties = 3
-        number_of_inputs = 1000 // number_of_parties
-        number_of_outputs = 50
-        os.system('java -jar %s/InstancesConfigurations/GenerateArythmeticCircuitForDepthAndGates.jar '
-                  '%s %s %s %s %s %s true' % (os.getcwd(), number_of_gates, number_of_mult_gates, depth,
-                                              number_of_parties, number_of_inputs, number_of_outputs))
-
-        file_name = '%sG_%sMG_%sIn_%sOut_%sD_OutputOne%sP.txt' % (number_of_gates, number_of_mult_gates,
-                                                                  number_of_inputs, number_of_outputs, depth,
-                                                                  number_of_parties)
-
-        os.rename('%s/%s' % (os.getcwd(), file_name), '%s/NodeApp/public/assets/%s' % (os.getcwd(), file_name))
-
-    @staticmethod
-    def check_running_spot_instances(region, machine_type):
-
-        instances_ids = list()
-        instances_count = 0
-
-        client = boto3.client('ec2', region_name=region)
-        response = client.describe_spot_instance_requests()
-
-        for req_idx in range(len(response['SpotInstanceRequests'])):
-            if (response['SpotInstanceRequests'][req_idx]['State'] == 'active' or
-                response['SpotInstanceRequests'][req_idx]['State'] == 'open')\
-                    and response['SpotInstanceRequests'][req_idx]['LaunchSpecification']['InstanceType'] \
-                    == machine_type:
-                instances_ids.append(response['SpotInstanceRequests'][req_idx]['InstanceId'])
-
-        ec2 = boto3.resource('ec2', region_name=region)
-        instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
-
-        for inst in instances:
-            if inst.id in instances_ids:
-                instances_count += 1
-
-        return instances_count
-
-    @staticmethod
-    def describe_instances(region_name, machines_name):
+    def describe_instances(self, region_name, machines_name):
         client = boto3.client('ec2', region_name=region_name)
-        response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [machines_name]}])
+        is_spot_request = self.conf['isSpotRequest']
+        if is_spot_request == 'True':
+            response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [machines_name]},
+                                                          {'Name': 'instance-lifecycle', 'Values': ['spot']}])
+        else:
+            response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [machines_name]},
+                                                          {'Name': 'instance-lifecycle', 'Values': ['scheduled']}])
         instances = []
 
         for res_idx in range(len(response['Reservations'])):
@@ -373,10 +253,8 @@ class Deploy:
 
         return instances
 
-    def check_running_instances(self):
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file)
-        regions = list(data['regions.json'].values())
+    def check_running_instances(self, region, machine_type):
+        regions = list(self.conf['regions.json'].values())
         ready_instances = 0
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
@@ -389,14 +267,11 @@ class Deploy:
                             'i-06146d4b39e3c79fb':
                         ready_instances += 1
 
-        print('**Number of ready instances : %s**' % ready_instances)
         return ready_instances
 
     def start_instances(self):
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file)
-            regions = list(data['regions.json'].values())
-            machines_name = data['protocol']
+        regions = list(self.conf['regions.json'].values())
+        machines_name = self.conf['protocol']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
@@ -406,10 +281,8 @@ class Deploy:
             client.start_instances(InstanceIds=instances)
 
     def stop_instances(self):
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file)
-            regions = list(data['regions'].values())
-            machines_name = data['protocol']
+        regions = list(self.conf['regions'].values())
+        machines_name = self.conf['protocol']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
@@ -419,10 +292,8 @@ class Deploy:
             client.stop_instances(InstanceIds=instances)
 
     def change_instance_types(self):
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file)
-            regions = list(data['regions'].values())
-            protocol_name = data['protocol']
+        regions = list(self.conf['regions'].values())
+        protocol_name = self.conf['protocol']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
@@ -440,3 +311,15 @@ class Deploy:
 
             # Start the instance
             client.start_instances(InstanceIds=instances)
+
+    def terminate(self):
+        regions = list(self.conf['regions'].values())
+        machines_name = self.conf['protocol']
+
+        for idx in range(len(regions)):
+            region_name = regions[idx][:-1]
+
+            instances = self.describe_instances(region_name, machines_name)
+
+            client = boto3.client('ec2', region_name=region_name)
+            client.terminate_instances(InstanceIds=instances)
