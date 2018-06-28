@@ -75,7 +75,7 @@ def run_protocol(config_file, args):
                 run('mkdir -p logs')
             else:
                 run('rm logs/*')
-                
+
             party_id = env.hosts.index(env.host)
             sudo('killall -9 %s; exit 0' % executable_name)
 
