@@ -6,9 +6,8 @@ from collections import OrderedDict
 
 class DeployCP:
     def __init__(self, conf_file):
-        with open(self.config_file_path) as data_file:
+        with open(conf_file) as data_file:
             self.conf = json.load(data_file, object_pairs_hook=OrderedDict)
-        self.config_file_path = conf_file
 
     def create_key_pair(self):
         raise NotImplementedError
@@ -59,11 +58,9 @@ class DeployCP:
         with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'w+') as private_ip_file:
             if not new_format:
                 for party_idx in range(len(ip_addresses)):
-                    print('party_%s_ip=%s' % (party_idx, ip_addresses[party_idx]))
                     private_ip_file.write('party_%s_ip=%s\n' % (party_idx, ip_addresses[party_idx]))
 
                 for port_idx in range(len(ip_addresses)):
-                    print('party_%s_port=%s' % (port_idx, port_counter))
                     private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_counter))
 
             else:

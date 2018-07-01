@@ -69,19 +69,20 @@ def run_protocol(config_file, args):
 
         with cd(working_directory):
             if exists('*.7z'):
-                run('7z e *.7z')
+                run('for arc in *.7z;do 7z $arc;done;')
 
             if not exists('logs'):
                 run('mkdir -p logs')
             else:
-                run('rm logs/*')
+                with warn_only():
+                    run('rm logs/*')
 
             party_id = env.hosts.index(env.host)
             sudo('killall -9 %s; exit 0' % executable_name)
 
             sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
 
-            if protocol_name == 'MPCFromSD':
+            if 'inputs0' in values_str:
                 values_str = values_str.replace('inputs0.txt', 'inputs%s.txt' % str(party_id))
 
             # with warn_only():
@@ -91,7 +92,7 @@ def run_protocol(config_file, args):
                     run('mv parties%s.conf parties.conf' % party_id)
                 else:
                     put('InstancesConfigurations/parties.conf', run('pwd'))
-                run('./%s -partyID %s %s' % (executable_name, party_id, values_str))
+                run('./%s PartyID %s %s' % (executable_name, party_id, values_str))
 
             else:
                 if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
