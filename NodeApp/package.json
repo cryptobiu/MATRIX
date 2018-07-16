@@ -15,6 +15,7 @@
     "express-session": "latest",
     "pug": "latest",
     "sleep": "latest",
-    "redis": "latest"
+    "redis": "latest",
+    "node-ssh": "latest"
   }
 }
