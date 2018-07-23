@@ -92,7 +92,7 @@ def run_protocol(config_file, args):
                     run('mv parties%s.conf parties.conf' % party_id)
                 else:
                     put('InstancesConfigurations/parties.conf', run('pwd'))
-                run('./%s PartyID %s %s' % (executable_name, party_id, values_str))
+                run('./%s partyID %s %s' % (executable_name, party_id, values_str))
 
             else:
                 if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:

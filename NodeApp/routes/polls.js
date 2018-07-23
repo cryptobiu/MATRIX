@@ -27,6 +27,10 @@ router.get('/closePollForRegistration/:pollName', function (req, res) {
     pollscontroller.closePollForRegistration(req, res);
 });
 
+router.get('/runProxyClients', function (req, res) {
+    pollscontroller.runProxyClients(req, res);
+});
+
 /*
 * Download files zone
 */
