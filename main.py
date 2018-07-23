@@ -1,7 +1,7 @@
 import os
+import wget
 import colorama
-from InstancesManagement import deploy_instances as di
-from InstancesManagement import terminate_instances as ti
+from InstancesManagement import aws_deploy as di
 from ExperimentExecute import end_to_end as e2e
 from ExperimentReport import analyze_results as ar
 from ExperimentReport import upload_elastic as ue
@@ -35,41 +35,28 @@ def print_instances_management_menu(conf_file_path):
     color_print('4. Get instances network data', 'red')
     color_print('5. Terminate machines', 'red')
     color_print('6. Change machines types', 'red')
-    color_print('7. Stop instances', 'red')
-    color_print('8. Get instances network data from API', 'red')
-    color_print('9. Check running instances from API', 'red')
-    color_print('10. Start instances from API', 'red')
-    color_print('11. Convert parties file to RTI format', 'red')
-    color_print('12. Sign Offline users', 'red')
+    color_print('7. Start instances from API', 'red')
+    color_print('8. Stop instances', 'red')
     selection = input('Your choice:')
 
-    deploy = di.Deploy(conf_file_path)
+    deploy = di.AmazonCP(conf_file_path)
 
     if selection == '1':
         deploy.deploy_instances()
     elif selection == '2':
-        deploy.create_key_pair(2)
+        deploy.create_key_pair()
     elif selection == '3':
         deploy.create_security_group()
     elif selection == '4':
         deploy.get_network_details()
     elif selection == '5':
-        terminate = ti.Terminate(conf_file_path)
-        terminate.terminate()
+        deploy.terminate()
     elif selection == '6':
         deploy.change_instance_types()
     elif selection == '7':
-        deploy.stop_instances()
-    elif selection == '8':
-        deploy.get_aws_network_details_from_api()
-    elif selection == '9':
-        deploy.check_running_instances()
-    elif selection == '10':
         deploy.start_instances()
-    elif selection == '11':
-        deploy.convert_parties_file_to_rti()
-    elif selection == '12':
-        deploy.sign_offline_users()
+    elif selection == '8':
+        deploy.stop_instances()
 
 
 def print_execution_menu(conf_file_path):
@@ -125,7 +112,8 @@ def main():
             continue
 
         color_print('Enter configuration file(s):', 'blue')
-        conf_file_path = input('Configuration file path (current path is: %s): ' % os.getcwd())
+        conf_file_address = input('Insert config file address. The address can be GitHub, BitBucket, GitLab, etc.')
+        conf_file_path = wget.download(conf_file_address, out='ProtocolsConfigurations')
 
         if selection == '1':
             print_instances_management_menu(conf_file_path)
