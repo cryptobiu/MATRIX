@@ -91,7 +91,7 @@ exports.closePollForRegistration = function (req, res) {
             else if (data[idx + 1] === 'offline')
             {
                 let offlineIp = data[idx];
-                ips.push(offlineIp + ':8000');
+                ips.push(offlineIp);
             }
         }
     });
