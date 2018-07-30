@@ -46,7 +46,7 @@ class Analyze:
         address_me = 'biu.cyber.experiments@gmail.com'
         me = 'BIU Cyber Experiments <biu.cyber.experiments@gmail.com>'
 
-        results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, protocol_time)
+        results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, self.protocol_time)
 
         message = MIMEMultipart()
         message['Subject'] = 'Experiment results for protocol %s' % protocol_name
@@ -89,10 +89,10 @@ class Analyze:
 
         protocol_name = conf_data['protocol']
 
-        results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, protocol_time)
+        results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, self.protocol_time)
         parties = set()
         for file in files_list:
-            parties.add(int(basename(file.split('_')[3].split('.')[0].split('=')[1])))
+            parties.add(int(basename(file.split('*')[3])))
 
         parties = list(parties)
         parties.sort()
@@ -101,6 +101,7 @@ class Analyze:
         # Assumption : all the parties measure the same tasks
 
         tasks_names = dict()
+        print(files_list)
 
         # load one of the data files to receive the headers to the xlsx file
 
@@ -152,19 +153,19 @@ class Analyze:
         wb.save(results_file_name)
 
     def analyze_cpu(self, results_path):
-        files_list = glob.glob(expanduser('%s/*_cpu*.json' % results_path))
+        files_list = glob.glob(expanduser('%s/*cpu*.json' % results_path))
         self.analyze_results(files_list, 'cpu')
 
     def analyze_comm_sent(self, results_path):
-        files_list = glob.glob(expanduser('%s/*_commSent*.json' % results_path))
+        files_list = glob.glob(expanduser('%s/*commSent*.json' % results_path))
         self.analyze_results(files_list, 'sent')
 
     def analyze_comm_received(self, results_path):
-        files_list = glob.glob(expanduser('%s/*_commReceived*.json' % results_path))
+        files_list = glob.glob(expanduser('%s/*commReceived*.json' % results_path))
         self.analyze_results(files_list, 'received')
 
     def analyze_memory(self, results_path):
-        files_list = glob.glob(expanduser('%s/*_memory*.json' % results_path))
+        files_list = glob.glob(expanduser('%s/*memory*.json' % results_path))
         self.analyze_results(files_list, 'memory')
 
     def analyze_all(self):

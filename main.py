@@ -64,7 +64,6 @@ def print_execution_menu(conf_file_path):
     color_print('2. Install Experiment', 'yellow')
     color_print('3. Execute Experiment', 'yellow')
     color_print('4. Update libscapi', 'yellow')
-    color_print('5. Check if poll completed', 'yellow')
     selection = input('Your choice:')
 
     ee = e2e.E2E(conf_file_path)

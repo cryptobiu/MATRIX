@@ -11,7 +11,7 @@ from elasticsearch import Elasticsearch
 class Elastic:
     def __init__(self, conf_file):
         self.config_file_path = conf_file
-        self.es = Elasticsearch('localhost:',
+        self.es = Elasticsearch('localhost',
                                 use_ssl=True, ca_certs=certifi.where())
 
     def delete_index(self, index_name):
@@ -22,7 +22,7 @@ class Elastic:
             {
                 'mappings':
                 {
-                    'memoryresults':
+                    'commSentresults':
                     {
                         'properties':
                             {
@@ -34,7 +34,41 @@ class Elastic:
                     }
                 }
             }
-        self.es.indices.create(index='memoryresults', body=request_body)
+        self.es.indices.create(index='commsentresults', body=request_body)
+        request_body = \
+            {
+                'mappings':
+                {
+                    'commReceivedresults':
+                    {
+                        'properties':
+                            {
+                                'partiesNumber': {'type': 'integer'},
+                                'partyId': {'type': 'integer'},
+                                'protocolName': {'type': 'text'},
+                                'executionTime': {'type': 'date'}
+                            }
+                    }
+                }
+            }
+        self.es.indices.create(index='commreceivedresults', body=request_body)
+        request_body = \
+            {
+                'mappings':
+                {
+                    'cpuresults':
+                    {
+                        'properties':
+                            {
+                                'partiesNumber': {'type': 'integer'},
+                                'partyId': {'type': 'integer'},
+                                'protocolName': {'type': 'text'},
+                                'executionTime': {'type': 'date'}
+                            }
+                    }
+                }
+            }
+        self.es.indices.create(index='cpuresults', body=request_body)
 
     def upload_data(self, analysis_type, results_path):
 
@@ -68,7 +102,7 @@ class Elastic:
                     doc[data[task_idx]['name']] = val / float(number_of_iterations)
                 doc['executionTime'] = dts
 
-                self.es.index(index='%sresults' % analyzed_parameter, doc_type='%s' % analyzed_parameter,
+                self.es.index(index='%sresults' % analyzed_parameter, doc_type='%sresults' % analyzed_parameter,
                               body=doc)
 
     def upload_all_data(self):

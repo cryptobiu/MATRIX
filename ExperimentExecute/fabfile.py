@@ -37,6 +37,9 @@ def install_git_project(git_branch, working_directory, git_address, external, in
             sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
             run('cmake .')
         run('make')
+        with warn_only():
+            if exists('*.7z'):
+                run('7za -y x \"*.7z\"')
 
 
 @task
@@ -68,8 +71,6 @@ def run_protocol(config_file, args):
                 values_str += '%s ' % val
 
         with cd(working_directory):
-            if exists('*.7z'):
-                run('for arc in *.7z;do 7z $arc;done;')
 
             if not exists('logs'):
                 run('mkdir -p logs')
@@ -83,7 +84,7 @@ def run_protocol(config_file, args):
             sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
 
             if 'inputs0' in values_str:
-                values_str = values_str.replace('inputs0.txt', 'inputs%s.txt' % str(party_id))
+                values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
 
             # with warn_only():
             if external_protocol == 'False':
