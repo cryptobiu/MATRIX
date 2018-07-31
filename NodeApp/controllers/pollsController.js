@@ -87,7 +87,7 @@ exports.closePollForRegistration = function (req, res) {
         }
     });
 
-    client.lrange('addresses', numberOfMobiles, -1, function (err, data) {
+    client.lrange('addresses', numberOfParties, -1, function (err, data) {
         if (err) console.log('Error retrieve addresses');
 
         //write addresses to file
