@@ -72,7 +72,7 @@ exports.closePollForRegistration = function (req, res) {
     let pollName = req.params.pollName ;
     let client = redis.createClient();
 
-    let numberOfMobiles = 0;
+    let numberOfParties = 0;
     let registeredIps = []; // save addresses for the json files
     let ips = [];
     let idx = 0;
@@ -81,18 +81,9 @@ exports.closePollForRegistration = function (req, res) {
         for (idx = 0; idx < data.length; idx += 2)
         {
             registeredIps.push(data[idx]);
-            if (data[idx + 1] === 'online_mobile')
-            {
-                let port = 9000 + numberOfMobiles;
-                ips.push('34.239.19.87' + ':' + port.toString());
-                numberOfMobiles++;
-            }
-
-            else if (data[idx + 1] === 'offline')
-            {
-                let offlineIp = data[idx];
-                ips.push(offlineIp);
-            }
+            let port = 9000 + numberOfParties;
+            ips.push('34.239.19.87' + ':' + port.toString());
+            numberOfParties++;
         }
     });
 
