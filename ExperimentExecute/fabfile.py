@@ -55,9 +55,8 @@ def run_protocol(config_file, args):
     with open(config_file) as data_file:
 
         data = json.load(data_file, object_pairs_hook=OrderedDict)
-        protocol_name = data['protocol']
-        executable_name = data['executableName']
-        working_directory = data['workingDirectory']
+        executable_name = list(data['executableName'].values())
+        working_directory = list(data['workingDirectory'].values())
         external_protocol = data['isExternal']
         regions = list(data['regions'].values())
         vals = args.split('@')
@@ -70,52 +69,53 @@ def run_protocol(config_file, args):
             else:
                 values_str += '%s ' % val
 
-        with cd(working_directory):
+        for idx in range(len(working_directory)):
+            with cd(working_directory[idx]):
 
-            if not exists('logs'):
-                run('mkdir -p logs')
-            else:
+                if not exists('logs'):
+                    run('mkdir -p logs')
+                else:
+                    with warn_only():
+                        run('rm logs/*')
+
+                party_id = env.hosts.index(env.host)
                 with warn_only():
-                    run('rm logs/*')
+                    sudo('killall -9 %s; exit 0' % executable_name[idx])
 
-            party_id = env.hosts.index(env.host)
-            sudo('killall -9 %s; exit 0' % executable_name)
+                sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
 
-            sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
+                if 'inputs0' in values_str:
+                    values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
 
-            if 'inputs0' in values_str:
-                values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
-
-            # with warn_only():
-            if external_protocol == 'False':
-                if len(regions) > 1:
-                    put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                    run('mv parties%s.conf parties.conf' % party_id)
-                else:
-                    put('InstancesConfigurations/parties.conf', run('pwd'))
-                run('./%s partyID %s %s' % (executable_name, party_id, values_str))
-
-            else:
-                if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
-                    coordinator_executable = data['coordinatorExecutable']
-                    coordinator_args = data['coordinatorConfig'].split('@')
-                    coordinator_values_str = ''
-
-                    for coordinator_val in coordinator_args:
-                        coordinator_values_str += '%s ' % coordinator_val
-                    sudo('killall -9 %s; exit 0' % coordinator_executable)
-                    run('./%s %s' % (coordinator_executable, coordinator_values_str))
-
-                else:
-                    time.sleep(31)
+                if external_protocol == 'False':
                     if len(regions) > 1:
                         put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                        put('InstancesConfigurations/multi_regions/party%s/*' % (party_id - 1), run('pwd'))
                         run('mv parties%s.conf parties.conf' % party_id)
                     else:
-                        put('InstancesConfigurations/*arties*', run('pwd'))
+                        put('InstancesConfigurations/parties.conf', run('pwd'))
+                    run('./%s partyID %s %s' % (executable_name[idx], party_id, values_str))
 
-                    run('./%s %s' % (executable_name, values_str))
+                else:
+                    if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
+                        coordinator_executable = data['coordinatorExecutable']
+                        coordinator_args = data['coordinatorConfig'].split('@')
+                        coordinator_values_str = ''
+
+                        for coordinator_val in coordinator_args:
+                            coordinator_values_str += '%s ' % coordinator_val
+                        sudo('killall -9 %s; exit 0' % coordinator_executable)
+                        run('./%s %s' % (coordinator_executable, coordinator_values_str))
+
+                    else:
+                        time.sleep(31)
+                        if len(regions) > 1:
+                            put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
+                            put('InstancesConfigurations/multi_regions/party%s/*' % (party_id - 1), run('pwd'))
+                            run('mv parties%s.conf parties.conf' % party_id)
+                        else:
+                            put('InstancesConfigurations/*arties*', run('pwd'))
+
+                        run('./%s %s' % (executable_name[idx], values_str))
 
 
 @task

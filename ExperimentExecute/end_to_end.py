@@ -19,7 +19,7 @@ class E2E:
         with open(self.config_file_path) as data_file:
             data = json.load(data_file, object_pairs_hook=OrderedDict)
 
-        working_directory = data['workingDirectory']
+        working_directory = list(data['workingDirectory'].values())
         external_protocol = data['isExternal']
 
         if external_protocol == 'True':
@@ -27,10 +27,11 @@ class E2E:
             os.system('fab -f ExperimentExecute/fabfile.py install_git_project:%s,%s,%s,%s,%s --parallel --no-pty'
                       % ('', working_directory, '', external_protocol, install_script))
         else:
-            git_address = data['gitAddress']
-            git_branch = data['gitBranch']
-            os.system('fab -f ExperimentExecute/fabfile.py install_git_project:%s,%s,%s,%s,%s --parallel --no-pty'
-                      % (git_branch, working_directory, git_address, external_protocol, ''))
+            git_address = list(data['gitAddress'].values())
+            git_branch = list(data['gitBranch'].values())
+            for idx in range(len(working_directory)):
+                os.system('fab -f ExperimentExecute/fabfile.py install_git_project:%s,%s,%s,%s,%s --parallel --no-pty'
+                          % (git_branch[idx], working_directory[idx], git_address[idx], external_protocol, ''))
 
     def execute_experiment(self):
         with open(self.config_file_path) as data_file:
