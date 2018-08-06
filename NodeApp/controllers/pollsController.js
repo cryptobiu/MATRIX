@@ -127,7 +127,7 @@ exports.closePollForRegistration = function (req, res) {
         jsonData['fieldType'] = 'ZpMersenne';
         jsonData['internalIterationsNumber'] = '1';
         jsonData['NG'] = '1';
-        let dataFileName =  __dirname + '/../public/assets/' + registeredIps[ipsIdx].split(':')[0]+'.json';
+        let dataFileName =  __dirname + '/../public/assets/' + registeredIps[ipsIdx]+'.json';
         fs.writeFile(dataFileName, JSON.stringify(jsonData), 'utf8', function (err) {
             if (err) console.log(err);
         });
