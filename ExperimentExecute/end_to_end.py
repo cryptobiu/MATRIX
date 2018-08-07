@@ -43,6 +43,8 @@ class E2E:
             for idx in range(len(configurations)):
                 os.system('fab -f ExperimentExecute/fabfile.py run_protocol:%s,%s --parallel --no-pty'
                           % (self.config_file_path, configurations[idx]))
+                with open('ExperimentExecute/execution_log.log', 'a+') as log_file:
+                    log_file.write('%s\n' % configurations[idx])
 
     @staticmethod
     def update_libscapi():

@@ -131,6 +131,21 @@ class AmazonCP(DeployCP):
                         print(e.response['Error']['Message'].upper())
                 else:
                     client.run_instances(
+                        BlockDeviceMappings=
+                        [
+                            {
+                                'DeviceName': '/dev/sda1',
+                                'Ebs':
+                                {
+                                    'DeleteOnTermination': True,
+                                    'VolumeSize': 80
+                                }
+                            },
+                            {
+                                'DeviceName': '/dev/sdf',
+                                'NoDevice': ''
+                            }
+                        ],
                         ImageId=global_config[regions[idx][:-1]]["ami"],
                         KeyName=global_config[regions[idx][:-1]]["key"],
                         MinCount=int(number_of_instances_to_deploy),
@@ -157,7 +172,7 @@ class AmazonCP(DeployCP):
 
         print('Finished to deploy machines')
 
-    def get_aws_network_details(self, port_counter, file_name, new_format=True):
+    def get_aws_network_details(self, port_counter, file_name, new_format=False):
         regions = list(self.conf['regions'].values())
         is_spot_request = self.conf['isSpotRequest']
         coordinator_exists = 'coordinatorConfig' in self.conf
@@ -253,19 +268,19 @@ class AmazonCP(DeployCP):
         return instances
 
     def check_running_instances(self, region, machine_type):
-        regions = list(self.conf['regions'].values())
         protocol_name = self.conf['protocol']
         ready_instances = 0
-        for idx in range(len(regions)):
-            client = boto3.client('ec2', region_name=regions[idx][:-1])
-            response = client.describe_instances()
-            for res_idx in range(len(response['Reservations'])):
-                reservations_len = len(response['Reservations'][res_idx]['Instances'])
-                for reserve_idx in range(reservations_len):
-                    if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running' and \
-                            response['Reservations'][res_idx]['Instances'][reserve_idx]['Tags'][0]['Value'] == \
-                            protocol_name:
-                        ready_instances += 1
+
+        client = boto3.client('ec2', region_name=region)
+        response = client.describe_instances()
+
+        for res_idx in range(len(response['Reservations'])):
+            reservations_len = len(response['Reservations'][res_idx]['Instances'])
+            for reserve_idx in range(reservations_len):
+                if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running' and \
+                        response['Reservations'][res_idx]['Instances'][reserve_idx]['Tags'][0]['Value'] == \
+                        protocol_name:
+                    ready_instances += 1
 
         return ready_instances
 

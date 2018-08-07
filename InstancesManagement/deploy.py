@@ -42,11 +42,12 @@ class DeployCP:
         with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'r') as origin_file:
             parties = origin_file.readlines()
 
-        number_of_parties = len(parties)
+        number_of_parties = len(parties) // 2
+        print(number_of_parties)
 
         for idx in range(number_of_parties):
             new_parties = copy.deepcopy(parties)
-            new_parties[idx] = '0.0.0.0:8000\n'
+            new_parties[idx] = 'party_%s_ip=0.0.0.0\n' % idx
 
             # write data to file
             with open('%s/InstancesConfigurations/parties%s.conf' % (os.getcwd(), idx), 'w+') as new_file:
