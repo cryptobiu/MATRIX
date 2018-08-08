@@ -2,7 +2,7 @@
   "protocol":"HyperMPC",
   "numOfParties":
   {
-    "size_0":250
+    "size_0":100
   },
   "gitAddress":
   {
