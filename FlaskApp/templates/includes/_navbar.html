@@ -1,0 +1,32 @@
+<nav class="navbar navbar-expand-md">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="nav navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/dashboard">Dashboard</a>
+          </li>
+        </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+              {% if session.logged_in %}
+                <li> <a class="nav-link" href="/logout">Logout</a></li>
+              {% else %}
+                <li><a class="nav-link" href="/register">Register</a></li>
+                <li> <a class="nav-link" href="/login">Login</a></li>
+              {% endif %}
+
+        </ul>
+
+
+
+      </div>
+    </nav>

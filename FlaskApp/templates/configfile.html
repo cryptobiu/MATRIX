@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+    <h1> {{config_file.title}} </h1>
+    <small>Last update by {{ config_file.author }} on {{ config_file.create_date }} </small>
+
+    <hr> <div> {{config_file.body | safe}}</div>
+
+{% endblock %}

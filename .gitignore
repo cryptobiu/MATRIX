@@ -13,4 +13,5 @@ NodeApp/InstancesConfigurations/parties*.conf
 NodeApp/node_modules
 InstancesConfigurations/Parties_gf2n.txt
 InstancesConfigurations/Parties_gfp.txt
+FlaskApp/Uploads
 
