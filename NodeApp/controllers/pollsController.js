@@ -75,17 +75,26 @@ exports.closePollForRegistration = function (req, res) {
     let numberOfParties = 0;
     let registeredIps = []; // save addresses for the json files
     let ips = [];
+    let ports = [];
     let idx = 0;
     client.lrange(pollName, 0, -1, function (err, data) {
         if (err) console.log('Error retrieve poll data');
         for (idx = 0; idx < data.length; idx += 2)
         {
             registeredIps.push(data[idx]);
-            let port = 9000 + numberOfParties;
+            let port = 0;
+            if(data[idx + 1] === 'online_mobile')
+                port = 9000 + idx;
+            if(data[idx + 1] === 'offline')
+                port = data[idx].split(':')[1];
             ips.push('34.239.19.87' + ':' + port.toString());
+            ports.push(port);
             numberOfParties++;
         }
     });
+
+    for(let portIdx = 0; portIdx < ports.length; portIdx++)
+        runProxyClients(portIdx, ports.length, ports[portIdx]);
 
     client.lrange('addresses', numberOfParties, -1, function (err, data) {
         if (err) console.log('Error retrieve addresses');
@@ -144,35 +153,16 @@ exports.closePollForRegistration = function (req, res) {
     res.redirect('/polls')
 };
 
-exports.runProxyClients = function(req, res)
+runProxyClients = function(partyId, numberOfParties, portNumber)
 {
-    let filePath = __dirname + '/../public/assets/parties.conf';
-    fs.readFile(filePath, {encoding: 'utf-8'}, function(err, data){
-        let splitedData = data.split("\n");
-        let newData = [];
-        for(let idx = 0; idx < splitedData.length; idx++)
-        {
-            let ip = splitedData[idx].split(":")[0];
-            let port = splitedData[idx].split(":")[1];
-            if (ip === "34.239.19.87")
-            {
-                let newIp = "127.0.0.1";
-                newData.push(newIp + ":" + port + "\n");
-            }
-            else newData.push(splitedData[idx] + "\n");
-        }
-
-        let proxyFileNames = __dirname + '/../public/assets/partiesProxy.conf';
-        fs.writeFile(proxyFileNames, newData.join(""), function (err) {
-            if(err) console.log(err);
-        });
-    });
-
-    // ssh to copy to proxy server
-
     let sshClient = new ssh();
-        sshClient.connect({host: 'localhost', username: 'ubuntu',
-            privateKey: '~/Keys/matrix.pem'});
+    sshClient.connect({host: '34.239.19.87', username: 'ubuntu',
+        privateKey: '~/Keys/matrix.pem'});
+    sshClient.exec('./ACP/cct_proxy/cct_proxy -i ' + partyId + ' -c ' +
+        numberOfParties + ' -f parties.conf -l 700 -p ' + portNumber);
+
+
+
 
     res.redirect('/polls');
 };
