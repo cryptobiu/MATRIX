@@ -89,12 +89,11 @@ exports.closePollForRegistration = function (req, res) {
                 port = data[idx].split(':')[1];
             ips.push('34.239.19.87' + ':' + port.toString());
             ports.push(port);
+            runProxyClients(idx, ports.length, port);
             numberOfParties++;
         }
     });
 
-    for(let portIdx = 0; portIdx < ports.length; portIdx++)
-        runProxyClients(portIdx, ports.length, ports[portIdx]);
 
     client.lrange('addresses', numberOfParties, -1, function (err, data) {
         if (err) console.log('Error retrieve addresses');
@@ -156,13 +155,23 @@ exports.closePollForRegistration = function (req, res) {
 runProxyClients = function(partyId, numberOfParties, portNumber)
 {
     let sshClient = new ssh();
-    sshClient.connect({host: '34.239.19.87', username: 'ubuntu',
-        privateKey: '~/Keys/matrix.pem'});
-    sshClient.exec('./ACP/cct_proxy/cct_proxy -i ' + partyId + ' -c ' +
-        numberOfParties + ' -f parties.conf -l 700 -p ' + portNumber);
-
-
-
-
-    res.redirect('/polls');
+    sshClient.connect({
+        host: '34.239.19.87',
+        username: 'ubuntu',
+        privateKey: '/home/liork/Keys/matrix.pem'}).
+    then(function () {
+        let command = './cct_proxy -i ' + partyId + ' -c ' +
+        numberOfParties + ' -f parties.conf -l 700 -p ' + portNumber + ' &';
+        sshClient.exec(command, {cwd:'/home/ubuntu/ACP/cct_proxy',
+            options: { pty: true } }).
+        then(function (result) {
+            console.log('STDOUT: ' + result.stdout);
+            console.log('STDERR: ' + result.stderr);
+        }).catch(function (error) {
+            console.log('Error: ' + error);
+        });
+    }).
+    catch(function (error) {
+      console.log('Error: ' + error);
+    });
 };
