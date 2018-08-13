@@ -7,10 +7,11 @@ from pymongo import MongoClient
 from functools import wraps
 
 import os
-import ast
 import wget
 import json
 from bson.json_util import dumps, loads
+
+from InstancesManagement import aws_deploy
 
 app = Flask(__name__)
 
@@ -205,13 +206,16 @@ def edit_config_file(title):
         try:
             json_data = dumps(form.body.data)
             d = loads(json_data)
-            res_update = collection.update_one({'protocol': form.title.data}, d)
-            a = 8
+            for key in d.keys():
+                res_update = collection.update_one({'protocol': form.title.data},
+                                                   {'$set': {key: d[key]}})
+            if res_update.modified_count == 0:
+                flash('%s updated successfully' % title, 'success')
         except ValueError:
             flash('Error while updating: The inserted data was not a valid json file', 'danger')
         return redirect(url_for('dashboard'))
 
-    return render_template('edit_config.html', form=form)
+    return render_template('edit_config.html', form=form, title=title)
 
 
 @app.route('/delete_file/<string:title>', methods=['POST'])
@@ -221,11 +225,24 @@ def delete_file(title):
     db = client['Experiments']
     collection = db['Configurations']
 
-    collection.delete_one({'protocol':title})
+    collection.delete_one({'protocol': title})
 
     flash('Config file %s deleted' % title, 'success')
 
     return redirect(url_for('dashboard'))
+
+
+@app.route('/deploy_experiment/<string:title>', methods=['GET', 'POST'])
+@is_logged_in
+def deploy_experiment(title):
+    if request.method == 'POST':
+        client = MongoClient()
+        db = client['Experiments']
+        collection = db['Configurations']
+        result = collection.find({'protocol': title}).next()
+        deploy = aws_deploy.AmazonCP(result)
+
+    return render_template('deploy_config.html', title=title)
 
 
 if __name__ == '__main__':
