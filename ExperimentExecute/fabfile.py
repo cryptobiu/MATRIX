@@ -113,9 +113,9 @@ def run_protocol(config_file, args):
                             put('InstancesConfigurations/multi_regions/party%s/*' % (party_id - 1), run('pwd'))
                             run('mv parties%s.conf parties.conf' % party_id)
                         else:
-                            put('InstancesConfigurations/*arties*', run('pwd'))
+                            put('InstancesConfigurations/parties.conf', run('pwd'))
 
-                        run('./%s %s' % (executable_name[idx], values_str))
+                        run('./%s %s %s' % (executable_name[idx], party_id, values_str))
 
 
 @task
