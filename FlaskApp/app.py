@@ -202,7 +202,6 @@ def edit_config_file(title):
     form.title.data = title
     form.body.data = result
     if request.method == 'POST' and form.validate():
-
         try:
             json_data = dumps(form.body.data)
             d = loads(json_data)
@@ -235,14 +234,24 @@ def delete_file(title):
 @app.route('/deploy_experiment/<string:title>', methods=['GET', 'POST'])
 @is_logged_in
 def deploy_experiment(title):
-    if request.method == 'POST':
-        client = MongoClient()
-        db = client['Experiments']
-        collection = db['Configurations']
-        result = collection.find({'protocol': title}).next()
-        deploy = aws_deploy.AmazonCP(result)
 
-    return render_template('deploy_config.html', title=title)
+    client = MongoClient()
+    db = client['Experiments']
+    collection = db['Configurations']
+    result = collection.find({'protocol': title}).next()
+    regions = list(result['regions'].values())
+    number_of_parties = max(list(result['numOfParties'].values()))
+
+    if request.method == 'POST':
+        json_data = dumps(result)
+        d = loads(json_data)
+        del d['_id']
+        deploy = aws_deploy.AmazonCP(d)
+        deploy.deploy_instances()
+
+        return redirect(url_for('dashboard'))
+
+    return render_template('deploy_config.html', title=title, regions=regions, number_of_parties=number_of_parties)
 
 
 if __name__ == '__main__':

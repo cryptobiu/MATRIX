@@ -76,8 +76,13 @@ class AmazonCP(DeployCP):
         spot_request = self.conf['isSpotRequest']
         protocol_name = self.conf['protocol']
 
-        with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
-            global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+        cwd = os.getcwd()
+        if 'FlaskApp' in cwd:
+            with open('%s/../GlobalConfigurations/regions.json' % cwd) as gc_file:
+                global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+        else:
+            with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
+                global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
 
         if len(regions) > 1:
             number_of_instances = max(number_of_parties) // len(regions)

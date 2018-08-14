@@ -2,6 +2,26 @@
 
 {% block body %}
 
-    <h1>Deploy {{ title }}</h1>
+    <h2>Deploy {{ title }}</h2>
+    <br>
+
+    <div class="info">
+        The {{ title }} experiment is going to execute up to {{ number_of_parties }} parties.
+        <br> The experiment will be executed on these region(s):
+        <ul>
+            {% for region in regions %}
+                <li> {{ region }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="info" id="deploy">
+        If the configuration is correct, please press the Deploy button below, otherwise
+        <a href="edit_file/{{title}}"> edit </a> it.
+        <br><form method="POST" action="">
+        <br>
+            <input type="submit" name="" class="btn btn-primary" value="Deploy">
+        </form>
+    </div>
 
 {% endblock %}

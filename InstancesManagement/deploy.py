@@ -6,8 +6,12 @@ from collections import OrderedDict
 
 class DeployCP:
     def __init__(self, conf_file):
-        with open(conf_file) as data_file:
-            self.conf = json.load(data_file, object_pairs_hook=OrderedDict)
+        if type(conf_file) is dict:
+            d1 = json.dumps(conf_file)
+            self.conf = json.loads(d1)
+        else:
+            with open(conf_file) as data_file:
+                self.conf = json.load(data_file, object_pairs_hook=OrderedDict)
 
     def create_key_pair(self):
         raise NotImplementedError
