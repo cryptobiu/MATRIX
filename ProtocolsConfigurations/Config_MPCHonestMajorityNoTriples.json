@@ -7,7 +7,10 @@
   "gitAddress": "https://github.com/cryptobiu/MPCHonestMajorityNoTriples.git",
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
-  "executableName": "MPCHonestMajorityNoTriples",
+  "executableName":
+  {
+    "executable_0": "MPCHonestMajorityNoTriples"
+  },
   "configurations":
   {
 
@@ -84,14 +87,20 @@
   "numOfRepetitions":1,
   "numOfInternalRepetitions":5,
   "isSpotRequest": "True",
-  "gitBranch": "master",
+  "gitBranch":
+  {
+    "branch_0": "master"
+  },
   "IsPublished": "False",
   "isExternal": "False",
   "regions":
   {
     "region_0":"us-east-1b"
   },
-  "workingDirectory": "~/MPCHonestMajorityNoTriples",
+  "workingDirectory":
+  {
+    "workingDirectory_0": "~/MPCHonestMajorityNoTriples"
+  },
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
   "emails":
   {

@@ -7,7 +7,10 @@
   "gitAddress": "https://github.com/cryptobiu/Semi-Honest-BMR.git",
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
-  "executableName": "SemiHonestBMR",
+  "executableName":
+  {
+    "executable_0": "SemiHonestBMR"
+  },
   "configurations":
   {
     "conf_0": "-circuitFile@3Party/AESout@-inputsFile@3Party/aesP0@-partiesFile@parties.conf@-key@3Party/aesP@-version@2",
@@ -17,14 +20,20 @@
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
   "isSpotRequest": "True",
-  "gitBranch": "experimentation",
+  "gitBranch":
+  {
+    "branch_0": "experimentation"
+  },
   "IsPublished": "True",
   "isExternal": "False",
   "regions":
   {
     "region_0":"us-east-1b"
   },
-  "workingDirectory": "~/Semi-Honest-BMR",
+  "workingDirectory":
+  {
+    "workingDirectory_0": "~/Semi-Honest-BMR"
+  },
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
   "emails":
   {

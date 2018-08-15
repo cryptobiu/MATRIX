@@ -8,7 +8,10 @@
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
   "network": "LAN",
-  "executableName": "PSI",
+  "executableName":
+  {
+    "executable_0": "PSI"
+  },
   "configurations":
   {
     "conf_0": "-groupID@0@-numOfItems@256@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@1@-partiesNumber@1",
@@ -27,14 +30,20 @@
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
   "isSpotRequest": "True",
-  "gitBranch": "master",
+  "gitBranch":
+  {
+    "branch_0": "master"
+  },
   "IsPublished": "False",
   "isExternal": "False",
   "regions":
   {
     "region_0":"us-east-1b"
   },
-  "workingDirectory": "~/PSI",
+  "workingDirectory":
+  {
+    "workingDirectory_0": "~/PSI"
+  },
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
   "emails":
   {

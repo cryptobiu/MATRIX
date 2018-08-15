@@ -7,7 +7,10 @@
   "gitAddress": "https://github.com/cryptobiu/LowCostConstantRoundShortKeysMPC.git",
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
-  "executableName": "LowCostConstantRoundShortKeysMPC",
+  "executableName":
+  {
+    "executable_0": "LowCostConstantRoundShortKeysMPC"
+  },
   "configurations":
   {
     "conf_0": "-circuitFile@AES_splitters_scapi_5Parties.txt@-keySize@8@-partiesFile@parties.conf@-isLookup@false@-inputsFile@AesInputs0.txt@-otherInputsFile@AesInputs0.txt@-internalIterationsNumber@1"
@@ -15,14 +18,20 @@
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
   "isSpotRequest": "True",
-  "gitBranch": "simulateOtherParties",
+  "gitBranch":
+  {
+    "branch_0": "simulateOtherParties"
+  },
   "IsPublished": "True",
   "isExternal": "False",
   "regions":
   {
     "region_0":"us-east-1b"
   },
-  "workingDirectory": "~/LowCostConstantRoundShortKeysMPC",
+  "workingDirectory":
+  {
+    "workingDirectory_0": "~/LowCostConstantRoundShortKeysMPC"
+  },
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
   "emails":
   {

@@ -7,7 +7,10 @@
   "gitAddress": "https://github.com/cryptobiu/BCast.git",
   "aWSInstType": "t2.medium",
   "aWWSBidPrice": "0.016",
-  "executableName": "BCast",
+  "executableName":
+  {
+    "executable_0": "BCast"
+  },
   "configurations":
   {
     "conf_0": "-numParties@100@-partiesFile@parties.conf@-internalIterationsNumber@1"
@@ -15,14 +18,20 @@
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
   "isSpotRequest": "False",
-  "gitBranch": "grg",
+  "gitBranch":
+  {
+    "branch_0": "master"
+  },
   "IsPublished": "False",
   "isExternal": "False",
   "regions":
   {
     "region_0":"us-east-1b"
   },
-  "workingDirectory": "~/BCast",
+  "workingDirectory":
+  {
+    "workingDirectory_0": "~/BCast"
+  },
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
   "emails":
   {

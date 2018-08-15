@@ -26,8 +26,8 @@ Basic architecture of MATRIX:
 
 ## Installation
 MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [openpyxl](https://openpyxl.readthedocs.io/en/stable/).  
-Matrix tested on Ubuntu 16.04.3 LTS and CentOS 7.3.  
-To install python3 and pip under Ubuntu 16.04 :
+Matrix tested on Ubuntu 16.04.3/18.04.1 LTS and CentOS 7.3.  
+To install python3 and pip under Ubuntu 16.04/18.04 :
 
 `sudo apt-get install python3 python3-pip`
 
@@ -48,7 +48,7 @@ After the modules installed, clone this repository to install MATRIX on your sys
 
 ## MATRIX Modules
 
-### InstancesManagement
+### Deployment
 
 After config file was created, You will need to deploy your images(instances). MATRIX supports three different deployments:
 1. Local deployment
@@ -67,7 +67,7 @@ After you created your key, change this line at [fabfile.py](../master/Experimen
 
 - set the correct location and name of your AWS key `env.key_filename = [expanduser('~/Keys/matrix.pem')]`
 
-### ExperimentExecute
+### Execution
 
 The execution module supports these operations:
 1. Pre process - Operations that need to be done before the protocol executed like installation of library.
@@ -77,7 +77,7 @@ The execution module supports these operations:
 5. Results - Collect the results file from the images and analyse them. For more details see ExperimentReport section.
 6. analyse - analyse the results from given directory.
 
-### ExperimentReport
+### Reporting
 
 MATRIX analyse four parameters:
 
@@ -145,4 +145,4 @@ The configuration need to be in the same format of 'configurations' field
 
 In order to receive easy access to the MATRIX system, MATRIX uses basic CLI. To run the CLI run: `python3 main.py`
 
-For features requests open an issue or send mail to liork.cryptobiu@gmail.com
+For bugs/features requests open an issue or send mail to liork.cryptobiu@gmail.com

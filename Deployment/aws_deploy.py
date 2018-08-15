@@ -10,7 +10,7 @@ from os.path import expanduser
 from botocore import exceptions
 from collections import OrderedDict
 
-from InstancesManagement.deploy import DeployCP
+from Deployment.deploy import DeployCP
 
 
 class AmazonCP(DeployCP):

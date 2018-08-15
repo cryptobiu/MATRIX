@@ -8,7 +8,10 @@
   "aWWSBidPrice": "0.031",
   "installScript": "",
   "preProcessTask": "4",
-  "executableName": "Player-Online.x",
+  "executableName":
+  {
+    "executable_0": "Player-Online.x"
+  },
   "configurations": {
     "configuration_0": "-lgp@127@-pn@39685@-h@54.208.50.231@partyid@sql_query_3"
   },
@@ -17,7 +20,10 @@
   "numOfRepetitions": 1,
   "numOfInternalRepetitions": 1,
   "isSpotRequest": "False",
-  "gitBranch": "experimentation",
+  "gitBranch":
+  {
+    "branch_0": "experimentation"
+  },
   "IsPublished": "False",
   "isExternal": "True",
   "regions":
@@ -26,7 +32,10 @@
     "region_1":"eu-west-2b",
     "region_2":"us-east-1b"
   },
-  "workingDirectory": "~/SPDZ-2",
+  "workingDirectory":
+  {
+    "workingDirectory_0": "~/SPDZ-2"
+  },
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
   "emails": {
     "email_0": "liork.cryptobiu@gmail.com"

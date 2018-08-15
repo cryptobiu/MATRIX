@@ -1,9 +1,9 @@
 import os
 import colorama
-from InstancesManagement import aws_deploy as di
-from ExperimentExecute import end_to_end as e2e
-from ExperimentReport import analyze_results as ar
-from ExperimentReport import upload_elastic as ue
+from Deployment import aws_deploy as di
+from Execution import end_to_end as e2e
+from Reporting import analyze_results as ar
+from Reporting import upload_elastic as ue
 
 d = {'blue': colorama.Fore.BLUE,
      'green': colorama.Fore.GREEN,

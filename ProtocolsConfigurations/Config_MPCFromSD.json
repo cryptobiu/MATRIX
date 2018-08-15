@@ -7,7 +7,10 @@
   "gitAddress": "https://github.com/cryptobiu/MPCFromSD.git",
   "aWSInstType": "c5.4xlarge",
   "aWWSBidPrice": "0.016",
-  "executableName": "MPCFromSD",
+  "executableName":
+  {
+    "executable_0": "MPCFromSD"
+  },
   "configurations":
   {
     "conf_0": "-numParties@48@-partiesFile@parties.conf@-numThreads@47@-l@16@-r@600@-h@16@-circuitFile@NigelAes10Parties.txt@-inputFile@inputs0.txt@-internalIterationsNumber@1@-selectCommitteesOnly@false@-B@5"
@@ -15,14 +18,20 @@
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
   "isSpotRequest": "False",
-  "gitBranch": "master",
+  "gitBranch":
+  {
+    "branch_0": "master"
+  },
   "IsPublished": "False",
   "isExternal": "False",
   "regions":
   {
     "region_0":"us-east-1b"
   },
-  "workingDirectory": "~/MPCFromSD",
+  "workingDirectory":
+  {
+    "workingDirectory_0": "~/MPCFromSD"
+  },
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
   "emails":
   {
