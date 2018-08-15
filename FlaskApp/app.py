@@ -12,6 +12,7 @@ import json
 from bson.json_util import dumps, loads
 
 from InstancesManagement import aws_deploy
+from ExperimentExecute import end_to_end
 
 app = Flask(__name__)
 
@@ -246,7 +247,9 @@ def deploy_experiment(title):
     if request.method == 'POST':
         json_data = dumps(result)
         d = loads(json_data)
+
         del d['_id']
+
         deploy = aws_deploy.AmazonCP(d)
         deploy.deploy_instances()
 
@@ -270,6 +273,16 @@ def execute_experiment(title):
     configurations = list(result['configurations'].values())
 
     if request.method == 'POST':
+        json_data = dumps(result)
+        d = loads(json_data)
+
+        del d['_id']
+
+        e = end_to_end.E2E(d)
+
+        e.install_experiment()
+
+        e.execute_experiment()
 
         return redirect(url_for('experiments'))
 

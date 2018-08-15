@@ -3,8 +3,11 @@
 {% block body %}
 
     <h1>Edit {{ title }}</h1>
+    <br>To edit the experiment, change the json file.
     {% from "includes/_formhelpers.html" import render_field %}
+
     <form method="POST" action="">
+        <br>
         <div class="form-group">
             {{render_field(form.title, class_="form-control")}}
         </div>
