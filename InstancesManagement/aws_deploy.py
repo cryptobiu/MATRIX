@@ -98,11 +98,11 @@ class AmazonCP(DeployCP):
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
 
-            number_of_instances_to_deploy = self.check_running_instances(regions[idx][:-1], machine_type)
+            number_of_running_instances = self.check_running_instances(regions[idx][:-1], machine_type)
             if idx < number_duplicated_servers:
-                number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
+                number_of_instances_to_deploy = (number_of_instances - number_of_running_instances) + 1
             else:
-                number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
+                number_of_instances_to_deploy = number_of_instances - number_of_running_instances
 
             print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
                   'valid until : %s' % (regions[idx], number_of_instances_to_deploy,
@@ -112,26 +112,29 @@ class AmazonCP(DeployCP):
                 if spot_request == 'True':
                     # check if price isn't too low
                     winning_bid_price = self.check_latest_price(machine_type, regions[idx])
-                    if float(price_bids) < float(winning_bid_price):
+                    if float(price_bids) > float(winning_bid_price):
                         price_bids = str(winning_bid_price)
                     try:
-                        client.request_spot_instances(
-                                DryRun=False,
-                                SpotPrice=price_bids,
-                                InstanceCount=number_of_instances_to_deploy,
-                                ValidUntil=new_date,
-                                LaunchSpecification=
-                                {
-                                    'ImageId': global_config[regions[idx][:-1]]["ami"],
-                                    'KeyName': global_config[regions[idx][:-1]]["key"],
-                                    'SecurityGroups': [global_config[regions[idx][:-1]]["securityGroup"]],
-                                    'InstanceType': machine_type,
-                                    'Placement':
-                                        {
-                                            'AvailabilityZone': regions[idx],
-                                        },
-                                }
+                        response = client.request_spot_instances(
+                            DryRun=False,
+                            SpotPrice=price_bids,
+                            InstanceCount=number_of_instances_to_deploy,
+                            ValidUntil=new_date,
+                            LaunchSpecification=
+                            {
+                                'ImageId': global_config[regions[idx][:-1]]["ami"],
+                                'KeyName': global_config[regions[idx][:-1]]["key"],
+                                'SecurityGroups': [global_config[regions[idx][:-1]]["securityGroup"]],
+                                'InstanceType': machine_type,
+                                'Placement':
+                                    {
+                                        'AvailabilityZone': regions[idx],
+                                    },
+                                'UserData': protocol_name
+                            }
                         )
+                        creation_time = response['SpotInstanceRequests'][0]['CreateTime']
+
                     except botocore.exceptions.ClientError as e:
                         print(e.response['Error']['Message'].upper())
                 else:
@@ -158,6 +161,23 @@ class AmazonCP(DeployCP):
 
         print('Waiting for the images to be deployed..')
         time.sleep(240)
+
+        # tag spot instances
+        if spot_request == 'True':
+            instance_ids = []
+            response2 = client.describe_spot_instance_requests(Filters=[
+                {
+                    'Name': 'create-time',
+                    'Values': [
+                        creation_time,
+                    ]
+                }]
+            )
+            for res in response2['SpotInstanceRequests']:
+                instance_ids.append(res['InstanceId'])
+
+            client.create_tags(Resources=instance_ids, Tags=[{'Key': 'name', 'Value': protocol_name}])
+
         self.get_network_details()
 
         print('Finished to deploy machines')

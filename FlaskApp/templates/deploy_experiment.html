@@ -6,7 +6,8 @@
     <br>
 
     <div class="info">
-        The {{ title }} experiment is going to execute up to {{ number_of_parties }} parties.
+        The {{ title }} experiment is going to execute up to {{ number_of_parties }} parties at AWS with
+        <b>{{machine_type}}</b> machines.
         <br> The experiment will be executed on these region(s):
         <ul>
             {% for region in regions %}
@@ -16,11 +17,11 @@
     </div>
 
     <div class="info" id="deploy">
-        If the configuration is correct, please press the Deploy button below, otherwise
+        If the configuration is correct, please press the <i>Deploy Experiment</i> button below, otherwise
         <a href="edit_file/{{title}}"> edit </a> it.
         <br><form method="POST" action="">
         <br>
-            <input type="submit" name="" class="btn btn-primary" value="Deploy">
+            <input type="submit" name="" class="btn btn-primary" value="Deploy Experiment">
         </form>
     </div>
 

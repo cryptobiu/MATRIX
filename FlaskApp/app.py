@@ -98,7 +98,7 @@ def login():
                 session['logged_in'] = True
                 session['username'] = username
 
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('experiments'))
 
             else:
                 error = 'invalid login'
@@ -130,9 +130,9 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/dashboard')
+@app.route('/experiments')
 @is_logged_in
-def dashboard():
+def experiments():
     config_files = []
     client = MongoClient()
     db = client['Experiments']
@@ -142,26 +142,26 @@ def dashboard():
         config_files.append(doc['protocol'])
 
     if len(config_files) > 0:
-        return render_template('dashboard.html', config_files=config_files)
+        return render_template('experiments.html', config_files=config_files)
     else:
         msg = 'No config files found'
-        return render_template('dashboard.html', msg=msg)
+        return render_template('experiments.html', msg=msg)
 
 
 # Config files class
 class ConfigFileForm(Form):
-    title = StringField('Title', [validators.length(min=5)])
-    body = TextAreaField('Body', [validators.length(min=10)])
+    title = StringField('Protocol Name', [validators.length(min=5)])
+    body = TextAreaField('Configuration', [validators.length(min=10)])
 
 
 class ConfigFileRegistration(Form):
-    protocol_name = StringField('Name', [validators.length(min=5)])
-    address = StringField('Address', [validators.URL()])
+    protocol_name = StringField('Protocol Name', [validators.length(min=5)])
+    address = StringField('Configuration File Address', [validators.URL()])
 
 
-@app.route('/add_config', methods=['GET', 'POST'])
+@app.route('/add_experiment', methods=['GET', 'POST'])
 @is_logged_in
-def add_config_file():
+def add_experiment():
     form = ConfigFileRegistration(request.form)
     if request.method == 'POST' and form.validate():
         address = form.address.data
@@ -183,14 +183,14 @@ def add_config_file():
         else:
             flash('Failed to add configuration', 'danger')
 
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('experiments'))
 
-    return render_template('add_config.html', form=form)
+    return render_template('add_experiment.html', form=form)
 
 
-@app.route('/edit_config/<string:title>', methods=['GET', 'POST'])
+@app.route('/edit_experiment/<string:title>', methods=['GET', 'POST'])
 @is_logged_in
-def edit_config_file(title):
+def edit_experiment(title):
 
     form = ConfigFileForm(request.form)
     client = MongoClient()
@@ -212,14 +212,14 @@ def edit_config_file(title):
                 flash('%s updated successfully' % title, 'success')
         except ValueError:
             flash('Error while updating: The inserted data was not a valid json file', 'danger')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('experiments'))
 
-    return render_template('edit_config.html', form=form, title=title)
+    return render_template('edit_experiment.html', form=form, title=title)
 
 
 @app.route('/delete_file/<string:title>', methods=['POST'])
 @is_logged_in
-def delete_file(title):
+def delete_experiment(title):
     client = MongoClient()
     db = client['Experiments']
     collection = db['Configurations']
@@ -228,7 +228,7 @@ def delete_file(title):
 
     flash('Config file %s deleted' % title, 'success')
 
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('experiments'))
 
 
 @app.route('/deploy_experiment/<string:title>', methods=['GET', 'POST'])
@@ -241,6 +241,7 @@ def deploy_experiment(title):
     result = collection.find({'protocol': title}).next()
     regions = list(result['regions'].values())
     number_of_parties = max(list(result['numOfParties'].values()))
+    machine_type = result['aWSInstType']
 
     if request.method == 'POST':
         json_data = dumps(result)
@@ -249,9 +250,32 @@ def deploy_experiment(title):
         deploy = aws_deploy.AmazonCP(d)
         deploy.deploy_instances()
 
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('experiments'))
 
-    return render_template('deploy_config.html', title=title, regions=regions, number_of_parties=number_of_parties)
+    return render_template('deploy_experiment.html', title=title, regions=regions, number_of_parties=number_of_parties,
+                           machine_type=machine_type)
+
+
+@app.route('/execute_experiment/<string:title>', methods=['GET', 'POST'])
+@is_logged_in
+def execute_experiment(title):
+
+    client = MongoClient()
+    db = client['Experiments']
+    collection = db['Configurations']
+    result = collection.find({'protocol': title}).next()
+    regions = list(result['regions'].values())
+    number_of_parties = max(list(result['numOfParties'].values()))
+    machine_type = result['aWSInstType']
+    configurations = list(result['configurations'].values())
+
+    if request.method == 'POST':
+
+        return redirect(url_for('experiments'))
+
+    return render_template('execute_experiment.html', title=title, regions=regions,
+                           number_of_parties=number_of_parties, machine_type=machine_type,
+                           configurations=configurations)
 
 
 if __name__ == '__main__':

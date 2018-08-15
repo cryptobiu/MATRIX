@@ -2,7 +2,12 @@
 
 {% block body %}
 
-    <h1>Add config file</h1>
+    <h1>Add Experiment Configuration</h1>
+    To add experiment to the system, please fill experiment name and link to json configuration file.
+    <br>For sample configuration file, press the
+    <a href="https://github.com/cryptobiu/MATRIX/blob/1.1/ProtocolsConfigurations/Config_HyperMPC.json"
+       target="_blank">link.</a>
+    <br><br>
     {% from "includes/_formhelpers.html" import render_field %}
     <form method="POST" action="">
         <div class="form-group">
