@@ -27,13 +27,14 @@ class Analyze:
     def download_data(self):
         with open(self.config_file_path) as conf_file:
             conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
-            remote_directory = conf_data['workingDirectory']
+            remote_directory = list(conf_data['workingDirectory'].values())
 
-        results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
-        os.system('fab -f ExperimentExecute/fabfile.py collect_results:%s,%s --parallel --no-pty'
-                  % (remote_directory, results_path))
-        # wait for all clients to download data
-        time.sleep(10)
+        for dir in remote_directory:
+            results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
+            os.system('fab -f Execution/fabfile.py collect_results:%s,%s --parallel --no-pty'
+                      % (dir, results_path))
+            # wait for all clients to download data
+            time.sleep(10)
 
     def send_email(self):
         with open(self.config_file_path) as conf_file:

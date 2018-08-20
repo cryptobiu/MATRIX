@@ -279,7 +279,8 @@ class AmazonCP(DeployCP):
             for reserve_idx in range(reservations_len):
                 if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running' and \
                         response['Reservations'][res_idx]['Instances'][reserve_idx]['Tags'][0]['Value'] == \
-                        protocol_name:
+                        protocol_name and \
+                        response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceType'] == machine_type:
                     ready_instances += 1
 
         return ready_instances

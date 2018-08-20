@@ -38,8 +38,8 @@ def install_git_project(git_branch, working_directory, git_address, external, in
             run('cmake .')
         run('make')
         with warn_only():
-            if exists('*.7z'):
-                run('7za -y x \"*.7z\"')
+            sudo('apt install p7zip-full -y')
+            run('7za -y x \"*.7z\"')
 
 
 @task

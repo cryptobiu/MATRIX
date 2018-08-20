@@ -34,7 +34,7 @@ def print_instances_management_menu(conf_file_path):
     color_print('4. Get instances network data', 'red')
     color_print('5. Terminate machines', 'red')
     color_print('6. Change machines types', 'red')
-    color_print('7. Start instances from API', 'red')
+    color_print('7. Start instances ', 'red')
     color_print('8. Stop instances', 'red')
     selection = input('Your choice:')
 
