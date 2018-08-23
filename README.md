@@ -37,7 +37,7 @@ To install under CentOS 7.3:
 
 After You installed python 3 and pip3 you will need to install the modules MATRIX uses. To install this three modules use pip3
 
-`pip3 install --user openpyxl fabric fabric3 boto3 colorama`
+`pip3 install --user openpyxl fabric fabric3 boto3 colorama certifi elasticsearch`
 
 **NOTE**: on some computers the following error may appear: `locale.Error: unsupported locale setting`
 To fix it, run:
