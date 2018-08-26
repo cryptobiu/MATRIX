@@ -53,21 +53,53 @@ class DeployCP:
             with open('%s/InstancesConfigurations/parties%s.conf' % (os.getcwd(), idx), 'w+') as new_file:
                 new_file.writelines(new_parties)
 
-    def create_parties_file(self, ip_addresses, port_counter, file_name, new_format=True, number_of_regions=1):
+    def create_parties_file(self, ip_addresses, port_number, file_name, new_format=True, number_of_regions=1):
 
         print('Parties network configuration')
+        regions = list(self.conf['regions'].values())
+
         with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'w+') as private_ip_file:
             if not new_format:
                 for party_idx in range(len(ip_addresses)):
                     private_ip_file.write('party_%s_ip=%s\n' % (party_idx, ip_addresses[party_idx]))
 
                 for port_idx in range(len(ip_addresses)):
-                    private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_counter))
+                    if 'local' in regions:
+                        private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_number + (port_idx * 20)))
+                    else:
+                        private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_number))
 
             else:
                 for party_idx in range(len(ip_addresses)):
-                    private_ip_file.write('%s:8000\n' % ip_addresses[party_idx])
+                    if 'local' in regions:
+                        private_ip_file.write('%s:%s\n' % (ip_addresses[party_idx], port_number + (party_idx * 20)))
+                    else:
+                        private_ip_file.write('%s:8000\n' % ip_addresses[party_idx])
 
         # create party file for each instance
         if number_of_regions > 1:
             self.create_parties_files_multi_regions(file_name)
+
+    def get_network_details(self, port_number=8000, file_name='parties.conf'):
+        regions = list(self.conf['regions'].values())
+
+        number_of_parties = max(list(self.conf['numOfParties'].values()))
+        if 'local' in regions:
+            public_ip_address = []
+            for ip_idx in range(number_of_parties):
+                public_ip_address.append('127.0.0.1')
+            with open('%s/InstancesConfigurations/public_ips' % os.getcwd(), 'w+') as local_ips:
+                for line in public_ip_address:
+                    local_ips.write('%s\n' % line)
+            self.create_parties_file(public_ip_address, port_number, file_name, False)
+
+        # read servers configuration
+        elif 'servers' in regions:
+            server_file = input('Enter your server file configuration: ')
+            os.system('mv %s %s/InstancesConfigurations/public_ips' % (os.getcwd(), server_file))
+
+            server_ips = []
+            with open('%s/InstancesConfigurations/public_ips' % os.getcwd(), 'r+') as server_ips_file:
+                for line in server_ips_file:
+                    server_ips.append(line)
+            self.create_parties_file(server_ips, port_number, file_name, False)
