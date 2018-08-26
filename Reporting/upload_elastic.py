@@ -70,7 +70,7 @@ class Elastic:
             }
         self.es.indices.create(index='cpuresults', body=request_body)
 
-    def upload_data(self, analysis_type, results_path):
+    def upload_json_data(self, analysis_type, results_path):
 
         with open(self.config_file_path) as data_file:
             data = json.load(data_file, object_pairs_hook=OrderedDict)
@@ -105,9 +105,32 @@ class Elastic:
                 self.es.index(index='%sresults' % analyzed_parameter, doc_type='%sresults' % analyzed_parameter,
                               body=doc)
 
+    def upload_log_data(self, results_path):
+        with open(self.config_file_path) as data_file:
+            data = json.load(data_file, object_pairs_hook=OrderedDict)
+            raw_configurations = list(data['configurations'].values())[0].split('@')
+            del raw_configurations[1::2]
+            raw_configurations = [rc[1:] for rc in raw_configurations]
+            raw_configurations.insert(0, 'partyId')
+            raw_configurations.insert(0, 'protocolName')
+
+        dts = datetime.utcnow()
+        results_files = glob('%s/*.log' % results_path)
+        for results_file in results_files:
+            config_values = basename(results_file).split('*')
+            config_values[-1] = config_values[-1][:-4]
+
     def upload_all_data(self):
-        results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
-        self.upload_data('cpu', results_path)
-        self.upload_data('commReceived', results_path)
-        self.upload_data('commSent', results_path)
-        self.upload_data('memory', results_path)
+
+        with open(self.config_file_path) as data_file:
+            data = json.load(data_file, object_pairs_hook=OrderedDict)
+            if data['isExternal'] == 'False':
+                results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
+                self.upload_json_data('cpu', results_path)
+                self.upload_json_data('commReceived', results_path)
+                self.upload_json_data('commSent', results_path)
+                self.upload_json_data('memory', results_path)
+            else:
+                results_path = '/home/liork/ABY/build/bin'
+                self.upload_log_data(results_path)
+

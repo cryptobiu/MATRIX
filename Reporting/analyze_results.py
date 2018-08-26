@@ -28,11 +28,12 @@ class Analyze:
         with open(self.config_file_path) as conf_file:
             conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
             remote_directory = list(conf_data['workingDirectory'].values())
+            is_external = conf_data['isExternal']
 
         for dir in remote_directory:
             results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
-            os.system('fab -f Execution/fabfile.py collect_results:%s,%s --parallel --no-pty'
-                      % (dir, results_path))
+            os.system('fab -f Execution/fabfile.py collect_results:%s,%s,%s --parallel --no-pty'
+                      % (dir, results_path, is_external))
             # wait for all clients to download data
             time.sleep(10)
 

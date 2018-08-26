@@ -20,26 +20,25 @@ def pre_process(working_directory, task_idx):
 
 
 @task
-def install_git_project(git_branch, working_directory, git_address, external, install_script):
-    if external == 'True':
-        put('ExternalProtocols/%s' % install_script, run('pwd'))
-        sudo('chmod +x %s' % install_script)
-        run('./%s' % install_script)
+def install_git_project(git_branch, working_directory, git_address, external):
 
-    else:
-        if not exists('%s' % working_directory):
-            run('git clone %s' % git_address)
+    if not exists('%s' % working_directory):
+        run('git clone %s' % git_address)
 
     with cd('%s' % working_directory):
         run('git pull')
         run('git checkout %s ' % git_branch)
-        if exists('%s/CMakeLists.txt' % working_directory):
-            sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
-            run('cmake .')
-        run('make')
-        with warn_only():
-            sudo('apt install p7zip-full -y')
-            run('7za -y x \"*.7z\"')
+        if external == 'True':
+            with cd('%s/MATRIX' % working_directory):
+                run('. ./build.sh')
+        else:
+            if exists('%s/CMakeLists.txt' % working_directory):
+                sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
+                run('cmake .')
+            run('make')
+            with warn_only():
+                sudo('apt install p7zip-full -y')
+                run('7za -y x \"*.7z\"')
 
 
 @task
@@ -72,12 +71,6 @@ def run_protocol(config_file, args):
         for idx in range(len(working_directory)):
             with cd(working_directory[idx]):
 
-                if not exists('logs'):
-                    run('mkdir -p logs')
-                else:
-                    with warn_only():
-                        run('rm logs/*')
-
                 party_id = env.hosts.index(env.host)
                 with warn_only():
                     sudo('killall -9 %s; exit 0' % executable_name[idx])
@@ -107,21 +100,24 @@ def run_protocol(config_file, args):
                         run('./%s %s' % (coordinator_executable, coordinator_values_str))
 
                     else:
-                        time.sleep(31)
-                        if len(regions) > 1:
-                            put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                            put('InstancesConfigurations/multi_regions/party%s/*' % (party_id - 1), run('pwd'))
-                            run('mv parties%s.conf parties.conf' % party_id)
-                        else:
-                            put('InstancesConfigurations/parties.conf', run('pwd'))
+                        with cd('MATRIX'):
+                            if len(regions) > 1:
+                                put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
+                                put('InstancesConfigurations/multi_regions/party%s/*' % (party_id - 1), run('pwd'))
+                                run('mv parties%s.conf parties.conf' % party_id)
+                            else:
+                                put('InstancesConfigurations/parties.conf', run('pwd'))
 
-                        run('./%s %s %s' % (executable_name[idx], party_id, values_str))
+                            run('. ./%s %s %s' % (executable_name[idx], party_id, values_str))
 
 
 @task
-def collect_results(results_server_directory, results_local_directory):
+def collect_results(results_server_directory, results_local_directory, is_external):
     local('mkdir -p %s' % results_local_directory)
-    get('%s/*.json' % results_server_directory, results_local_directory)
+    if is_external == 'False':
+        get('%s/*.json' % results_server_directory, results_local_directory)
+    else:
+        get('%s/MATRIX/logs/*.log' % results_server_directory, results_local_directory)
 
 
 @task

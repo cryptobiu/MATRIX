@@ -21,17 +21,12 @@ class E2E:
 
         working_directory = list(data['workingDirectory'].values())
         external_protocol = data['isExternal']
+        git_address = list(data['gitAddress'].values())
+        git_branch = list(data['gitBranch'].values())
 
-        if external_protocol == 'True':
-            install_script = data['installScript']
-            os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s,%s --parallel --no-pty'
-                      % ('', working_directory, '', external_protocol, install_script))
-        else:
-            git_address = list(data['gitAddress'].values())
-            git_branch = list(data['gitBranch'].values())
-            for idx in range(len(working_directory)):
-                os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s,%s --parallel --no-pty'
-                          % (git_branch[idx], working_directory[idx], git_address[idx], external_protocol, ''))
+        for idx in range(len(working_directory)):
+            os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s --parallel --no-pty'
+                      % (git_branch[idx], working_directory[idx], git_address[idx], external_protocol))
 
     def execute_experiment(self):
         with open(self.config_file_path) as data_file:
