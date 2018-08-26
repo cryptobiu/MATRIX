@@ -134,7 +134,6 @@ exports.closePollForRegistration = function (req, res) {
         jsonData['partiesFile'] = 'http://35.171.69.162/polls/parties/';
         jsonData['fieldType'] = 'ZpMersenne';
         jsonData['internalIterationsNumber'] = '1';
-        jsonData['NG'] = '1';
         let dataFileName =  __dirname + '/../public/assets/' + registeredIps[ipsIdx]+'.json';
         fs.writeFile(dataFileName, JSON.stringify(jsonData), 'utf8', function (err) {
             if (err) console.log(err);
