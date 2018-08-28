@@ -103,3 +103,6 @@ class DeployCP:
                 for line in server_ips_file:
                     server_ips.append(line)
             self.create_parties_file(server_ips, port_number, file_name, False)
+
+        else:
+            self.get_aws_network_details()

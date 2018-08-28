@@ -175,7 +175,7 @@ class AmazonCP(DeployCP):
 
         print('Finished to deploy machines')
 
-    def get_aws_network_details(self, port_number, file_name, new_format=False):
+    def get_aws_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
         regions = list(self.conf['regions'].values())
         is_spot_request = self.conf['isSpotRequest']
         coordinator_exists = 'coordinatorConfig' in self.conf
