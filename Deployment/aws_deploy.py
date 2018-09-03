@@ -141,7 +141,7 @@ class AmazonCP(DeployCP):
                                     'Ebs':
                                     {
                                         'DeleteOnTermination': True,
-                                        'VolumeSize': 80
+                                        'VolumeSize': 20
                                     }
                                 },
                                 {
@@ -289,6 +289,7 @@ class AmazonCP(DeployCP):
     def change_instance_types(self):
         regions = list(self.conf['regions'].values())
         protocol_name = self.conf['protocol']
+        instance_type = self.conf['aWSInstType']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
@@ -302,7 +303,7 @@ class AmazonCP(DeployCP):
             for instance_idx in range(len(instances)):
                 # Change the instance type
                 client.modify_instance_attribute(InstanceId=instances[instance_idx],
-                                                 Attribute='instanceType', Value='c4.large')
+                                                 Attribute='instanceType', Value=instance_type)
 
             # Start the instance
             client.start_instances(InstanceIds=instances)
