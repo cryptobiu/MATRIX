@@ -23,7 +23,7 @@ def pre_process(working_directory, task_idx):
 def install_git_project(git_branch, working_directory, git_address, external):
 
     if not exists('%s' % working_directory):
-        run('git clone %s' % git_address)
+        run('git clone %s %s' % (git_address, working_directory))
 
     with cd('%s' % working_directory):
         run('git pull')
