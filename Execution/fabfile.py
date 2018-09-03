@@ -73,9 +73,7 @@ def run_protocol(config_file, args):
 
                 party_id = env.hosts.index(env.host)
                 with warn_only():
-                    sudo('killall -9 %s; exit 0' % executable_name[idx])
-
-                sudo('ldconfig ~/boost_1_64_0/stage/lib/ ~/libscapi/install/lib/')
+                    sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name[idx])
 
                 if 'inputs0' in values_str:
                     values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
@@ -96,7 +94,7 @@ def run_protocol(config_file, args):
 
                         for coordinator_val in coordinator_args:
                             coordinator_values_str += '%s ' % coordinator_val
-                        sudo('killall -9 %s; exit 0' % coordinator_executable)
+                            sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % coordinator_executable)
                         run('./%s %s' % (coordinator_executable, coordinator_values_str))
 
                     else:
@@ -136,18 +134,13 @@ def update_acp_protocol():
 
 
 @task
-def kill_process(process_name):
-    sudo('killall -9 %s' % process_name)
-
-
-@task
 def deploy_proxy(number_of_proxies):
     # set hosts to be proxy server
     env.host = ['34.239.19.87']
 
     # kill all existing proxies
     with warn_only():
-        sudo('killall -9 cct_proxy')
+        sudo("kill -9 `ps aux | grep cct_proxy | awk '{print $2}'`")
 
     with cd('ACP/cct_proxy'):
         put('NodeApp/public/assets/parties.conf', run('pwd'))
