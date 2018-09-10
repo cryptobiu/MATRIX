@@ -18,7 +18,7 @@ class AmazonCP(DeployCP):
         super(AmazonCP, self).__init__(conf_file)
 
     def create_key_pair(self):
-        regions = list(self.conf['regions.json'].values())
+        regions = list(self.conf['regions'].values())
 
         for regions_idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[regions_idx][:-1])
@@ -37,7 +37,7 @@ class AmazonCP(DeployCP):
                 print(e.response['Error']['Message'].upper())
 
     def create_security_group(self):
-        regions = list(self.conf['regions.json'].values())
+        regions = list(self.conf['regions'].values())
 
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
