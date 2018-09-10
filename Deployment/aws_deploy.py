@@ -192,7 +192,7 @@ class AmazonCP(DeployCP):
             if is_spot_request == 'True':
                 response = client.describe_instances(Filters=[{'Name': 'instance-lifecycle', 'Values': ['spot']},
                                                               {'Name': 'instance-type', 'Values': [instance_type]},
-                                                              {'Name': 'tag:Name', 'Values': protocol_name}])
+                                                              {'Name': 'tag:Name', 'Values': [protocol_name]}])
 
             else:
                 response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [protocol_name]}])
