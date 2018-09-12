@@ -1,6 +1,7 @@
 import os
 import colorama
-from Deployment import aws_deploy as di
+from Deployment import aws_deploy as awsdi
+from Deployment import scaleway_deploy as sdi
 from Execution import end_to_end as e2e
 from Reporting import analyze_results as ar
 from Reporting import upload_elastic as ue
@@ -8,7 +9,8 @@ from Reporting import upload_elastic as ue
 d = {'blue': colorama.Fore.BLUE,
      'green': colorama.Fore.GREEN,
      'yellow': colorama.Fore.YELLOW,
-     'red': colorama.Fore.RED}
+     'red': colorama.Fore.RED,
+     'magenta': colorama.Fore.MAGENTA}
 
 
 def color_print(text, color):
@@ -27,35 +29,71 @@ def print_main_menu():
 
 
 def print_instances_management_menu(conf_file_path):
-    color_print('Choose deployment task', 'red')
-    color_print('1. Deploy Instance(s)', 'red')
-    color_print('2. Create Key pair(s)', 'red')
-    color_print('3. Create security group(s)', 'red')
-    color_print('4. Get instances network data', 'red')
-    color_print('5. Terminate machines', 'red')
-    color_print('6. Change machines types', 'red')
-    color_print('7. Start instances ', 'red')
-    color_print('8. Stop instances', 'red')
-    selection = input('Your choice:')
+    color_print('Choose cloud provider:', 'blue')
+    color_print('1. AWS', 'blue')
+    color_print('2. Scaleway', 'blue')
+    
+    cp = input('Your choice:')
+    if cp == '1':
+        color_print('Choose deployment task', 'red')
+        color_print('1. Deploy Instance(s)', 'red')
+        color_print('2. Create Key pair(s)', 'red')
+        color_print('3. Create security group(s)', 'red')
+        color_print('4. Get instances network data', 'red')
+        color_print('5. Terminate machines', 'red')
+        color_print('6. Change machines types', 'red')
+        color_print('7. Start instances ', 'red')
+        color_print('8. Stop instances', 'red')
+        selection = input('Your choice:')
+    
+        deploy = awsdi.AmazonCP(conf_file_path)
+    
+        if selection == '1':
+            deploy.deploy_instances()
+        elif selection == '2':
+            deploy.create_key_pair()
+        elif selection == '3':
+            deploy.create_security_group()
+        elif selection == '4':
+            deploy.get_network_details()
+        elif selection == '5':
+            deploy.terminate()
+        elif selection == '6':
+            deploy.change_instance_types()
+        elif selection == '7':
+            deploy.start_instances()
+        elif selection == '8':
+            deploy.stop_instances()
+    
+    elif cp == '2':
+        color_print('Choose deployment task', 'magenta')
+        color_print('1. Deploy Instance(s)', 'magenta')
+        color_print('2. Create Key pair(s)', 'magenta')
+        color_print('3. Create security group(s)', 'magenta')
+        color_print('4. Get instances network data', 'magenta')
+        color_print('5. Terminate machines', 'magenta')
+        color_print('6. Change machines types', 'magenta')
+        color_print('7. Start instances ', 'magenta')
+        color_print('8. Stop instances', 'magenta')
+        selection = input('Your choice:')
 
-    deploy = di.AmazonCP(conf_file_path)
-
-    if selection == '1':
-        deploy.deploy_instances()
-    elif selection == '2':
-        deploy.create_key_pair()
-    elif selection == '3':
-        deploy.create_security_group()
-    elif selection == '4':
-        deploy.get_network_details()
-    elif selection == '5':
-        deploy.terminate()
-    elif selection == '6':
-        deploy.change_instance_types()
-    elif selection == '7':
-        deploy.start_instances()
-    elif selection == '8':
-        deploy.stop_instances()
+        deploy = sdi.ScalewayCP(conf_file_path)
+        if selection == '1':
+            deploy.deploy_instances()
+        elif selection == '2':
+            deploy.create_key_pair()
+        elif selection == '3':
+            deploy.create_security_group()
+        elif selection == '4':
+            deploy.get_network_details()
+        elif selection == '5':
+            deploy.terminate()
+        elif selection == '6':
+            deploy.change_instance_types()
+        elif selection == '7':
+            deploy.start_instances()
+        elif selection == '8':
+            deploy.stop_instances()
 
 
 def print_execution_menu(conf_file_path):

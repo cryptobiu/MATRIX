@@ -8,9 +8,17 @@ The system requires a management computer (Manager) - a computer that centralize
 The Manager executes all the experiment phases, starting from install the experiment up to analyse it's results.
 The Manager is a stand alone workstation and it's not part of the the workstations that participate in the experiment.
 
-In order to use MATRIX an account at AWS is required. To create account at AWS: 
-1. Sing up for [AWS](https://portal.aws.amazon.com/billing/signup#/start).   
-2. Define your [credentials](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) at the Manager computer. 
+In order to use all MATRIX capabilities, a cloud account is required.
+MATRIX uses two cloud providers(CP):
+1. AWS
+2. Scaleway - for ARM computing resources
+
+To create account at AWS: 
+* Sign up for [AWS](https://portal.aws.amazon.com/billing/signup#/start).   
+* Define your [credentials](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) at the Manager computer.
+
+To create account at Scaleway:
+* sign up for [Scaleway](https://www.scaleway.com/)
 
 MATRIX uses two services of AWS:
 1. Spot instances - The execution of the protocols is done by deploy spot instances. All the instances have the same AMI(Amazon Machine Image).
