@@ -18,7 +18,7 @@ To create account at AWS:
 * Define your [credentials](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) at the Manager computer.
 
 To create account at Scaleway:
-* sign up for [Scaleway](https://www.scaleway.com/)
+* Sign up for [Scaleway](https://www.scaleway.com/)
 
 MATRIX uses two services of AWS:
 1. Spot instances - The execution of the protocols is done by deploy spot instances. All the instances have the same AMI(Amazon Machine Image).
@@ -29,7 +29,7 @@ More on AMI can be found [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGu
 Information on ES can be found [here](https://www.elastic.co/). We are also using the built in [Kibana](https://www.elastic.co/products/kibana)
 plugin to visualize our results.
 
-Basic architecture of MATRIX:  
+Basic architecture of MATRIX using AWS CP:  
 ![alt text](../dev/Assets/BasicArchitecture.png)   
 
 ## Installation
