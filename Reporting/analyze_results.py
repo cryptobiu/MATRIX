@@ -3,9 +3,9 @@ import glob
 import json
 import time
 import smtplib
+from pathlib import Path
 from os.path import exists
 from os.path import basename
-from os.path import expanduser
 
 from openpyxl import Workbook
 from openpyxl import load_workbook
@@ -155,19 +155,19 @@ class Analyze:
         wb.save(results_file_name)
 
     def analyze_cpu(self, results_path):
-        files_list = glob.glob(expanduser('%s/*cpu*.json' % results_path))
+        files_list = glob.glob(('%s/%s/*cpu*.json' % (Path.home(), results_path)))
         self.analyze_results(files_list, 'cpu')
 
     def analyze_comm_sent(self, results_path):
-        files_list = glob.glob(expanduser('%s/*commSent*.json' % results_path))
+        files_list = glob.glob(('%s/%s/*commSent*.json' % (Path.home(), results_path)))
         self.analyze_results(files_list, 'sent')
 
     def analyze_comm_received(self, results_path):
-        files_list = glob.glob(expanduser('%s/*commReceived*.json' % results_path))
+        files_list = glob.glob(('%s/%s/*commReceived*.json' % (Path.home(), results_path)))
         self.analyze_results(files_list, 'received')
 
     def analyze_memory(self, results_path):
-        files_list = glob.glob(expanduser('%s/*memory*.json' % results_path))
+        files_list = glob.glob(('%s/%s/*memory*.json' % (Path.home(), results_path)))
         self.analyze_results(files_list, 'memory')
 
     def analyze_all(self):

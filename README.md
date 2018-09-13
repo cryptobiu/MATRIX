@@ -34,7 +34,10 @@ Basic architecture of MATRIX using AWS CP:
 
 ## Installation
 MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [openpyxl](https://openpyxl.readthedocs.io/en/stable/).  
-Matrix tested on Ubuntu 16.04.3/18.04.1 LTS and CentOS 7.3.  
+Matrix tested on These OSs:
+* Ubuntu 16.04.3/18.04.1 LTS
+* CentOS 7.3
+* Arch Linux  
 To install python3 and pip under Ubuntu 16.04/18.04 :
 
 `sudo apt-get install python3 python3-pip`
@@ -43,14 +46,18 @@ To install under CentOS 7.3:
 
 `sudo yum install python35u.x86_64 python35u-pip.noarch`
 
+To install under Arch Linux:  
+
+`pacman -S python3 python-pip`
+
 After You installed python 3 and pip3 you will need to install the modules MATRIX uses. To install this three modules use pip3
 
 `pip3 install --user openpyxl fabric fabric3 boto3 colorama certifi elasticsearch`
 
 **NOTE**: on some computers the following error may appear: `locale.Error: unsupported locale setting`
 To fix it, run:
-1. sudo apt-get clean && sudo apt-get update && sudo apt-get install -y locales
-2. locale-gen en_US.UTF-8
+1. `sudo apt-get clean && sudo apt-get update && sudo apt-get install -y locales`
+2. `locale-gen en_US.UTF-8`
 
 After the modules installed, clone this repository to install MATRIX on your system.
 
@@ -73,7 +80,7 @@ After you created your AWS account and set your credentials, you will need a key
 Detailed explanation can be found [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html).  
 After you created your key, change this line at [fabfile.py](../master/ExperimentExecute/fabfile.py):
 
-- set the correct location and name of your AWS key `env.key_filename = [expanduser('~/Keys/matrix.pem')]`
+- set the correct location and name of your AWS key `env.key_filename = ['%s/Keys/matrix.pem' % Path.home()]`
 
 ### Execution
 

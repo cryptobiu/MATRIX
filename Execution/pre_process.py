@@ -4,7 +4,7 @@ import json
 import boto3
 from collections import OrderedDict
 from shutil import copyfile
-from os.path import expanduser
+from pathlib import Path
 
 
 def install_ntl():
@@ -16,7 +16,7 @@ def install_ntl():
 
 
 def install_malicious_yao_lib():
-    os.chdir(expanduser('~/libscapi/protocols/MaliciousYaoBatch/lib'))
+    os.chdir('%s/libscapi/protocols/MaliciousYaoBatch/lib' % Path.home())
     os.system('make')
 
 
@@ -43,30 +43,30 @@ def install_spdz_stations():
     install_ntl()
 
     # Install libscapi
-    os.chdir(expanduser('~'))
+    os.chdir(str(Path.home()))
     os.system('git clone https://github.com/cryptobiu/libscapi.git')
-    os.chdir(expanduser('~/libscapi'))
+    os.chdir('%s/libscapi' % Path.home())
     os.system('git checkout SPDZ')
     os.system('make')
 
     # Install MPCHonestMajorityForSpdz
-    os.chdir(expanduser('~'))
+    os.chdir(str(Path.home()))
     os.system('git clone https://github.com/cryptobiu/MPCHonestMajorityForSpdz.git')
-    os.chdir(expanduser('~/MPCHonestMajorityForSpdz'))
+    os.chdir('%s/MPCHonestMajorityForSpdz' % Path.home())
     os.system('cmake .')
     os.system('make')
 
     # Install SPDZ-2_extension_library
-    os.chdir(expanduser('~'))
+    os.chdir(str(Path.home()))
     os.system('git clone https://github.com/cryptobiu/spdz-2_extension_library')
-    os.chdir(expanduser('~/spdz-2_extension_library'))
+    os.chdir('%s/spdz-2_extension_library' % Path.home())
     os.system('cmake .')
     os.system('make')
 
     # Install SPDZ-2
-    os.chdir(expanduser('~'))
+    os.chdir(str(Path.home()))
     os.system('git clone https://github.com/cryptobiu/SPDZ-2')
-    os.chdir(expanduser('~/SPDZ-2'))
+    os.chdir('%s/SPDZ-2' % Path.home())
     os.system('make')
 
 
@@ -143,10 +143,10 @@ def manipulate_spdz2_networking_multi_region():
 
 
 def create_inputs_for_mpcfromsd():
-    with open(expanduser('~/MPCFromSD/inputs9.txt')) as input_file:
+    with open('%s/MPCFromSD/inputs9.txt' % Path.home()) as input_file:
         inputs = input_file.readlines()
         for i in range(10, 128):
-            with open(expanduser('~/MPCFromSD/inputs%s.txt' % i), 'w+') as new_input:
+            with open('%s/MPCFromSD/inputs%s.txt' % (Path.home(), i), 'w+') as new_input:
                 new_input.writelines(inputs)
 
 
@@ -154,7 +154,7 @@ def create_inputs_for_statistics():
     inputs_size = [400000, 200000, 133332, 100000, 80000, 66666, 57142, 50000, 44444, 40000, 36362, 33332, 30768, 28570,
                    26666]
     for idx in range(len(inputs_size)):
-        with open(expanduser('~/Secret-Sharing/inputs%s.txt' % inputs_size[idx]), 'w+') as input_file:
+        with open('%s/Secret-Sharing/inputs%s.txt' % (Path.home(), inputs_size[idx]), 'w+') as input_file:
             for idx2 in range(inputs_size[idx]):
                 input_file.write('1\n')
 

@@ -6,7 +6,7 @@ import botocore
 
 from random import shuffle
 from datetime import datetime
-from os.path import expanduser
+from pathlib import Path
 from botocore import exceptions
 from collections import OrderedDict
 
@@ -29,7 +29,7 @@ class AmazonCP(DeployCP):
                 key_pair = client.create_key_pair(KeyName='Matrix%s-%s'
                                                           % (regions[regions_idx].replace('-', '')[:-1], key_idx))
                 key_name = key_pair['KeyName']
-                with open(expanduser('~/Keys/%s' % key_name), 'w+') as key_file:
+                with open('%s/Keys/%s' % (Path.home(), key_name), 'w+') as key_file:
                     key_file.write(key_pair['KeyMaterial'])
             except botocore.exceptions.EndpointConnectionError as e:
                 print(e.response['Error']['Message'].upper())

@@ -1,21 +1,20 @@
 import json
-import time
 from collections import OrderedDict
 from fabric.api import *
 from fabric.contrib.files import exists
-from os.path import expanduser
+from pathlib import Path
 
 env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
-env.key_filename = [expanduser('~/Keys/matrix.pem')]
+env.key_filename = ['%s/Keys/matrix.pem' % Path.home()]
 
 
 @task
 def pre_process(working_directory, task_idx):
     sudo('apt-get install python3 -y')
     with cd(working_directory):
-        put(expanduser('ExperimentExecute/pre_process.py'))
+        put('%s/ExperimentExecute/pre_process.py' % Path.home())
         run('python3 pre_process.py %s' % task_idx)
 
 
@@ -121,7 +120,7 @@ def collect_results(results_server_directory, results_local_directory, is_extern
 @task
 def get_logs(working_directory):
     local('mkdir -p logs')
-    get('%s/logs/*.log' % working_directory, expanduser('~/MATRIX/logs'))
+    get('%s/logs/*.log' % working_directory, '%s/MATRIX/logs' % Path.home())
 
 
 @task
