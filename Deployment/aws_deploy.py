@@ -5,7 +5,7 @@ import boto3
 import botocore
 
 from random import shuffle
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from botocore import exceptions
 from collections import OrderedDict
@@ -89,9 +89,9 @@ class AmazonCP(DeployCP):
             else:
                 number_of_instances = max(number_of_parties)
     
-            date = datetime.now().replace(hour=datetime.now().hour - 3)
+            date = datetime.now() - timedelta(hours=3)
             print('Current date : \n%s' % str(date))
-            new_date = date.replace(hour=date.hour + 6)
+            new_date = date + timedelta(hours=6)
     
             for idx in range(len(regions)):
                 client = boto3.client('ec2', region_name=regions[idx][:-1])
