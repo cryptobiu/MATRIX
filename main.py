@@ -1,7 +1,8 @@
 import os
 import colorama
-from Deployment import aws_deploy as awsdi
-from Deployment import scaleway_deploy as sdi
+from Deployment import deploy as de
+from Deployment import aws_deploy as awsde
+from Deployment import scaleway_deploy as sde
 from Execution import end_to_end as e2e
 from Reporting import analyze_results as ar
 from Reporting import upload_elastic as ue
@@ -23,7 +24,8 @@ def print_main_menu():
     color_print('1. Deploy Menu', 'blue')
     color_print('2. Execute Menu', 'blue')
     color_print('3. Analysis Menu', 'blue')
-    color_print('4. Exit', 'blue')
+    color_print('4. Generate Circuits', 'blue')
+    color_print('5. Exit', 'blue')
     selection = input('Your choice:')
     return selection
 
@@ -46,7 +48,7 @@ def print_instances_management_menu(conf_file_path):
         color_print('8. Stop instances', 'red')
         selection = input('Your choice:')
     
-        deploy = awsdi.AmazonCP(conf_file_path)
+        deploy = awsde.AmazonCP(conf_file_path)
     
         if selection == '1':
             deploy.deploy_instances()
@@ -77,7 +79,7 @@ def print_instances_management_menu(conf_file_path):
         color_print('8. Stop instances', 'magenta')
         selection = input('Your choice:')
 
-        deploy = sdi.ScalewayCP(conf_file_path)
+        deploy = sde.ScalewayCP(conf_file_path)
         if selection == '1':
             deploy.deploy_instances()
         elif selection == '2':
@@ -141,23 +143,26 @@ def print_analysis_menu(conf_file_path):
 def main():
     selection = print_main_menu()
 
-    while not selection == '4':
-        if int(selection) > 4:
+    while not selection == '5':
+        if int(selection) > 5:
             print('Choose valid option!')
             selection = print_main_menu()
             continue
 
-        color_print('Enter configuration file(s):', 'blue')
-        conf_file_path = input('Configuration file path (current path is: %s): ' % os.getcwd())
+        if selection == '4':
+            de.DeployCP.generate_circuits()
+        else:
+            color_print('Enter configuration file(s):', 'blue')
+            conf_file_path = input('Configuration file path (current path is: %s): ' % os.getcwd())
 
-        if selection == '1':
-            print_instances_management_menu(conf_file_path)
+            if selection == '1':
+                print_instances_management_menu(conf_file_path)
 
-        elif selection == '2':
-            print_execution_menu(conf_file_path)
+            elif selection == '2':
+                print_execution_menu(conf_file_path)
 
-        elif selection == '3':
-            print_analysis_menu(conf_file_path)
+            elif selection == '3':
+                print_analysis_menu(conf_file_path)
 
         selection = print_main_menu()
 

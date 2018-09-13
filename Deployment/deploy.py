@@ -1,6 +1,8 @@
 import os
 import json
 import copy
+import subprocess
+import shutil
 from collections import OrderedDict
 
 
@@ -8,6 +10,26 @@ class DeployCP:
     def __init__(self, conf_file):
         with open(conf_file) as data_file:
             self.conf = json.load(data_file, object_pairs_hook=OrderedDict)
+
+    @staticmethod
+    def generate_circuits():
+        # Synthetic circuits generation
+        parties = [2, 3, 4, 8, 16, 32, 64, 128]
+        depth = [10, 100, 1000, 10000, 100000, 1000000]
+        mult_gates = [10000, 100000, 1000000, 10000000, 100000000, 1000000000]
+        gates = [g * 4 for g in mult_gates]
+        inputs = [[int(i * 0.01) for i in mult_gates], [int(i * 0.05) for i in mult_gates],
+                  [int(i * 0.1) for i in mult_gates], [int(i * 0.5) for i in mult_gates]]
+
+        for idx in range(len(parties)):
+            for idx2 in range(len(inputs)):
+                for idx3 in range(len(inputs[idx2])):
+                    subprocess.call(['java', '-jar', 'Circuits/GenerateArythmeticCircuitForDepthAndGates.jar',
+                                     str(gates[idx3]), str(mult_gates[idx3]), str(depth[idx3]),
+                                     str(parties[idx]), str(inputs[idx2][idx3]), '50', 'true'], shell=False,
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        shutil.move('*.txt', 'Circuits')
 
     def create_key_pair(self):
         raise NotImplementedError
