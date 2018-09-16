@@ -4,7 +4,10 @@
   {
     "size_0":10
   },
-  "gitAddress": "https://github.com/cryptobiu/MPCFromSD.git",
+  "gitAddress":
+  {
+    "address_0":"https://github.com/cryptobiu/MPCFromSD.git"
+  },
   "aWSInstType": "c5.4xlarge",
   "aWWSBidPrice": "0.016",
   "executableName":

@@ -4,7 +4,10 @@
   {
     "size_0":4
   },
-  "gitAddress": "https://github.com/cryptobiu/NEC.git",
+  "gitAddress":
+  {
+    "address_0": "https://github.com/cryptobiu/NEC.git"
+  },
   "aWSInstType": "c4.large",
   "aWWSBidPrice": "0.07",
   "executableName":

@@ -4,7 +4,10 @@
   {
     "size_0":128
   },
-  "gitAddress": "https://github.com/cryptobiu/PSI.git",
+  "gitAddress":
+  {
+    "address_0": "https://github.com/cryptobiu/PSI.git"
+  },
   "aWSInstType": "c5.large",
   "aWWSBidPrice": "0.07",
   "network": "LAN",

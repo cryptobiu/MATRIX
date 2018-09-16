@@ -4,7 +4,10 @@
   {
     "size_0": 200
   },
-  "gitAddress": "https://github.com/cryptobiu/BCast.git",
+  "gitAddress":
+  {
+    "address_0": "https://github.com/cryptobiu/BCast.git"
+  },
   "aWSInstType": "t2.medium",
   "aWWSBidPrice": "0.016",
   "executableName":

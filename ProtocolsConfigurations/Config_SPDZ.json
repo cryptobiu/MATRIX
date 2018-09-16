@@ -3,7 +3,10 @@
   "numOfParties": {
     "size_0": 51
   },
-  "gitAddress": "https://github.com/cryptobiu/spdz-2_extension_library.git",
+  "gitAddress":
+  {
+    "address_0": "https://github.com/cryptobiu/spdz-2_extension_library.git"
+  },
   "aWSInstType": "c5.xlarge",
   "aWWSBidPrice": "0.031",
   "installScript": "",
