@@ -110,10 +110,10 @@ class AmazonCP(DeployCP):
                     if spot_request == 'True':
                         # check if price isn't too low
                         winning_bid_price = self.check_latest_price(machine_type, regions[idx])
-                        if float(price_bids) < float(winning_bid_price):
+                        if float(price_bids) > float(winning_bid_price):
                             price_bids = str(winning_bid_price)
                         try:
-                            client.request_spot_instances(
+                            response = client.request_spot_instances(
                                     DryRun=False,
                                     SpotPrice=price_bids,
                                     InstanceCount=number_of_instances_to_deploy,
@@ -130,6 +130,21 @@ class AmazonCP(DeployCP):
                                             },
                                     }
                             )
+                            time.sleep(10)
+                            spot_requests_ids = []
+                            for request in response['SpotInstanceRequests']:
+                                spot_requests_ids.append(request['SpotInstanceRequestId'])
+                            instances_response = client.describe_spot_instance_requests(
+                                Filters=[{'Name': 'spot-instance-request-id', 'Values': spot_requests_ids}])
+                            instances_ids = []
+                            for instance_response in instances_response['SpotInstanceRequests']:
+                                instances_ids.append(instance_response['InstanceId'])
+                            client.create_tags(Resources=instances_ids,Tags=[{
+                                'Key': 'Name',
+                                'Value': protocol_name
+                            }])
+
+
                         except botocore.exceptions.ClientError as e:
                             print(e.response['Error']['Message'].upper())
                     else:
