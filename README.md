@@ -6,7 +6,7 @@ It uses AWS [spot instances](https://aws.amazon.com/ec2/spot/), and can be used 
 
 The system requires a management computer (Manager) - a computer that centralized all the execution.
 The Manager executes all the experiment phases, starting from install the experiment up to analyse it's results.
-The Manager is a stand alone workstation and it's not part of the the workstations that participate in the experiment.
+The Manager is a stand alone workstation and it's not part of the workstations that participate in the experiment.
 
 In order to use all MATRIX capabilities, a cloud account is required.
 MATRIX uses two cloud providers(CP):
@@ -34,11 +34,12 @@ Basic architecture of MATRIX using AWS CP:
 
 ## Installation
 MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [openpyxl](https://openpyxl.readthedocs.io/en/stable/).  
-Matrix tested on These OSs:
+Matrix tested on these OSs:
 * Ubuntu 16.04.3/18.04.1 LTS
 * CentOS 7.3
-* Arch Linux  
-To install python3 and pip under Ubuntu 16.04/18.04 :
+* Arch Linux
+
+To install Python 3 and pip under Ubuntu 16.04/18.04 :
 
 `sudo apt-get install python3 python3-pip`
 
@@ -46,11 +47,11 @@ To install under CentOS 7.3:
 
 `sudo yum install python35u.x86_64 python35u-pip.noarch`
 
-To install under Arch Linux:  
+To install under Arch Linux:
 
-`pacman -S python3 python-pip`
+`pacman -S python python-pip`
 
-After You installed python 3 and pip3 you will need to install the modules MATRIX uses. To install this three modules use pip3
+After You installed Python 3 and pip3 you will need to install the modules MATRIX uses. To install this three modules use pip3
 
 `pip3 install --user openpyxl fabric fabric3 boto3 colorama certifi elasticsearch scaleway-sdk`
 
