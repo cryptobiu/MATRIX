@@ -1,6 +1,8 @@
+import json
 import math
 import os
 import colorama
+from collections import OrderedDict
 from Deployment import deploy as de
 from Deployment import aws_deploy as awsde
 from Deployment import scaleway_deploy as sde
@@ -76,6 +78,7 @@ class MatrixMenu:
 
 
     def __init__(self):
+        self.protocol_config = None
         self.protocol_config_path = None
 
 
@@ -140,7 +143,8 @@ class MatrixMenu:
         Start the client.
         """
         try:
-            self.load_protocol_config()
+            while self.protocol_config is None:
+                self.load_protocol_config()
             self.main_menu()
         except KeyboardInterrupt:
             print('\nReceived KeyboardInterrupt, quitting ...')
@@ -153,8 +157,17 @@ class MatrixMenu:
         self.color_print('Enter configuration file(s):', 'blue')
         cwd = os.getcwd()
         prompt = 'Protocol configuration file path (current path is: {}): '.format(cwd)
-        protocol_config_path = self.color_input(prompt,  'blue')
-        self.protocol_config_path = protocol_config_path.strip()
+        try:
+            protocol_config_path = self.color_input(prompt,  'blue')
+        except EOFError:
+            return
+        try:
+            with open(protocol_config_path, 'r') as f:
+                self.protocol_config = json.load(f, object_pairs_hook=OrderedDict)
+        except OSError as e:
+            MatrixMenu.color_print("Reading config file '{}' failed: {}".format(e.filename, e.strerror), 'blue')
+            return
+        self.protocol_config_path = protocol_config_path
 
 
     def main_menu(self):
@@ -184,10 +197,10 @@ class MatrixMenu:
         """
         cp = self.print_menu(*self.cloud_provider_menu_desc)
         if cp == 1:
-            deploy = awsde.AmazonCP(self.protocol_config_path)
+            deploy = awsde.AmazonCP(self.protocol_config)
             menu_color = 'red'
         elif cp == 2:
-            deploy = sde.ScalewayCP(self.protocol_config_path)
+            deploy = sde.ScalewayCP(self.protocol_config)
             menu_color = 'magenta'
         elif cp == 3:
             return
@@ -218,7 +231,7 @@ class MatrixMenu:
         """
         selection = self.print_menu(*self.execution_menu_desc)
 
-        ee = e2e.E2E(self.protocol_config_path)
+        ee = e2e.E2E(self.protocol_config, self.protocol_config_path)
 
         if selection == 1:
             ee.pre_process()
@@ -236,7 +249,7 @@ class MatrixMenu:
         """
         selection = self.print_menu(*self.analysis_menu_desc)
 
-        a = ar.Analyze(self.protocol_config_path)
+        a = ar.Analyze(self.protocol_config)
 
         if selection == 1:
             a.download_data()
@@ -246,5 +259,5 @@ class MatrixMenu:
         elif selection == 3:
             a.analyze_all()
         elif selection == 4:
-            e = ue.Elastic(conf_file_path)
+            e = ue.Elastic(self.protocol_config)
             e.upload_all_data()

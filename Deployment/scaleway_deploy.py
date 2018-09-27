@@ -9,8 +9,8 @@ from Deployment.deploy import DeployCP
 
 
 class ScalewayCP(DeployCP):
-    def __init__(self, conf_file):
-        super(ScalewayCP, self).__init__(conf_file)
+    def __init__(self, protocol_config):
+        super(ScalewayCP, self).__init__(protocol_config)
         with open('%s/GlobalConfigurations/tokens.json' % os.getcwd()) as gc_file:
             data = json.load(gc_file)
             self.token = data['scalewayToken']
@@ -26,7 +26,7 @@ class ScalewayCP(DeployCP):
               'Please refer to Scaleway Web UI at https://cloud.scaleway.com/#/credentials')
 
     def create_security_group(self):
-        regions = list(self.conf['regions'].values())
+        regions = list(self.protocol_config['regions'].values())
         for idx in range(len(regions)):
             api = ComputeAPI(auth_token=self.token, region=regions[idx])
             api.query().security_groups.post({
@@ -41,10 +41,10 @@ class ScalewayCP(DeployCP):
 
     def deploy_instances(self):
 
-        protocol_name = self.conf['protocol']
-        machine_type = self.conf['aWSInstType']
-        regions = list(self.conf['regions'].values())
-        number_of_parties = list(self.conf['numOfParties'].values())
+        protocol_name = self.protocol_config['protocol']
+        machine_type = self.protocol_config['aWSInstType']
+        regions = list(self.protocol_config['regions'].values())
+        number_of_parties = list(self.protocol_config['numOfParties'].values())
         number_duplicated_servers = 0
 
         if len(regions) > 1:
@@ -80,10 +80,10 @@ class ScalewayCP(DeployCP):
         self.get_network_details()
 
     def get_network_details(self, port_number=8000, file_name='parties.conf'):
-        regions = list(self.conf['regions'].values())
+        regions = list(self.protocol_config['regions'].values())
         public_ip_address = []
         private_ip_address = []
-        protocol_name = self.conf['protocol']
+        protocol_name = self.protocol_config['protocol']
 
         for region in regions:
             instances = self.describe_instances(region, protocol_name)
@@ -109,8 +109,8 @@ class ScalewayCP(DeployCP):
         return instances
 
     def check_running_instances(self, region, machine_type):
-        protocol_name = self.conf['protocol']
-        machine_type = self.conf['aWSInstType']
+        protocol_name = self.protocol_config['protocol']
+        machine_type = self.protocol_config['aWSInstType']
         number_of_instances = 0
 
         servers = self.describe_instances(region, protocol_name)
@@ -122,8 +122,8 @@ class ScalewayCP(DeployCP):
         return number_of_instances
 
     def start_instances(self):
-        protocol_name = self.conf['protocol']
-        regions = list(self.conf['regions'].values())
+        protocol_name = self.protocol_config['protocol']
+        regions = list(self.protocol_config['regions'].values())
 
         for region in regions:
             api = ComputeAPI(region=region, auth_token=self.token)
@@ -134,8 +134,8 @@ class ScalewayCP(DeployCP):
                     api.query().servers(server_id).action.post({'action': 'poweron'})
 
     def stop_instances(self):
-        protocol_name = self.conf['protocol']
-        regions = list(self.conf['regions'].values())
+        protocol_name = self.protocol_config['protocol']
+        regions = list(self.protocol_config['regions'].values())
 
         for region in regions:
             api = ComputeAPI(region=region, auth_token=self.token)
@@ -146,8 +146,8 @@ class ScalewayCP(DeployCP):
                     api.query().servers(server_id).action.post({'action': 'poweroff'})
 
     def terminate(self):
-        protocol_name = self.conf['protocol']
-        regions = list(self.conf['regions'].values())
+        protocol_name = self.protocol_config['protocol']
+        regions = list(self.protocol_config['regions'].values())
 
         for region in regions:
             api = ComputeAPI(region=region, auth_token=self.token)

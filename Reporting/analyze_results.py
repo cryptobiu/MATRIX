@@ -19,16 +19,14 @@ from email.mime.application import MIMEApplication
 
 
 class Analyze:
-    def __init__(self, conf_file):
-        self.config_file_path = conf_file
+    def __init__(self, protocol_config):
+        self.protocol_config = protocol_config
         self.protocol_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         self.style1 = NamedStyle(number_format='#.##')
 
     def download_data(self):
-        with open(self.config_file_path) as conf_file:
-            conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
-            remote_directory = list(conf_data['workingDirectory'].values())
-            is_external = conf_data['isExternal']
+        remote_directory = list(self.protocol_config['workingDirectory'].values())
+        is_external = self.protocol_config['isExternal']
 
         for dir in remote_directory:
             results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
@@ -38,13 +36,10 @@ class Analyze:
             time.sleep(10)
 
     def send_email(self):
-        with open(self.config_file_path) as conf_file:
-            conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
-
-        protocol_name = conf_data['protocol']
-        users = list(conf_data['emails'].values())
-        configurations = list(conf_data['configurations'].values())
-        regions = list(conf_data['regions.json'].values())
+        protocol_name = self.protocol_config['protocol']
+        users = list(self.protocol_config['emails'].values())
+        configurations = list(self.protocol_config['configurations'].values())
+        regions = list(self.protocol_config['regions.json'].values())
         address_me = 'biu.cyber.experiments@gmail.com'
         me = 'BIU Cyber Experiments <biu.cyber.experiments@gmail.com>'
 
@@ -86,10 +81,7 @@ class Analyze:
         server.quit()
 
     def analyze_results(self, files_list, analysis_type):
-        with open(self.config_file_path) as conf_file:
-            conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
-
-        protocol_name = conf_data['protocol']
+        protocol_name = self.protocol_config['protocol']
 
         results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, self.protocol_time)
         parties = set()
@@ -114,7 +106,7 @@ class Analyze:
         for i in range(len(data)):
             tasks_names[data[i]['name']] = list()
 
-        num_of_repetitions = conf_data['numOfInternalRepetitions']
+        num_of_repetitions = self.protocol_config['numOfInternalRepetitions']
 
         if not exists(results_file_name):
             wb = Workbook(write_only=False)
