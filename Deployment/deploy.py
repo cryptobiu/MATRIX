@@ -7,9 +7,8 @@ from collections import OrderedDict
 
 
 class DeployCP:
-    def __init__(self, conf_file):
-        with open(conf_file) as data_file:
-            self.conf = json.load(data_file, object_pairs_hook=OrderedDict)
+    def __init__(self, protocol_config):
+        self.protocol_config = protocol_config
 
     @staticmethod
     def generate_circuits():
@@ -78,7 +77,7 @@ class DeployCP:
     def create_parties_file(self, ip_addresses, port_number, file_name, new_format=True, number_of_regions=1):
 
         print('Parties network configuration')
-        regions = list(self.conf['regions'].values())
+        regions = list(self.protocol_config['regions'].values())
 
         with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'w+') as private_ip_file:
             if not new_format:
@@ -103,9 +102,9 @@ class DeployCP:
             self.create_parties_files_multi_regions(file_name)
 
     def get_network_details(self, port_number=8000, file_name='parties.conf'):
-        regions = list(self.conf['regions'].values())
+        regions = list(self.protocol_config['regions'].values())
 
-        number_of_parties = max(list(self.conf['numOfParties'].values()))
+        number_of_parties = max(list(self.protocol_config['numOfParties'].values()))
         if 'local' in regions:
             public_ip_address = []
             for ip_idx in range(number_of_parties):

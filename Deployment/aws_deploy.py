@@ -14,11 +14,11 @@ from Deployment.deploy import DeployCP
 
 
 class AmazonCP(DeployCP):
-    def __init__(self, conf_file):
-        super(AmazonCP, self).__init__(conf_file)
+    def __init__(self, protocol_config):
+        super(AmazonCP, self).__init__(protocol_config)
 
     def create_key_pair(self):
-        regions = list(self.conf['regions'].values())
+        regions = list(self.protocol_config['regions'].values())
 
         for regions_idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[regions_idx][:-1])
@@ -37,7 +37,7 @@ class AmazonCP(DeployCP):
                 print(e.response['Error']['Message'].upper())
 
     def create_security_group(self):
-        regions = list(self.conf['regions'].values())
+        regions = list(self.protocol_config['regions'].values())
 
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
@@ -68,16 +68,16 @@ class AmazonCP(DeployCP):
         return prices['SpotPriceHistory'][0]['SpotPrice']
 
     def deploy_instances(self):
-        regions = list(self.conf['regions'].values())
+        regions = list(self.protocol_config['regions'].values())
         if 'local' in regions or 'servers' in regions:
             self.get_network_details()
         else:
-            machine_type = self.conf['aWSInstType']
-            price_bids = self.conf['aWWSBidPrice']
-            number_of_parties = list(self.conf['numOfParties'].values())
+            machine_type = self.protocol_config['aWSInstType']
+            price_bids = self.protocol_config['aWWSBidPrice']
+            number_of_parties = list(self.protocol_config['numOfParties'].values())
             number_duplicated_servers = 0
-            spot_request = self.conf['isSpotRequest']
-            protocol_name = self.conf['protocol']
+            spot_request = self.protocol_config['isSpotRequest']
+            protocol_name = self.protocol_config['protocol']
     
             with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
                 global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
@@ -191,11 +191,11 @@ class AmazonCP(DeployCP):
         print('Finished to deploy machines')
 
     def get_aws_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
-        regions = list(self.conf['regions'].values())
-        is_spot_request = self.conf['isSpotRequest']
-        coordinator_exists = 'coordinatorConfig' in self.conf
-        instance_type = self.conf['aWSInstType']
-        protocol_name = self.conf['protocol']
+        regions = list(self.protocol_config['regions'].values())
+        is_spot_request = self.protocol_config['isSpotRequest']
+        coordinator_exists = 'coordinatorprotocol_configig' in self.protocol_config
+        instance_type = self.protocol_config['aWSInstType']
+        protocol_name = self.protocol_config['protocol']
 
         instances_ids = []
         public_ip_address = []
@@ -246,7 +246,7 @@ class AmazonCP(DeployCP):
 
     def describe_instances(self, region_name, machines_name):
         client = boto3.client('ec2', region_name=region_name)
-        is_spot_request = self.conf['isSpotRequest']
+        is_spot_request = self.protocol_config['isSpotRequest']
         if is_spot_request == 'True':
             response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [machines_name]},
                                                           {'Name': 'instance-lifecycle', 'Values': ['spot']}])
@@ -262,7 +262,7 @@ class AmazonCP(DeployCP):
         return instances
 
     def check_running_instances(self, region, machine_type):
-        protocol_name = self.conf['protocol']
+        protocol_name = self.protocol_config['protocol']
         ready_instances = 0
 
         client = boto3.client('ec2', region_name=region)
@@ -280,8 +280,8 @@ class AmazonCP(DeployCP):
         return ready_instances
 
     def start_instances(self):
-        regions = list(self.conf['regions'].values())
-        machines_name = self.conf['protocol']
+        regions = list(self.protocol_config['regions'].values())
+        machines_name = self.protocol_config['protocol']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
@@ -291,8 +291,8 @@ class AmazonCP(DeployCP):
             client.start_instances(InstanceIds=instances)
 
     def stop_instances(self):
-        regions = list(self.conf['regions'].values())
-        machines_name = self.conf['protocol']
+        regions = list(self.protocol_config['regions'].values())
+        machines_name = self.protocol_config['protocol']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
@@ -302,9 +302,9 @@ class AmazonCP(DeployCP):
             client.stop_instances(InstanceIds=instances)
 
     def change_instance_types(self):
-        regions = list(self.conf['regions'].values())
-        protocol_name = self.conf['protocol']
-        instance_type = self.conf['aWSInstType']
+        regions = list(self.protocol_config['regions'].values())
+        protocol_name = self.protocol_config['protocol']
+        instance_type = self.protocol_config['aWSInstType']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
@@ -324,8 +324,8 @@ class AmazonCP(DeployCP):
             client.start_instances(InstanceIds=instances)
 
     def terminate(self):
-        regions = list(self.conf['regions'].values())
-        machines_name = self.conf['protocol']
+        regions = list(self.protocol_config['regions'].values())
+        machines_name = self.protocol_config['protocol']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
