@@ -159,6 +159,7 @@ class MatrixMenu:
                 self.protocol_config = json.load(f, object_pairs_hook=OrderedDict)
         except json.decoder.JSONDecodeError as e:
             MatrixMenu.color_print("Configuration file '{}' is not valid".format(protocol_config_path), 'blue')
+            return
         except OSError as e:
             MatrixMenu.color_print("Reading config file '{}' failed: {}".format(e.filename, e.strerror), 'blue')
             return
