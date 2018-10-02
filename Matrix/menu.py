@@ -76,11 +76,9 @@ class MatrixMenu:
         ],
         'green')
 
-
     def __init__(self):
         self.protocol_config = None
         self.protocol_config_path = None
-
 
     @staticmethod
     def color_print(text, color):
@@ -91,7 +89,6 @@ class MatrixMenu:
         reset_code = colorama.Fore.RESET
         print(''.join([color_code, text, reset_code]))
 
-
     @staticmethod
     def color_input(prompt, color):
         """
@@ -100,7 +97,6 @@ class MatrixMenu:
         color_code = MatrixMenu.d[color]
         reset_code = colorama.Fore.RESET
         return input(''.join([color_code, prompt, reset_code]))
-
 
     @staticmethod
     def read_number(maximum, color, prompt='Your choice: '):
@@ -119,7 +115,6 @@ class MatrixMenu:
                 continue
             return choice
 
-
     @staticmethod
     def print_menu(title, items, color):
         """
@@ -137,7 +132,6 @@ class MatrixMenu:
             choice = num_items
         return choice
 
-
     def run(self):
         """
         Start the client.
@@ -148,7 +142,6 @@ class MatrixMenu:
             self.main_menu()
         except KeyboardInterrupt:
             print('\nReceived KeyboardInterrupt, quitting ...')
-
 
     def load_protocol_config(self):
         """
@@ -164,11 +157,12 @@ class MatrixMenu:
         try:
             with open(protocol_config_path, 'r') as f:
                 self.protocol_config = json.load(f, object_pairs_hook=OrderedDict)
+        except json.decoder.JSONDecodeError as e:
+            MatrixMenu.color_print("Configuration file '{}' is not valid".format(protocol_config_path), 'blue')
         except OSError as e:
             MatrixMenu.color_print("Reading config file '{}' failed: {}".format(e.filename, e.strerror), 'blue')
             return
         self.protocol_config_path = protocol_config_path
-
 
     def main_menu(self):
         """
@@ -189,7 +183,6 @@ class MatrixMenu:
                 self.load_protocol_config()
 
             selection = self.print_menu(*self.main_menu_desc)
-
 
     def instances_management_menu(self):
         """
@@ -224,7 +217,6 @@ class MatrixMenu:
         elif selection == 8:
             deploy.stop_instances()
 
-
     def execution_menu(self):
         """
         Show execution menu.
@@ -241,7 +233,6 @@ class MatrixMenu:
             ee.execute_experiment()
         elif selection == 4:
             ee.update_libscapi()
-
 
     def analysis_menu(self):
         """
