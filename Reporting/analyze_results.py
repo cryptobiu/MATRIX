@@ -29,7 +29,7 @@ class Analyze:
         is_external = self.protocol_config['isExternal']
 
         for dir in remote_directory:
-            results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
+            results_path = self.protocol_config['resultsDirectory']
             os.system('fab -f Execution/fabfile.py collect_results:%s,%s,%s --parallel --no-pty'
                       % (dir, results_path, is_external))
             # wait for all clients to download data
