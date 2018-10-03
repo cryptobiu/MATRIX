@@ -67,6 +67,17 @@ class AmazonCP(DeployCP):
                                                     AvailabilityZone=region)
         return prices['SpotPriceHistory'][0]['SpotPrice']
 
+    @staticmethod
+    def get_ami_disk_size(region_name):
+        client = boto3.client('ec2', region_name)
+
+        with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
+            global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+
+        ami_id = global_config[region_name]["ami"]
+        response = client.describe_images(ImageIds=[ami_id])
+        return response['Images'][0]['BlockDeviceMappings'][0]['Ebs']['VolumeSize']
+
     def deploy_instances(self):
         regions = list(self.protocol_config['regions'].values())
         if 'local' in regions or 'servers' in regions:
@@ -95,6 +106,7 @@ class AmazonCP(DeployCP):
     
             for idx in range(len(regions)):
                 client = boto3.client('ec2', region_name=regions[idx][:-1])
+                disk_size = self.get_ami_disk_size(regions[idx][:-1])
     
                 number_of_instances_to_deploy = self.check_running_instances(regions[idx][:-1], machine_type)
                 if idx < number_duplicated_servers:
@@ -144,7 +156,6 @@ class AmazonCP(DeployCP):
                                 'Value': protocol_name
                             }])
 
-
                         except botocore.exceptions.ClientError as e:
                             print(e.response['Error']['Message'].upper())
                     else:
@@ -156,7 +167,7 @@ class AmazonCP(DeployCP):
                                     'Ebs':
                                     {
                                         'DeleteOnTermination': True,
-                                        'VolumeSize': 20
+                                        'VolumeSize': disk_size
                                     }
                                 },
                                 {
