@@ -37,7 +37,7 @@ MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric)
 Matrix tested on these OSs:
 * Ubuntu 16.04.3/18.04.1 LTS
 * CentOS 7.3
-* Arch Linux
+* Arch Linux  
 
 To install Python 3 and pip under Ubuntu 16.04/18.04 :
 
@@ -53,7 +53,7 @@ To install under Arch Linux:
 
 After You installed Python 3 and pip3 you will need to install the modules MATRIX uses. To install this three modules use pip3
 
-`pip3 install --user openpyxl fabric fabric3 boto3 colorama certifi elasticsearch scaleway-sdk`
+`pip3 install --user openpyxl fabric<2.0 fabric3 boto3 colorama certifi elasticsearch scaleway-sdk`
 
 **NOTE**: on some computers the following error may appear: `locale.Error: unsupported locale setting`
 To fix it, run:
@@ -98,25 +98,15 @@ The execution module supports these operations:
 MATRIX analyse four parameters:
 
 1. CPU runtime (milliseconds)
-2. RAM usage (GB)
-3. Sent bytes (bytes)
-4. Received bytes (bytes)
+2. RAM usage (GB) - Will be added in future release
+3. Sent bytes (bytes) - Will be added in future release
+4. Received bytes (bytes) - Will be added in future release
 
 The report module analyse the results files that was taken from the images by number of parties parameter.
 If you want to analyse by different parameter use the Elasticsearch option.
 
-MATRIX uses libscapi logger [API](https://github.com/cryptobiu/libscapi/blob/dev/include/infra/Measurement.hpp).  
-The logging is done at the protocol code. The logger generate suitable json files for the report module.  
-If you don't want to use libscapi logger API, make sure your files are at this name and format:   
-`protocolName_analysedParameter_partyId=id_numOfParties=#parties.json`  
-The values for analysedParameter are:
-
-1. cpu
-2. commSent
-3. commReceived
-4. memory
-
-Example file can be found [here](../master/Assets/MPCHonestMajorityNoTriples_cpu_partyId=0_numOfParties=3.json)
+MATRIX uses a header class logger [API](../master/Reporting/MatrixMeasurement.h).  
+The logging is done at the protocol code. The logger generate logs files that uploaded to ElasticSearch server. 
 
 ## MATRIX Configurations
 
