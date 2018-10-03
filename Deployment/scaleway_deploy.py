@@ -70,13 +70,13 @@ class ScalewayCP(DeployCP):
                 res = api.query().servers.post({
                     'name': protocol_name,
                     'organization': self.account_id,
-                    'image': 'a78f9025-5984-4880-b148-e63442edbc82',
+                    'image': 'c0d8477f-ce8c-4219-9523-e0338ed1d5d1',
                     'commercial_type': machine_type
                 })
                 server_id = res['server']['id']
                 api.query().servers(server_id).action.post({'action': 'poweron'})
 
-        time.sleep(240)
+        time.sleep(600)
         self.get_network_details()
 
     def get_network_details(self, port_number=8000, file_name='parties.conf'):
@@ -97,7 +97,7 @@ class ScalewayCP(DeployCP):
         # write public ips for fabric
         with open('%s/InstancesConfigurations/public_ips' % os.getcwd(), 'w+') as ips_file:
             for ip in public_ip_address:
-                ips_file.write('%s\n' % ip)
+                ips_file.write('root@%s\n' % ip)
 
     def describe_instances(self, region_name, machines_name):
         api = ComputeAPI(region=region_name, auth_token=self.token)
@@ -146,8 +146,11 @@ class ScalewayCP(DeployCP):
                     api.query().servers(server_id).action.post({'action': 'poweroff'})
 
     def terminate(self):
+        self.stop_instances()
         protocol_name = self.protocol_config['protocol']
         regions = list(self.protocol_config['regions'].values())
+
+        time.sleep(300)
 
         for region in regions:
             api = ComputeAPI(region=region, auth_token=self.token)
@@ -156,16 +159,17 @@ class ScalewayCP(DeployCP):
                 if server['state'] == 'stopped' or server['state'] == 'stopped in place':
                     server_id = server['id']
                     volume_id = server['volumes']['0']['id']
-                    ip_id = server['public_ip']['id']
-
-                    # delete volume
-                    api.query().volumes(volume_id).delete()
 
                     # delete ip
-                    api.query().ips(ip_id).delete()
+                    if not server['public_ip'] is None:
+                        ip_id = server['public_ip']['id']
+                        api.query().ips(ip_id).delete()
 
                     # delete server
                     api.query().servers(server_id).delete()
+
+                    # delete volume
+                    api.query().volumes(volume_id).delete()
 
     def change_instance_types(self):
         print('Scaleway does not support changing instance types')

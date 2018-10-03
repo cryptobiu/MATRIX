@@ -64,7 +64,6 @@ class DeployCP:
             parties = origin_file.readlines()
 
         number_of_parties = len(parties) // 2
-        print(number_of_parties)
 
         for idx in range(number_of_parties):
             new_parties = copy.deepcopy(parties)

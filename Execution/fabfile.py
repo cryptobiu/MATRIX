@@ -70,7 +70,11 @@ def run_protocol(config_file, args):
         for idx in range(len(working_directory)):
             with cd(working_directory[idx]):
 
-                party_id = env.hosts.index(env.host)
+                if env.user == 'root':
+                    party_id = env.hosts.index('root@%s' % env.host)
+                else:
+                    party_id = env.hosts.index(env.host)
+
                 with warn_only():
                     sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name[idx])
 
@@ -100,7 +104,7 @@ def run_protocol(config_file, args):
                         with cd('MATRIX'):
                             if len(regions) > 1:
                                 put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                                put('InstancesConfigurations/multi_regions/party%s/*' % (party_id - 1), run('pwd'))
+                                put('InstancesConfigurations/party%s/*' % (party_id - 1), run('pwd'))
                                 run('mv parties%s.conf parties.conf' % party_id)
                             else:
                                 put('InstancesConfigurations/parties.conf', run('pwd'))
