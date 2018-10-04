@@ -60,6 +60,7 @@ class MatrixMenu:
             'Preform pre process operations',
             'Install Experiment',
             'Execute Experiment',
+            'Execute Experiment with profiler',
             'Update libscapi',
             'Return',
         ],
@@ -233,6 +234,8 @@ class MatrixMenu:
         elif selection == 3:
             ee.execute_experiment()
         elif selection == 4:
+            ee.execute_experiment_callgrind()
+        elif selection == 5:
             ee.update_libscapi()
 
     def analysis_menu(self):
