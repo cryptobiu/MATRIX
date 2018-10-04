@@ -1,3 +1,4 @@
+import os
 import json
 from collections import OrderedDict
 from fabric.api import *
@@ -20,7 +21,6 @@ def pre_process(working_directory, task_idx):
 
 @task
 def install_git_project(git_branch, working_directory, git_address, external):
-
     if not exists('%s' % working_directory):
         run('git clone %s %s' % (git_address, working_directory))
 
@@ -36,7 +36,6 @@ def install_git_project(git_branch, working_directory, git_address, external):
                 run('cmake .')
             run('make')
             with warn_only():
-                sudo('apt install p7zip-full -y')
                 run('7za -y x \"*.7z\"')
 
 
@@ -88,6 +87,75 @@ def run_protocol(config_file, args):
                     else:
                         put('InstancesConfigurations/parties.conf', run('pwd'))
                     run('./%s partyID %s %s' % (executable_name[idx], party_id, values_str))
+                else:
+                    with cd('MATRIX'):
+                        print(env.hosts.index(env.host))
+                        if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
+                            print('***********************')
+                            coordinator_executable = data['coordinatorExecutable']
+                            coordinator_args = data['coordinatorConfig'].split('@')
+                            coordinator_values_str = ''
+
+                            for coordinator_val in coordinator_args:
+                                coordinator_values_str += '%s ' % coordinator_val
+                                sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % coordinator_executable)
+                            run('./%s %s' % (coordinator_executable, coordinator_values_str))
+                        else:
+                                if len(regions) > 1:
+                                    put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
+                                    put('InstancesConfigurations/party%s/*' % (party_id - 1), run('pwd'))
+                                    run('mv parties%s.conf parties.conf' % party_id)
+                                else:
+                                    put('InstancesConfigurations/parties.conf', run('pwd'))
+
+                                run('. ./%s %s %s' % (executable_name[idx], party_id - 1, values_str))
+
+
+@task
+def run_protocol_profiler(config_file, args):
+    with open(config_file) as data_file:
+
+        data = json.load(data_file, object_pairs_hook=OrderedDict)
+        executable_name = list(data['executableName'].values())
+        working_directory = list(data['workingDirectory'].values())
+        external_protocol = data['isExternal']
+        regions = list(data['regions'].values())
+        vals = args.split('@')
+        values_str = ''
+
+        for val in vals:
+            # for external protocols
+            if val == 'partyid':
+                values_str += '%s ' % str(env.hosts.index(env.host) - 1)
+            else:
+                values_str += '%s ' % val
+
+        for idx in range(len(working_directory)):
+            with cd(working_directory[idx]):
+
+                if env.user == 'root':
+                    party_id = env.hosts.index('root@%s' % env.host)
+                else:
+                    party_id = env.hosts.index(env.host)
+
+                with warn_only():
+                    sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name[idx])
+
+                if 'inputs0' in values_str:
+                    values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
+
+                if external_protocol == 'False':
+                    if len(regions) > 1:
+                        put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
+                        run('mv parties%s.conf parties.conf' % party_id)
+                    else:
+                        put('InstancesConfigurations/parties.conf', run('pwd'))
+                    if party_id == 0:
+                        run('valgrind --tool=callgrind ./%s partyID %s %s'
+                            % (executable_name[idx], party_id, values_str))
+                        get('callgrind.out.*', os.getcwd())
+                    else:
+                        run('./%s partyID %s %s' % (executable_name[idx], party_id, values_str))
 
                 else:
                     if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
