@@ -26,7 +26,7 @@ class Analyze:
 
     def download_data(self):
         remote_directory = list(self.protocol_config['workingDirectory'].values())
-        is_external = self.protocol_config['isExternal']
+        is_external = json.loads(self.protocol_config['isExternal'].lower())
 
         for dir in remote_directory:
             results_path = self.protocol_config['resultsDirectory']
@@ -165,9 +165,6 @@ class Analyze:
     def analyze_all(self):
         results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
         self.analyze_cpu(results_path)
-        self.analyze_comm_sent(results_path)
-        self.analyze_comm_received(results_path)
-        self.analyze_memory(results_path)
         to_send = input('Do you want to send the results to email? (y/n):')
         if to_send == 'y':
             self.send_email()

@@ -1,50 +1,38 @@
 {
   "protocol":"NEC",
-  "numOfParties":
+  "CloudProviders":
   {
-    "size_0":4
+    "aws":
+    {
+      "numOfParties":4,
+      "instanceType":"c4.large",
+      "spotPrice": 0.07,
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["master"],
+        "gitAddress": ["https://github.com/cryptobiu/NEC.git"]
+      }
+    }
   },
-  "gitAddress":
-  {
-    "address_0": "https://github.com/cryptobiu/NEC.git"
-  },
-  "aWSInstType": "c4.large",
-  "aWWSBidPrice": "0.07",
-  "executableName":
-  {
-    "executable_0":"MPCServerApp.out"
-  },
+  "executableName": ["MPCServerApp.out"],
   "configurations":
-  {
-    "conf_0": "-groupID@0@-partiesFile@parties.conf@-circuitFile@NecAes.txt@-internalIterationsNumber@1@"
-  },
+  [
+    "-groupID@0@-partiesFile@parties.conf@-circuitFile@NecAes.txt@-internalIterationsNumber@1@"
+  ],
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
-  "isSpotRequest": "True",
-  "gitBranch":
-  {
-    "branch_0": "master"
-  },
-  "IsPublished": "False",
-  "isExternal": "False",
-  "regions":
-  {
-    "region_0":"us-east-1b"
-  },
+  "IsPublished": "false",
+  "isExternal": "false",
   "workingDirectory":
-  {
-    "workingDirectory_0": "~/NEC/"
-  },
+  ["~/NEC/"],
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
-  "emails":
-  {
-    "email_0": "liork.cryptobiu@gmail.com"
-  },
+  "emails": ["liork.cryptobiu@gmail.com"],
   "institute":"Bar Ilan Cyber Center",
   "coordinatorConfig":
-  {
-    "conf_0": "-groupID@0@-inputFile@CircuitInputs.txt@-partiesFile@parties.conf@-internalIterationsNumber@1@"
-  },
+  [
+    "-groupID@0@-inputFile@CircuitInputs.txt@-partiesFile@parties.conf@-internalIterationsNumber@1@"
+  ],
   "coordinatorExecutable":"KingServerApp.out"
 
 }

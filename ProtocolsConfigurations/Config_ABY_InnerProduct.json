@@ -1,44 +1,27 @@
 {
   "protocol": "ABY",
-  "numOfParties":
+  "CloudProviders":
   {
-    "size_0": 2
+    "aws":
+    {
+      "numOfParties":3,
+      "instanceType":"c5.large",
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["public"],
+        "gitAddress": ["https://github.com/cryptobiu/ABY.git"]
+      }
+    }
   },
-  "gitAddress":{
-    "address_0": "https://github.com/cryptobiu/ABY.git"
-  },
-
-  "aWSInstType": "c5.large",
-  "aWWSBidPrice": "0.031",
-  "executableName":
-  {
-    "executable_0": "run.sh"
-  },
-  "configurations":
-  {
-    "configuration_0": "-b@32"
-  },
+  "executableName": ["run.sh"],
+  "configurations": ["-b@32"],
   "numOfRepetitions": 1,
   "numOfInternalRepetitions": 1,
-  "isSpotRequest": "False",
-  "gitBranch":
-  {
-    "branch_0": "public"
-  },
-  "IsPublished": "False",
-  "isExternal": "True",
-  "regions":
-  {
-    "region_0":"us-east-1b"
-  },
-  "workingDirectory":
-  {
-    "workingDirectory_0": "~/ABY"
-  },
+  "IsPublished": "false",
+  "isExternal": "true",
+  "workingDirectory": ["~/ABY"],
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
-  "emails":
-  {
-    "email_0": "liork.cryptobiu@gmail.com"
-  },
+  "emails": ["liork.cryptobiu@gmail.com"],
   "institute": "Bar Ilan Cyber Center"
 }

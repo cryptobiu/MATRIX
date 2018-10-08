@@ -1,47 +1,34 @@
 {
   "protocol":"Semi-Honest-BMR",
-  "numOfParties":
+  "CloudProviders":
   {
-    "size_0":3
+    "aws":
+    {
+      "numOfParties":3,
+      "instanceType":"c4.large",
+      "spotPrice": 0.07,
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["experimentation"],
+        "gitAddress": ["https://github.com/cryptobiu/Semi-Honest-BMR.git"]
+      }
+    }
   },
-  "gitAddress":
-  {
-    "address_0": "https://github.com/cryptobiu/Semi-Honest-BMR.git"
-  },
-  "aWSInstType": "c4.large",
-  "aWWSBidPrice": "0.07",
-  "executableName":
-  {
-    "executable_0": "SemiHonestBMR"
-  },
+  "executableName": ["SemiHonestBMR"],
   "configurations":
-  {
-    "conf_0": "-circuitFile@3Party/AESout@-inputsFile@3Party/aesP0@-partiesFile@parties.conf@-key@3Party/aesP@-version@2",
-    "conf_1": "-circuitFile@3Party/AESout@-inputsFile@3Party/aesP0@-partiesFile@parties.conf@-key@3Party/aesP@-version@3",
-    "conf_2": "-circuitFile@3Party/AESout@-inputsFile@3Party/aesP0@-partiesFile@parties.conf@-key@3Party/aesP@-version@4"
-  },
+  [
+    "-circuitFile@3Party/AESout@-inputsFile@3Party/aesP0@-partiesFile@parties.conf@-key@3Party/aesP@-version@2",
+    "-circuitFile@3Party/AESout@-inputsFile@3Party/aesP0@-partiesFile@parties.conf@-key@3Party/aesP@-version@3",
+    "-circuitFile@3Party/AESout@-inputsFile@3Party/aesP0@-partiesFile@parties.conf@-key@3Party/aesP@-version@4"
+  ],
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
-  "isSpotRequest": "True",
-  "gitBranch":
-  {
-    "branch_0": "experimentation"
-  },
-  "IsPublished": "True",
-  "isExternal": "False",
-  "regions":
-  {
-    "region_0":"us-east-1b"
-  },
-  "workingDirectory":
-  {
-    "workingDirectory_0": "~/Semi-Honest-BMR"
-  },
+  "IsPublished": "true",
+  "isExternal": "false",
+  "workingDirectory": ["~/Semi-Honest-BMR"],
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
-  "emails":
-  {
-    "email_0":"liork.cryptobiu@gmail.com"
-  },
+  "emails": ["liork.cryptobiu@gmail.com"],
   "institute":"Bar Ilan Cyber Center"
 }
 

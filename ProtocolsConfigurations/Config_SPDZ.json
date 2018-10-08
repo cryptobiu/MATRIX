@@ -1,44 +1,32 @@
 {
   "protocol": "SPDZ",
-  "numOfParties":
+  "CloudProviders":
   {
-    "size_0": 4
+    "aws":
+    {
+      "numOfParties":4,
+      "instanceType":"c5.large",
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["matrix"],
+        "gitAddress": ["https://github.com/cryptobiu/SPDZ-2.git"]
+      }
+    }
   },
-  "gitAddress":
-  {
-    "address_0": "https://github.com/cryptobiu/SPDZ-2.git"
-  },
-  "aWSInstType": "c5.large",
-  "aWWSBidPrice": "0.031",
-  "executableName":
-  {
-    "executable_0": "run.sh"
-  },
-  "configurations": {
-    "configuration_0": "-lgp@61@-pn@39685@-h@34.207.176.134@demo"
-  },
+  "executableName":["run.sh"],
+  "configurations":
+  [
+    "-lgp@61@-pn@39685@-h@34.207.176.134@demo"
+  ],
   "coordinatorExecutable": "run.sh",
   "coordinatorConfig": "3@39685@",
   "numOfRepetitions": 1,
   "numOfInternalRepetitions": 1,
-  "isSpotRequest": "False",
-  "gitBranch":
-  {
-    "branch_0": "matrix"
-  },
-  "IsPublished": "False",
-  "isExternal": "True",
-  "regions":
-  {
-    "region_2":"us-east-1b"
-  },
-  "workingDirectory":
-  {
-    "workingDirectory_0": "~/SPDZ-2"
-  },
+  "IsPublished": "true",
+  "isExternal": "true",
+  "workingDirectory":["~/SPDZ-2"],
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
-  "emails": {
-    "email_0": "liork.cryptobiu@gmail.com"
-  },
+  "emails": ["liork.cryptobiu@gmail.com"],
   "institute": "Bar Ilan Cyber Center"
 }

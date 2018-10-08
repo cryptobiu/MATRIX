@@ -27,7 +27,7 @@ def install_git_project(git_branch, working_directory, git_address, external):
     with cd('%s' % working_directory):
         run('git pull')
         run('git checkout %s ' % git_branch)
-        if external == 'True':
+        if external == 'true':
             with cd('%s/MATRIX' % working_directory):
                 run('. ./build.sh')
         else:
@@ -50,12 +50,17 @@ def update_libscapi(branch):
 @task
 def run_protocol(config_file, args):
     with open(config_file) as data_file:
-
         data = json.load(data_file, object_pairs_hook=OrderedDict)
-        executable_name = list(data['executableName'].values())
-        working_directory = list(data['workingDirectory'].values())
-        external_protocol = data['isExternal']
-        regions = list(data['regions'].values())
+        executable_name = data['executableName']
+        working_directory = data['workingDirectory']
+        external_protocol = json.loads(data['isExternal'].lower())
+        if 'aws' in data['CloudProviders']:
+            regions = data['CloudProviders']['aws']['regions']
+        elif 'scaleway' in data['CloudProviders']:
+            regions = data['CloudProviders']['scaleway']['regions']
+        else:
+            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['scaleway']['regions']
+
         vals = args.split('@')
         values_str = ''
 
@@ -80,7 +85,7 @@ def run_protocol(config_file, args):
                 if 'inputs0' in values_str:
                     values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
 
-                if external_protocol == 'False':
+                if not external_protocol:
                     if len(regions) > 1:
                         put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
                         run('mv parties%s.conf parties.conf' % party_id)
@@ -88,10 +93,9 @@ def run_protocol(config_file, args):
                         put('InstancesConfigurations/parties.conf', run('pwd'))
                     run('./%s partyID %s %s' % (executable_name[idx], party_id, values_str))
                 else:
+                    # print(env.hosts.index(env.host))
                     with cd('MATRIX'):
-                        print(env.hosts.index(env.host))
                         if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
-                            print('***********************')
                             coordinator_executable = data['coordinatorExecutable']
                             coordinator_args = data['coordinatorConfig'].split('@')
                             coordinator_values_str = ''
@@ -101,25 +105,29 @@ def run_protocol(config_file, args):
                                 sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % coordinator_executable)
                             run('./%s %s' % (coordinator_executable, coordinator_values_str))
                         else:
-                                if len(regions) > 1:
-                                    put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                                    put('InstancesConfigurations/party%s/*' % (party_id - 1), run('pwd'))
-                                    run('mv parties%s.conf parties.conf' % party_id)
-                                else:
-                                    put('InstancesConfigurations/parties.conf', run('pwd'))
+                            if len(regions) > 1:
+                                put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
+                                put('InstancesConfigurations/party%s/*' % (party_id - 1), run('pwd'))
+                                run('mv parties%s.conf parties.conf' % party_id)
+                            else:
+                                put('InstancesConfigurations/parties.conf', run('pwd'))
 
-                                run('. ./%s %s %s' % (executable_name[idx], party_id - 1, values_str))
+                            run('. ./%s %s %s' % (executable_name[idx], party_id - 1, values_str))
 
 
 @task
 def run_protocol_profiler(config_file, args):
     with open(config_file) as data_file:
-
         data = json.load(data_file, object_pairs_hook=OrderedDict)
-        executable_name = list(data['executableName'].values())
-        working_directory = list(data['workingDirectory'].values())
-        external_protocol = data['isExternal']
-        regions = list(data['regions'].values())
+        executable_name = data['executableName']
+        working_directory = data['workingDirectory']
+        external_protocol = json.loads(data['isExternal'].lower())
+        if 'aws' in data['CloudProviders']:
+            regions = data['CloudProviders']['aws']['regions']
+        elif 'scaleway' in data['CloudProviders']:
+            regions = data['CloudProviders']['scaleway']['regions']
+        else:
+            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['scaleway']['regions']
         vals = args.split('@')
         values_str = ''
 
@@ -144,7 +152,7 @@ def run_protocol_profiler(config_file, args):
                 if 'inputs0' in values_str:
                     values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
 
-                if external_protocol == 'False':
+                if not external_protocol:
                     if len(regions) > 1:
                         put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
                         run('mv parties%s.conf parties.conf' % party_id)
@@ -156,6 +164,8 @@ def run_protocol_profiler(config_file, args):
                         get('callgrind.out.*', os.getcwd())
                     else:
                         run('./%s partyID %s %s' % (executable_name[idx], party_id, values_str))
+                        with open('Execution/execution_log.log', 'a+') as log_file:
+                            log_file.write('%s\n' % values_str)
 
                 else:
                     if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
@@ -167,6 +177,8 @@ def run_protocol_profiler(config_file, args):
                             coordinator_values_str += '%s ' % coordinator_val
                             sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % coordinator_executable)
                         run('./%s %s' % (coordinator_executable, coordinator_values_str))
+                        with open('Execution/execution_log.log', 'a+') as log_file:
+                            log_file.write('%s\n' % values_str)
 
                     else:
                         with cd('MATRIX'):
@@ -178,12 +190,14 @@ def run_protocol_profiler(config_file, args):
                                 put('InstancesConfigurations/parties.conf', run('pwd'))
 
                             run('. ./%s %s %s' % (executable_name[idx], party_id, values_str))
+                            with open('Execution/execution_log.log', 'a+') as log_file:
+                                log_file.write('%s\n' % values_str)
 
 
 @task
 def collect_results(results_server_directory, results_local_directory, is_external):
     local('mkdir -p %s' % results_local_directory)
-    if is_external == 'False':
+    if not is_external:
         get('%s/*.json' % results_server_directory, results_local_directory)
     else:
         get('%s/MATRIX/logs/*.log' % results_server_directory, results_local_directory)

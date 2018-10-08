@@ -26,7 +26,7 @@ class ScalewayCP(DeployCP):
               'Please refer to Scaleway Web UI at https://cloud.scaleway.com/#/credentials')
 
     def create_security_group(self):
-        regions = list(self.protocol_config['regions'].values())
+        regions = self.protocol_config['CloudProviders']['scaleway']['regions']
         for idx in range(len(regions)):
             api = ComputeAPI(auth_token=self.token, region=regions[idx])
             api.query().security_groups.post({
@@ -42,17 +42,17 @@ class ScalewayCP(DeployCP):
     def deploy_instances(self):
 
         protocol_name = self.protocol_config['protocol']
-        machine_type = self.protocol_config['aWSInstType']
-        regions = list(self.protocol_config['regions'].values())
-        number_of_parties = list(self.protocol_config['numOfParties'].values())
+        machine_type = self.protocol_config['CloudProviders']['scaleway']['instanceType']
+        regions = self.protocol_config['CloudProviders']['scaleway']['regions']
+        number_of_parties = self.protocol_config['CloudProviders']['scaleway']['numOfParties']
         number_duplicated_servers = 0
 
         if len(regions) > 1:
-            number_of_instances = max(number_of_parties) // len(regions)
-            if max(number_of_parties) % len(regions):
-                number_duplicated_servers = max(number_of_parties) % len(regions)
+            number_of_instances = number_of_parties // len(regions)
+            if number_of_parties % len(regions):
+                number_duplicated_servers = number_of_parties % len(regions)
         else:
-            number_of_instances = max(number_of_parties)
+            number_of_instances = number_of_parties
 
         for idx in range(len(regions)):
             api = ComputeAPI(auth_token=self.token, region=regions[idx])
@@ -66,21 +66,23 @@ class ScalewayCP(DeployCP):
             print('Deploying instances :\nregion : %s\nnumber of instances : %s\ninstance_type : %s\n'
                   % (regions[idx], number_of_instances_to_deploy, machine_type))
             for idx2 in range(number_of_instances_to_deploy):
+                try:
+                    res = api.query().servers.post({
+                        'name': protocol_name,
+                        'organization': self.account_id,
+                        'image': 'c0d8477f-ce8c-4219-9523-e0338ed1d5d1',
+                        'commercial_type': machine_type
+                    })
+                    server_id = res['server']['id']
+                    api.query().servers(server_id).action.post({'action': 'poweron'})
+                except Exception as e:
+                    print(e.with_traceback())
 
-                res = api.query().servers.post({
-                    'name': protocol_name,
-                    'organization': self.account_id,
-                    'image': 'c0d8477f-ce8c-4219-9523-e0338ed1d5d1',
-                    'commercial_type': machine_type
-                })
-                server_id = res['server']['id']
-                api.query().servers(server_id).action.post({'action': 'poweron'})
-
-        time.sleep(600)
+        time.sleep(number_of_instances_to_deploy * 30)
         self.get_network_details()
 
-    def get_network_details(self, port_number=8000, file_name='parties.conf'):
-        regions = list(self.protocol_config['regions'].values())
+    def get_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
+        regions = self.protocol_config['CloudProviders']['scaleway']['regions']
         public_ip_address = []
         private_ip_address = []
         protocol_name = self.protocol_config['protocol']
@@ -92,12 +94,19 @@ class ScalewayCP(DeployCP):
                     public_ip_address.append(instance['public_ip']['address'])
                     private_ip_address.append(instance['private_ip'])
 
-        self.create_parties_file(private_ip_address, port_number, file_name, False)
+        if len(self.protocol_config['CloudProviders']) > 1:
+            self.create_parties_file(public_ip_address, port_number, file_name, new_format, len(regions))
+        else:
+            self.create_parties_file(private_ip_address, port_number, file_name, False)
 
-        # write public ips for fabric
-        with open('%s/InstancesConfigurations/public_ips' % os.getcwd(), 'w+') as ips_file:
-            for ip in public_ip_address:
-                ips_file.write('root@%s\n' % ip)
+        # write public ips to file for fabric
+        if len(self.protocol_config['CloudProviders']) > 1:
+            mode = 'a+'
+        else:
+            mode = 'w+'
+        with open('InstancesConfigurations/public_ips', mode) as public_ip_file:
+            for public_idx in range(len(public_ip_address)):
+                public_ip_file.write('root@%s\n' % public_ip_address[public_idx])
 
     def describe_instances(self, region_name, machines_name):
         api = ComputeAPI(region=region_name, auth_token=self.token)
@@ -110,7 +119,7 @@ class ScalewayCP(DeployCP):
 
     def check_running_instances(self, region, machine_type):
         protocol_name = self.protocol_config['protocol']
-        machine_type = self.protocol_config['aWSInstType']
+        machine_type = self.protocol_config['CloudProviders']['scaleway']['instanceType']
         number_of_instances = 0
 
         servers = self.describe_instances(region, protocol_name)
@@ -123,7 +132,7 @@ class ScalewayCP(DeployCP):
 
     def start_instances(self):
         protocol_name = self.protocol_config['protocol']
-        regions = list(self.protocol_config['regions'].values())
+        regions = self.protocol_config['CloudProviders']['scaleway']['regions']
 
         for region in regions:
             api = ComputeAPI(region=region, auth_token=self.token)
@@ -135,7 +144,7 @@ class ScalewayCP(DeployCP):
 
     def stop_instances(self):
         protocol_name = self.protocol_config['protocol']
-        regions = list(self.protocol_config['regions'].values())
+        regions = self.protocol_config['CloudProviders']['scaleway']['regions']
 
         for region in regions:
             api = ComputeAPI(region=region, auth_token=self.token)
@@ -145,12 +154,14 @@ class ScalewayCP(DeployCP):
                     server_id = server['id']
                     api.query().servers(server_id).action.post({'action': 'poweroff'})
 
-    def terminate(self):
+    def terminate_instances(self):
         self.stop_instances()
         protocol_name = self.protocol_config['protocol']
-        regions = list(self.protocol_config['regions'].values())
+        regions = self.protocol_config['CloudProviders']['scaleway']['regions']
+        number_of_instances = self.protocol_config['CloudProviders']['scaleway']['numOfParties']
 
-        time.sleep(300)
+        # Don't change the sleep duration, trust me I'm engineer
+        time.sleep(number_of_instances * 45)
 
         for region in regions:
             api = ComputeAPI(region=region, auth_token=self.token)

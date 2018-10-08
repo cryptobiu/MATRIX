@@ -1,45 +1,32 @@
 {
   "protocol":"MaliciousYaoBatch",
-  "numOfParties":
+  "CloudProviders":
   {
-    "size_0":2
+    "aws":
+    {
+      "numOfParties":2,
+      "instanceType":"c4.large",
+      "spotPrice": 0.07,
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["dev"],
+        "gitAddress": ["https://github.com/cryptobiu/libscapi.git"]
+      }
+    }
   },
-  "gitAddress":
-  {
-    "address_0": "https://github.com/cryptobiu/libscapi.git"
-  },
-  "aWSInstType": "c4.large",
-  "aWWSBidPrice": "0.07",
-  "executableName":
-  {
-    "executable_0": "AppOfflineP2.out"
-  },
+  "executableName":["AppOfflineP2.out"],
   "preProcessTask": "2",
   "configurations":
-  {
-    "conf_0": "-circuitFile@/lib/assets/circuits/AES/NigelAes.txt@-circuitCRFile@/lib/assets/circuits/CheatingRecovery/UnlockP1Input.txt@-bucketsPrefixMain@/lib/data/P2/aes@-bucketsPrefixCR@/lib/data/P2/cr@-mainMatrix@/lib/data/P2/aes.matrix@-crMatrix@/lib/data/P2/cr.matrix@-partiesFile@/lib/assets/conf/PartiesConfig.txt@-n1@32@-b1@7@-s1@40@-p1@0.62@-n2@32@-b2@20@-s2@40@-p2@0.71"
-  },
+  [
+    "-circuitFile@/lib/assets/circuits/AES/NigelAes.txt@-circuitCRFile@/lib/assets/circuits/CheatingRecovery/UnlockP1Input.txt@-bucketsPrefixMain@/lib/data/P2/aes@-bucketsPrefixCR@/lib/data/P2/cr@-mainMatrix@/lib/data/P2/aes.matrix@-crMatrix@/lib/data/P2/cr.matrix@-partiesFile@/lib/assets/conf/PartiesConfig.txt@-n1@32@-b1@7@-s1@40@-p1@0.62@-n2@32@-b2@20@-s2@40@-p2@0.71"
+  ],
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
-  "isSpotRequest": "True",
-  "gitBranch":
-  {
-    "branch_0": "dev"
-  },
-  "IsPublished": "True",
-  "isExternal": "False",
-  "regions":
-  {
-    "region_0":"us-east-1b"
-  },
-  "workingDirectory":
-  {
-    "workingDirectory_0": "~/libscapi/protocols/MaliciousYaoBatch/"
-  },
+  "IsPublished": "true",
+  "isExternal": "false",
+  "workingDirectory":["~/libscapi/protocols/MaliciousYaoBatch/"],
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
-  "emails":
-  {
-    "email_0": "liork.cryptobiu@gmail.com"
-  },
+  "emails":["liork.cryptobiu@gmail.com"],
   "institute":"Bar Ilan Cyber Center"
 }

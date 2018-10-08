@@ -15,10 +15,10 @@ class E2E:
                   % (working_directory, pre_process_task))
 
     def install_experiment(self):
-        working_directory = list(self.protocol_config['workingDirectory'].values())
+        working_directory = self.protocol_config['workingDirectory']
         external_protocol = self.protocol_config['isExternal']
-        git_address = list(self.protocol_config['gitAddress'].values())
-        git_branch = list(self.protocol_config['gitBranch'].values())
+        git_address = self.protocol_config['CloudProviders']['aws']['git']['gitAddress']
+        git_branch = self.protocol_config['CloudProviders']['aws']['git']['gitBranch']
 
         for idx in range(len(working_directory)):
             os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s --parallel'
@@ -26,17 +26,15 @@ class E2E:
 
     def execute_experiment(self):
         number_of_repetitions = self.protocol_config['numOfRepetitions']
-        configurations = list(self.protocol_config['configurations'].values())
+        configurations = self.protocol_config['configurations']
         for i in range(number_of_repetitions):
             for idx in range(len(configurations)):
                 os.system('fab -f Execution/fabfile.py run_protocol:%s,%s --parallel'
                           % (self.protocol_config_path, configurations[idx]))
-                with open('Execution/execution_log.log', 'a+') as log_file:
-                    log_file.write('%s\n' % configurations[idx])
 
     def execute_experiment_callgrind(self):
         number_of_repetitions = self.protocol_config['numOfRepetitions']
-        configurations = list(self.protocol_config['configurations'].values())
+        configurations = self.protocol_config['configurations']
         for i in range(number_of_repetitions):
             for idx in range(len(configurations)):
                 os.system('fab -f Execution/fabfile.py run_protocol_profiler:%s,%s --parallel'

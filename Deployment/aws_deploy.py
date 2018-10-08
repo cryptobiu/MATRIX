@@ -18,7 +18,7 @@ class AmazonCP(DeployCP):
         super(AmazonCP, self).__init__(protocol_config)
 
     def create_key_pair(self):
-        regions = list(self.protocol_config['regions'].values())
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
 
         for regions_idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[regions_idx][:-1])
@@ -37,7 +37,7 @@ class AmazonCP(DeployCP):
                 print(e.response['Error']['Message'].upper())
 
     def create_security_group(self):
-        regions = list(self.protocol_config['regions'].values())
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
 
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
@@ -79,26 +79,29 @@ class AmazonCP(DeployCP):
         return response['Images'][0]['BlockDeviceMappings'][0]['Ebs']['VolumeSize']
 
     def deploy_instances(self):
-        regions = list(self.protocol_config['regions'].values())
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
         if 'local' in regions or 'servers' in regions:
             self.get_network_details()
         else:
-            machine_type = self.protocol_config['aWSInstType']
-            price_bids = self.protocol_config['aWWSBidPrice']
-            number_of_parties = list(self.protocol_config['numOfParties'].values())
+            machine_type = self.protocol_config['CloudProviders']['aws']['instanceType']
+            if 'spotPrice' in self.protocol_config['CloudProviders']['aws']:
+                spot_request = True
+                price_bids = self.protocol_config['CloudProviders']['aws']['spotPrice']
+            else:
+                spot_request = False
+            number_of_parties = self.protocol_config['CloudProviders']['aws']['numOfParties']
             number_duplicated_servers = 0
-            spot_request = self.protocol_config['isSpotRequest']
             protocol_name = self.protocol_config['protocol']
     
             with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
                 global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
     
             if len(regions) > 1:
-                number_of_instances = max(number_of_parties) // len(regions)
-                if max(number_of_parties) % len(regions):
-                    number_duplicated_servers = max(number_of_parties) % len(regions)
+                number_of_instances = number_of_parties // len(regions)
+                if number_of_parties % len(regions):
+                    number_duplicated_servers = number_of_parties % len(regions)
             else:
-                number_of_instances = max(number_of_parties)
+                number_of_instances = number_of_parties
     
             date = datetime.now() - timedelta(hours=3)
             print('Current date : \n%s' % str(date))
@@ -119,15 +122,15 @@ class AmazonCP(DeployCP):
                                             global_config[regions[idx][:-1]]["ami"], machine_type, str(new_date)))
     
                 if number_of_instances_to_deploy > 0:
-                    if spot_request == 'True':
+                    if spot_request:
                         # check if price isn't too low
                         winning_bid_price = self.check_latest_price(machine_type, regions[idx])
-                        if float(price_bids) > float(winning_bid_price):
+                        if price_bids > float(winning_bid_price):
                             price_bids = str(winning_bid_price)
                         try:
                             response = client.request_spot_instances(
                                     DryRun=False,
-                                    SpotPrice=price_bids,
+                                    SpotPrice=str(price_bids),
                                     InstanceCount=number_of_instances_to_deploy,
                                     ValidUntil=new_date,
                                     LaunchSpecification=
@@ -195,17 +198,17 @@ class AmazonCP(DeployCP):
                                             }]
                         )
     
-            print('Waiting for the images to be deployed..')
-            time.sleep(240)
-            self.get_aws_network_details()
+                    print('Waiting for the images to be deployed..')
+                    time.sleep(240)
+            self.get_network_details()
 
         print('Finished to deploy machines')
 
-    def get_aws_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
-        regions = list(self.protocol_config['regions'].values())
-        is_spot_request = self.protocol_config['isSpotRequest']
-        coordinator_exists = 'coordinatorprotocol_configig' in self.protocol_config
-        instance_type = self.protocol_config['aWSInstType']
+    def get_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        is_spot_request = 'spotPrice' in self.protocol_config['CloudProviders']['aws']
+        coordinator_exists = 'coordinatorConfig' in self.protocol_config
+        instance_type = self.protocol_config['CloudProviders']['aws']['instanceType']
         protocol_name = self.protocol_config['protocol']
 
         instances_ids = []
@@ -215,7 +218,7 @@ class AmazonCP(DeployCP):
         # get the spot instances ids
         for idx in range(len(regions)):
             client = boto3.client('ec2', region_name=regions[idx][:-1])
-            if is_spot_request == 'True':
+            if is_spot_request:
                 response = client.describe_instances(Filters=[{'Name': 'instance-lifecycle', 'Values': ['spot']},
                                                               {'Name': 'instance-type', 'Values': [instance_type]},
                                                               {'Name': 'tag:Name', 'Values': [protocol_name]}])
@@ -246,19 +249,24 @@ class AmazonCP(DeployCP):
         if len(regions) > 1:
             shuffle(public_ip_address)
             self.create_parties_file(public_ip_address, port_number, file_name, new_format, len(regions))
+        elif len(self.protocol_config['CloudProviders']) > 1:
+            self.create_parties_file(public_ip_address, port_number, file_name, new_format, len(regions))
         else:
             self.create_parties_file(private_ip_address, port_number, file_name,  new_format, len(regions))
 
         # write public ips to file for fabric
-        if 'local' in regions or 'server' not in regions:
-            with open('InstancesConfigurations/public_ips', 'w+') as public_ip_file:
-                for public_idx in range(len(public_ip_address)):
-                    public_ip_file.write('%s\n' % public_ip_address[public_idx])
+        if len(self.protocol_config['CloudProviders']) > 1:
+            mode = 'a+'
+        else:
+            mode = 'w+'
+        with open('InstancesConfigurations/public_ips', mode) as public_ip_file:
+            for public_idx in range(len(public_ip_address)):
+                public_ip_file.write('%s\n' % public_ip_address[public_idx])
 
     def describe_instances(self, region_name, machines_name):
         client = boto3.client('ec2', region_name=region_name)
-        is_spot_request = self.protocol_config['isSpotRequest']
-        if is_spot_request == 'True':
+        is_spot_request = 'spotPrice' in self.protocol_config['CloudProviders']['aws']
+        if is_spot_request:
             response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [machines_name]},
                                                           {'Name': 'instance-lifecycle', 'Values': ['spot']}])
         else:
@@ -291,7 +299,7 @@ class AmazonCP(DeployCP):
         return ready_instances
 
     def start_instances(self):
-        regions = list(self.protocol_config['regions'].values())
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
         machines_name = self.protocol_config['protocol']
 
         for idx in range(len(regions)):
@@ -302,7 +310,7 @@ class AmazonCP(DeployCP):
             client.start_instances(InstanceIds=instances)
 
     def stop_instances(self):
-        regions = list(self.protocol_config['regions'].values())
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
         machines_name = self.protocol_config['protocol']
 
         for idx in range(len(regions)):
@@ -313,7 +321,7 @@ class AmazonCP(DeployCP):
             client.stop_instances(InstanceIds=instances)
 
     def change_instance_types(self):
-        regions = list(self.protocol_config['regions'].values())
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
         protocol_name = self.protocol_config['protocol']
         instance_type = self.protocol_config['aWSInstType']
 
@@ -334,8 +342,8 @@ class AmazonCP(DeployCP):
             # Start the instance
             client.start_instances(InstanceIds=instances)
 
-    def terminate(self):
-        regions = list(self.protocol_config['regions'].values())
+    def terminate_instances(self):
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
         machines_name = self.protocol_config['protocol']
 
         for idx in range(len(regions)):

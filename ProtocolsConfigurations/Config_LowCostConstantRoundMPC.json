@@ -1,45 +1,32 @@
 {
   "protocol":"LowCostConstantRoundMPC",
-  "numOfParties":
+  "CloudProviders":
   {
-    "size_0":3
+    "aws":
+    {
+      "numOfParties":3,
+      "instanceType":"c4.large",
+      "spotPrice": 0.07,
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["master"],
+        "gitAddress": ["https://github.com/cryptobiu/LowCostConstantRoundMPC.git"]
+      }
+    }
   },
-  "gitAddress":
-  {
-    "address_0": "https://github.com/cryptobiu/LowCostConstantRoundMPC.git"
-  },
-  "aWSInstType": "c4.large",
-  "aWWSBidPrice": "0.07",
-  "executableName":
-  {
-    "executable_0": "LowCostConstantRoundMPC"
-  },
+  "executableName": ["LowCostConstantRoundMPC"],
   "configurations":
-  {
-    "conf_0": "-circuitFile@NigelAes3Parties.txt@-partiesFile@parties.conf@-inputsFile@AesInputs0.txt@-numThreads@2@-B@3@-internalIterationsNumber@1"
-  },
+  [
+    "-circuitFile@NigelAes3Parties.txt@-partiesFile@parties.conf@-inputsFile@AesInputs0.txt@-numThreads@2@-B@3@-internalIterationsNumber@1"
+  ],
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
-  "isSpotRequest": "True",
-  "gitBranch":
-  {
-    "branch_0": "master"
-  },
-  "IsPublished": "True",
-  "isExternal": "False",
-  "regions":
-  {
-    "region_0":"us-east-1b"
-  },
-  "workingDirectory":
-  {
-    "workingDirectory_0": "~/LowCostConstantRoundMPC"
-  },
+  "IsPublished": "true",
+  "isExternal": "false",
+  "workingDirectory": ["~/LowCostConstantRoundMPC"],
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
-  "emails":
-  {
-    "email_0": "liork.cryptobiu@gmail.com"
-  },
+  "emails": ["liork.cryptobiu@gmail.com"],
   "institute":"Bar Ilan Cyber Center"
 }
 

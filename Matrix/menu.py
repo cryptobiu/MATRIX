@@ -6,6 +6,7 @@ from collections import OrderedDict
 from Deployment import deploy as de
 from Deployment import aws_deploy as awsde
 from Deployment import scaleway_deploy as sde
+from Deployment import multi_cp_deploy as mde
 from Execution import end_to_end as e2e
 from Reporting import analyze_results as ar
 from Reporting import upload_elastic as ue
@@ -37,7 +38,7 @@ class MatrixMenu:
 
     cloud_provider_menu_desc = (
         'Choose cloud provider',
-        ['AWS', 'Scaleway', 'Return'],
+        ['AWS', 'Scaleway', 'Both', 'Return'],
         'blue')
 
     deploy_menu_desc = (
@@ -198,6 +199,9 @@ class MatrixMenu:
             deploy = sde.ScalewayCP(self.protocol_config)
             menu_color = 'magenta'
         elif cp == 3:
+            deploy = mde.MultiCP(self.protocol_config)
+            menu_color = 'blue'
+        elif cp == 4:
             return
 
         selection = self.print_menu(*self.deploy_menu_desc, menu_color)
@@ -211,7 +215,7 @@ class MatrixMenu:
         elif selection == 4:
             deploy.get_network_details()
         elif selection == 5:
-            deploy.terminate()
+            deploy.terminate_instances()
         elif selection == 6:
             deploy.change_instance_types()
         elif selection == 7:
