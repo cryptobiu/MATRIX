@@ -112,7 +112,7 @@ def run_protocol(config_file, args, executable_name, working_directory):
                         else:
                             put('InstancesConfigurations/parties.conf', run('pwd'))
 
-                        run('. ./%s %s %s' % (executable_name, party_id - 1, values_str))
+                        run('. ./%s %s %s' % (executable_name, party_id, values_str))
                         with open('Execution/execution_log.log', 'a+') as log_file:
                             log_file.write('%s\n' % values_str)
 
