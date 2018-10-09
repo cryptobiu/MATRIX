@@ -30,8 +30,8 @@ class E2E:
         working_directory = self.protocol_config['workingDirectory']
         executables = self.protocol_config['executableName']
         for i in range(number_of_repetitions):
-            for idx in range(len(executables)):
-                for idx2 in range(len(configurations)):
+            for idx2 in range(len(configurations)):
+                for idx in range(len(executables)):
                     os.system('fab -f Execution/fabfile.py run_protocol:%s,%s,%s,%s --parallel'
                               % (self.protocol_config_path, configurations[idx2],
                                  executables[idx], working_directory[idx]))
@@ -42,8 +42,8 @@ class E2E:
         working_directory = self.protocol_config['workingDirectory']
         executables = self.protocol_config['executableName']
         for i in range(number_of_repetitions):
-            for idx in range(len(executables)):
-                for idx2 in range(len(configurations)):
+            for idx2 in range(len(configurations)):
+                for idx in range(len(executables)):
                     os.system('fab -f Execution/fabfile.py run_protocol_profiler:%s,%s,%s,%s --parallel'
                               % (self.protocol_config_path, configurations[idx2],
                                  executables[idx], working_directory[idx]))
