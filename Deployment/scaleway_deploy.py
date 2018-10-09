@@ -70,15 +70,15 @@ class ScalewayCP(DeployCP):
                     res = api.query().servers.post({
                         'name': protocol_name,
                         'organization': self.account_id,
-                        'image': 'c0d8477f-ce8c-4219-9523-e0338ed1d5d1',
+                        'image': '9a6253b0-d03c-44c9-a151-e647f82760e6',
                         'commercial_type': machine_type
                     })
                     server_id = res['server']['id']
                     api.query().servers(server_id).action.post({'action': 'poweron'})
                 except Exception as e:
-                    print(e.with_traceback())
+                    print(e.__traceback__)
 
-        time.sleep(number_of_instances_to_deploy * 30)
+        time.sleep(number_of_instances_to_deploy * 15)
         self.get_network_details()
 
     def get_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
@@ -161,7 +161,7 @@ class ScalewayCP(DeployCP):
         number_of_instances = self.protocol_config['CloudProviders']['scaleway']['numOfParties']
 
         # Don't change the sleep duration, trust me I'm engineer
-        time.sleep(number_of_instances * 45)
+        time.sleep(number_of_instances * 15)
 
         for region in regions:
             api = ComputeAPI(region=region, auth_token=self.token)
