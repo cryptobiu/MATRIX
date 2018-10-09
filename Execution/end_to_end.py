@@ -27,20 +27,26 @@ class E2E:
     def execute_experiment(self):
         number_of_repetitions = self.protocol_config['numOfRepetitions']
         configurations = self.protocol_config['configurations']
+        working_directory = self.protocol_config['workingDirectory']
+        executables = self.protocol_config['executableName']
         for i in range(number_of_repetitions):
-            for idx in range(len(configurations)):
-                os.system('fab -f Execution/fabfile.py run_protocol:%s,%s --parallel'
-                          % (self.protocol_config_path, configurations[idx]))
+            for idx in range(len(executables)):
+                for idx2 in range(len(configurations)):
+                    os.system('fab -f Execution/fabfile.py run_protocol:%s,%s,%s,%s --parallel'
+                              % (self.protocol_config_path, configurations[idx2],
+                                 executables[idx], working_directory[idx]))
 
     def execute_experiment_callgrind(self):
         number_of_repetitions = self.protocol_config['numOfRepetitions']
         configurations = self.protocol_config['configurations']
+        working_directory = self.protocol_config['workingDirectory']
+        executables = self.protocol_config['executableName']
         for i in range(number_of_repetitions):
-            for idx in range(len(configurations)):
-                os.system('fab -f Execution/fabfile.py run_protocol_profiler:%s,%s --parallel'
-                          % (self.protocol_config_path, configurations[idx]))
-                with open('Execution/execution_log.log', 'a+') as log_file:
-                    log_file.write('%s\n' % configurations[idx])
+            for idx in range(len(executables)):
+                for idx2 in range(len(configurations)):
+                    os.system('fab -f Execution/fabfile.py run_protocol_profiler:%s,%s,%s,%s --parallel'
+                              % (self.protocol_config_path, configurations[idx2],
+                                 executables[idx], working_directory[idx]))
 
     @staticmethod
     def update_libscapi():

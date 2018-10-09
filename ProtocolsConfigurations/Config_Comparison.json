@@ -69,9 +69,9 @@
   ],
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
-  "IsPublished": "False",
-  "isExternal": "False",
-  "workingDirectory": ["~/MPCHonestMajorityNoTriplesYehuda", "HyperMPC", "MPCHonestMajorityNoTriples"],
+  "IsPublished": "false",
+  "isExternal": "false",
+  "workingDirectory": ["~/MPCHonestMajorityNoTriplesYehuda", "~/HyperMPC", "~/MPCHonestMajorityNoTriples"],
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
   "emails":
   [
