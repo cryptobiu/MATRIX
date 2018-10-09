@@ -23,8 +23,8 @@ class MultiCP:
         self.scaleway.stop_instances()
 
     def terminate_instances(self):
-        # self.aws.terminate_instances()
-        # self.scaleway.terminate_instances()
+        self.aws.terminate_instances()
+        self.scaleway.terminate_instances()
 
         try:
             cwd = os.getcwd()
