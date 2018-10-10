@@ -53,7 +53,7 @@ To install under Arch Linux:
 
 After You installed Python 3 and pip3 you will need to install the modules MATRIX uses. To install this three modules use pip3
 
-`pip3 install --user openpyxl fabric<2.0 fabric3 boto3 colorama certifi elasticsearch scaleway-sdk`
+`pip3 install --user openpyxl 'fabric<2.0' fabric3 boto3 colorama certifi elasticsearch scaleway-sdk`
 
 **NOTE**: on some computers the following error may appear: `locale.Error: unsupported locale setting`
 To fix it, run:
