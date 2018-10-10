@@ -25,7 +25,7 @@ class Analyze:
         self.style1 = NamedStyle(number_format='#.##')
 
     def download_data(self):
-        remote_directory = list(self.protocol_config['workingDirectory'].values())
+        remote_directory = self.protocol_config['workingDirectory']
         is_external = json.loads(self.protocol_config['isExternal'].lower())
 
         for dir in remote_directory:
