@@ -2,7 +2,7 @@ import os
 import json
 import certifi
 from glob import glob
-from os.path import basename
+from os.path import basename, expanduser
 from datetime import datetime
 from collections import OrderedDict
 from elasticsearch import Elasticsearch
@@ -10,8 +10,8 @@ from elasticsearch import Elasticsearch
 
 class Elastic:
     def __init__(self, conf_file):
-        self.config_file_path = conf_file
-        self.es = Elasticsearch('localhost',
+        self.config_file = conf_file
+        self.es = Elasticsearch('https://search-escryptobiu-fyopgg3zepk6dtda4zerc53apy.us-east-1.es.amazonaws.com',
                                 use_ssl=True, ca_certs=certifi.where())
 
     def delete_index(self, index_name):
@@ -72,23 +72,24 @@ class Elastic:
 
     def upload_json_data(self, analysis_type, results_path):
 
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file, object_pairs_hook=OrderedDict)
-            raw_configurations = list(data['configurations'].values())[0].split('@')
-            del raw_configurations[1::2]
-            raw_configurations = [rc[1:] for rc in raw_configurations]
-            raw_configurations.insert(0, 'partyId')
-            raw_configurations.insert(0, 'protocolName')
+        raw_configurations = self.config_file['configurations'][0].split('@')
+        # delete values, only the parameters are left
+        del raw_configurations[1::2]
+        raw_configurations = [rc[1:] for rc in raw_configurations]
+        raw_configurations.insert(0, 'partyId')
+        raw_configurations.insert(0, 'protocolName')
 
         dts = datetime.utcnow()
+        # results_path += '/*%s*.json' % analysis_type
         results_files = glob('%s/*%s*.json' % (results_path, analysis_type))
-        for results_file in results_files:
-            config_values = basename(results_file).split('*')
+        for file in results_files:
+            config_values = basename(file).split('*')
+            # remove the json extension
             config_values[-1] = config_values[-1][:-5]
             analyzed_parameter = config_values[1].lower()
             del config_values[1]
 
-            with open(results_file) as results:
+            with open(file) as results:
                 data = json.load(results, object_pairs_hook=OrderedDict)
                 doc = OrderedDict()
                 for idx in range(len(raw_configurations)):
@@ -106,13 +107,11 @@ class Elastic:
                               body=doc)
 
     def upload_log_data(self, results_path):
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file, object_pairs_hook=OrderedDict)
-            raw_configurations = list(data['configurations'].values())[0].split('@')
-            del raw_configurations[1::2]
-            raw_configurations = [rc[1:] for rc in raw_configurations]
-            raw_configurations.insert(0, 'partyId')
-            raw_configurations.insert(0, 'protocolName')
+        raw_configurations = self.config_file['configurations'].values()[0].split('@')
+        del raw_configurations[1::2]
+        raw_configurations = [rc[1:] for rc in raw_configurations]
+        raw_configurations.insert(0, 'partyId')
+        raw_configurations.insert(0, 'protocolName')
 
         dts = datetime.utcnow()
         results_files = glob('%s/*.log' % results_path)
@@ -121,16 +120,10 @@ class Elastic:
             config_values[-1] = config_values[-1][:-4]
 
     def upload_all_data(self):
-
-        with open(self.config_file_path) as data_file:
-            data = json.load(data_file, object_pairs_hook=OrderedDict)
-            if data['isExternal'] == 'False':
-                results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
-                self.upload_json_data('cpu', results_path)
-                self.upload_json_data('commReceived', results_path)
-                self.upload_json_data('commSent', results_path)
-                self.upload_json_data('memory', results_path)
-            else:
-                results_path = '/home/liork/ABY/build/bin'
-                self.upload_log_data(results_path)
+        is_external = json.loads(self.config_file['isExternal'].lower())
+        results_path = self.config_file['resultsDirectory']
+        if not is_external:
+            self.upload_json_data('cpu', results_path)
+        else:
+            self.upload_log_data(results_path)
 
