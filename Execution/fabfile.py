@@ -120,6 +120,12 @@ def run_protocol(config_file, args, executable_name, working_directory):
                                 log_file.write('%s\n' % values_str)
                     else:
                         # run external protocols with no coordinator
+                        if len(regions) > 1:
+                            put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
+                            put('InstancesConfigurations/party%s/*' % (party_id - 1), run('pwd'))
+                            run('mv parties%s.conf parties.conf' % party_id)
+                        else:
+                            put('InstancesConfigurations/parties.conf', run('pwd'))
                         run('. ./%s %s %s' % (executable_name, party_id, values_str))
                         with open('Execution/execution_log.log', 'a+') as log_file:
                             log_file.write('%s\n' % values_str)
