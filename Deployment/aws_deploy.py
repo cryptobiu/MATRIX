@@ -65,7 +65,7 @@ class AmazonCP(DeployCP):
         prices = client.describe_spot_price_history(InstanceTypes=[instance_type], MaxResults=1,
                                                     ProductDescriptions=['Linux/UNIX (Amazon VPC)'],
                                                     AvailabilityZone=region)
-        return prices['SpotPriceHistory'][0]['SpotPrice']
+        return float(prices['SpotPriceHistory'][0]['SpotPrice'])
 
     @staticmethod
     def get_ami_disk_size(region_name):
@@ -125,12 +125,11 @@ class AmazonCP(DeployCP):
                     if spot_request:
                         # check if price isn't too low
                         winning_bid_price = self.check_latest_price(machine_type, regions[idx])
-                        if price_bids > float(winning_bid_price):
-                            price_bids = str(winning_bid_price)
+                        request_bid = min(price_bids, winning_bid_price)
                         try:
                             response = client.request_spot_instances(
                                     DryRun=False,
-                                    SpotPrice=str(price_bids),
+                                    SpotPrice=str(request_bid),
                                     InstanceCount=number_of_instances_to_deploy,
                                     ValidUntil=new_date,
                                     LaunchSpecification=
