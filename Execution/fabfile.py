@@ -27,7 +27,7 @@ def install_git_project(git_branch, working_directory, git_address, external):
     with cd('%s' % working_directory):
         run('git pull')
         run('git checkout %s ' % git_branch)
-        if external == 'true':
+        if external:
             with cd('%s/MATRIX' % working_directory):
                 run('. ./build.sh')
         else:
@@ -92,27 +92,35 @@ def run_protocol(config_file, args, executable_name, working_directory):
                 with open('Execution/execution_log.log', 'a+') as log_file:
                     log_file.write('%s\n' % values_str)
             else:
+                # run external protocols
                 with cd('MATRIX'):
-                    if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
-                        coordinator_executable = data['coordinatorExecutable']
-                        coordinator_args = data['coordinatorConfig'].split('@')
-                        coordinator_values_str = ''
+                    if 'coordinatorConfig' in data:
+                        # run protocols  with coordinator
+                        if env.hosts.index(env.host) == 0:
+                            coordinator_executable = data['coordinatorExecutable']
+                            coordinator_args = data['coordinatorConfig'].split('@')
+                            coordinator_values_str = ''
 
-                        for coordinator_val in coordinator_args:
-                            coordinator_values_str += '%s ' % coordinator_val
-                            sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % coordinator_executable)
-                        run('./%s %s' % (coordinator_executable, coordinator_values_str))
-                        with open('Execution/execution_log.log', 'a+') as log_file:
-                            log_file.write('%s\n' % values_str)
-                    else:
-                        if len(regions) > 1:
-                            put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                            put('InstancesConfigurations/party%s/*' % (party_id - 1), run('pwd'))
-                            run('mv parties%s.conf parties.conf' % party_id)
+                            for coordinator_val in coordinator_args:
+                                coordinator_values_str += '%s ' % coordinator_val
+                                sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % coordinator_executable)
+                            run('./%s %s' % (coordinator_executable, coordinator_values_str))
+                            with open('Execution/execution_log.log', 'a+') as log_file:
+                                log_file.write('%s\n' % values_str)
                         else:
-                            put('InstancesConfigurations/parties.conf', run('pwd'))
+                            if len(regions) > 1:
+                                put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
+                                put('InstancesConfigurations/party%s/*' % (party_id - 1), run('pwd'))
+                                run('mv parties%s.conf parties.conf' % party_id)
+                            else:
+                                put('InstancesConfigurations/parties.conf', run('pwd'))
 
-                        run('. ./%s %s %s' % (executable_name, party_id - 1, values_str))
+                            run('. ./%s %s %s' % (executable_name, party_id - 1, values_str))
+                            with open('Execution/execution_log.log', 'a+') as log_file:
+                                log_file.write('%s\n' % values_str)
+                    else:
+                        # run external protocols with no coordinator
+                        run('. ./%s %s %s' % (executable_name, party_id, values_str))
                         with open('Execution/execution_log.log', 'a+') as log_file:
                             log_file.write('%s\n' % values_str)
 
@@ -165,32 +173,6 @@ def run_protocol_profiler(config_file, args, executable_name, working_directory)
                     run('./%s partyID %s %s' % (executable_name, party_id, values_str))
                     with open('Execution/execution_log.log', 'a+') as log_file:
                         log_file.write('%s\n' % values_str)
-
-            else:
-                if 'coordinatorConfig' in data and env.hosts.index(env.host) == 0:
-                    coordinator_executable = data['coordinatorExecutable']
-                    coordinator_args = data['coordinatorConfig'].split('@')
-                    coordinator_values_str = ''
-
-                    for coordinator_val in coordinator_args:
-                        coordinator_values_str += '%s ' % coordinator_val
-                        sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % coordinator_executable)
-                    run('./%s %s' % (coordinator_executable, coordinator_values_str))
-                    with open('Execution/execution_log.log', 'a+') as log_file:
-                        log_file.write('%s\n' % values_str)
-
-                else:
-                    with cd('MATRIX'):
-                        if len(regions) > 1:
-                            put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                            put('InstancesConfigurations/party%s/*' % (party_id - 1), run('pwd'))
-                            run('mv parties%s.conf parties.conf' % party_id)
-                        else:
-                            put('InstancesConfigurations/parties.conf', run('pwd'))
-
-                        run('. ./%s %s %s' % (executable_name, party_id, values_str))
-                        with open('Execution/execution_log.log', 'a+') as log_file:
-                            log_file.write('%s\n' % values_str)
 
 
 @task
