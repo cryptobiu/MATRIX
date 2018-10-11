@@ -197,8 +197,8 @@ class AmazonCP(DeployCP):
                                             }]
                         )
     
-                    print('Waiting for the images to be deployed..')
-                    time.sleep(240)
+            print('Waiting for the images to be deployed..')
+            time.sleep(240)
             self.get_network_details()
 
         print('Finished to deploy machines')
