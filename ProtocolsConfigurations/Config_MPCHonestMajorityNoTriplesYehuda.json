@@ -45,7 +45,7 @@
     "-partiesNumber@90@-inputFile@inputs11.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_11In_50Out_20D_OutputOne90P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1",
     
     "-partiesNumber@100@-inputFile@inputs10.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_10In_50Out_20D_OutputOne100P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@0",
-    "-partiesNumber@100@-inputFile@inputs10.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_10In_50Out_20D_OutputOne100P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1",
+    "-partiesNumber@100@-inputFile@inputs10.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_10In_50Out_20D_OutputOne100P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1"
   ],
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
