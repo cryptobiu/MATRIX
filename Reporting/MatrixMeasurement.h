@@ -19,8 +19,11 @@ class MatrixMeasurement
 private:
     string getcwdStr()
     {
-        char* buff;//automatically cleaned when it exits scope
-        return string(getcwd(buff,255));
+        char buff[256];
+        auto res = getcwd(buff, 256);
+        if(NULL == res)
+            exit(-1);
+        return string(res);
     }
 
     int getTaskIdx(string name)
@@ -75,7 +78,12 @@ public:
         // if this is the last task and last iteration write the data to file
         if (taskIdx == m_tasksNames.size() - 1 && currentIterationNumber == m_cpuEndTimes[0].size() - 1)
         {
-            string logFileName = getcwdStr() + "/../../MATRIX/logs/" + m_arguments + ".log";
+            string path = getenv("MATRIX_RESULT_DIR");
+            if (NULL == path)
+                string logFileName = getcwdStr() + m_arguments + ".log";
+            else
+                string logFileName = getcwdStr() + path + m_arguments + ".log";
+
             ofstream logFile(logFileName);
             if (logFile.is_open())
             {
@@ -88,7 +96,7 @@ public:
                     for (size_t idx2 = 0; idx2 < numberOfIterations; ++idx2)
                     {
                         cout << "value : " << m_cpuEndTimes[idx][idx2] << endl;
-                        logFile << to_string(m_cpuEndTimes[idx][idx2]- m_cpuStartTimes[taskIdx][currentIterationNumber])
+                        logFile << to_string(m_cpuEndTimes[idx][idx2] - m_cpuStartTimes[idx][idx2])
                         + ",";
                     }
 
