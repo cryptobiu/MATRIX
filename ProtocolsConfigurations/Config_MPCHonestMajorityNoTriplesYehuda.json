@@ -17,42 +17,62 @@
   "executableName":["MPCHonestMajorityNoTriplesYehuda"],
   "configurations":
   [
+    "-partiesNumber@10@-inputFile@inputs100.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_100In_50Out_20D_OutputOne10P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@0",
+    "-partiesNumber@10@-inputFile@inputs100.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_100In_50Out_20D_OutputOne10P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@1",
     "-partiesNumber@10@-inputFile@inputs100.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_100In_50Out_20D_OutputOne10P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@0",
     "-partiesNumber@10@-inputFile@inputs100.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_100In_50Out_20D_OutputOne10P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1",
 
+    "-partiesNumber@20@-inputFile@inputs50.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_50In_50Out_20D_OutputOne20P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@0",
+    "-partiesNumber@20@-inputFile@inputs50.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_50In_50Out_20D_OutputOne20P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@1",
     "-partiesNumber@20@-inputFile@inputs50.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_50In_50Out_20D_OutputOne20P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@0",
     "-partiesNumber@20@-inputFile@inputs50.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_50In_50Out_20D_OutputOne20P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1",
 
+    "-partiesNumber@30@-inputFile@inputs33.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_33In_50Out_20D_OutputOne30P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@0",
+    "-partiesNumber@30@-inputFile@inputs33.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_33In_50Out_20D_OutputOne30P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@1",
     "-partiesNumber@30@-inputFile@inputs33.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_33In_50Out_20D_OutputOne30P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@0",
     "-partiesNumber@30@-inputFile@inputs33.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_33In_50Out_20D_OutputOne30P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1",
 
+    "-partiesNumber@40@-inputFile@inputs25.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_25In_50Out_20D_OutputOne40P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@0",
+    "-partiesNumber@40@-inputFile@inputs25.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_25In_50Out_20D_OutputOne40P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@1",
     "-partiesNumber@40@-inputFile@inputs25.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_25In_50Out_20D_OutputOne40P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@0",
     "-partiesNumber@40@-inputFile@inputs25.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_25In_50Out_20D_OutputOne40P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1",
 
+    "-partiesNumber@50@-inputFile@inputs20.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_20In_50Out_20D_OutputOne50P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@0",
+    "-partiesNumber@50@-inputFile@inputs20.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_20In_50Out_20D_OutputOne50P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@1",
     "-partiesNumber@50@-inputFile@inputs20.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_20In_50Out_20D_OutputOne50P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@0",
     "-partiesNumber@50@-inputFile@inputs20.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_20In_50Out_20D_OutputOne50P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1",
 
+    "-partiesNumber@60@-inputFile@inputs16.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_16In_50Out_20D_OutputOne60P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@0",
+    "-partiesNumber@60@-inputFile@inputs16.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_16In_50Out_20D_OutputOne60P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@1",
     "-partiesNumber@60@-inputFile@inputs16.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_16In_50Out_20D_OutputOne60P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@0",
     "-partiesNumber@60@-inputFile@inputs16.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_16In_50Out_20D_OutputOne60P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1",
 
+    "-partiesNumber@70@-inputFile@inputs14.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_14In_50Out_20D_OutputOne70P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@0",
+    "-partiesNumber@70@-inputFile@inputs14.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_14In_50Out_20D_OutputOne70P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@1",
     "-partiesNumber@70@-inputFile@inputs14.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_14In_50Out_20D_OutputOne70P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@0",
     "-partiesNumber@70@-inputFile@inputs14.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_14In_50Out_20D_OutputOne70P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1",
 
+    "-partiesNumber@80@-inputFile@inputs12.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_12In_50Out_20D_OutputOne80P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@0",
+    "-partiesNumber@80@-inputFile@inputs12.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_12In_50Out_20D_OutputOne80P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@1",
     "-partiesNumber@80@-inputFile@inputs12.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_12In_50Out_20D_OutputOne80P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@0",
     "-partiesNumber@80@-inputFile@inputs12.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_12In_50Out_20D_OutputOne80P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1",
 
+    "-partiesNumber@90@-inputFile@inputs11.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_11In_50Out_20D_OutputOne90P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@0",
+    "-partiesNumber@90@-inputFile@inputs11.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_11In_50Out_20D_OutputOne90P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@1",
     "-partiesNumber@90@-inputFile@inputs11.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_11In_50Out_20D_OutputOne90P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@0",
     "-partiesNumber@90@-inputFile@inputs11.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_11In_50Out_20D_OutputOne90P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1",
-    
+
+    "-partiesNumber@100@-inputFile@inputs10.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_10In_50Out_20D_OutputOne100P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@0",
+    "-partiesNumber@100@-inputFile@inputs10.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_10In_50Out_20D_OutputOne100P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@0@isPRF@1"
     "-partiesNumber@100@-inputFile@inputs10.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_10In_50Out_20D_OutputOne100P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@0",
     "-partiesNumber@100@-inputFile@inputs10.txt@-outputFile@output.txt@-circuitFile@1000000G_1000000MG_10In_50Out_20D_OutputOne100P.txt@-fieldType@ZpMersenne61@-partiesFile@parties.conf@-internalIterationsNumber@5@isHonest@1@isPRF@1"
   ],
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
-  "IsPublished": "False",
-  "isExternal": "False",
+  "IsPublished": "false",
+  "isExternal": "false",
   "workingDirectory": ["~/MPCHonestMajorityNoTriplesYehuda"],
-  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "resultsDirectory": "~/MATRIX/Reporting/Results_New",
   "emails":
   [
     "Yehuda.Lindell@biu.ac.il",
