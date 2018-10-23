@@ -2,7 +2,7 @@
 
 MATRIX is an MPC Test Automation Framework developed by [Bar Ilan University Cryptography Research Group](http://crypto.biu.ac.il/).
 It automates the tedious process of deploying, running, monitoring and summarizing results.
-It uses AWS [spot instances](https://aws.amazon.com/ec2/spot/), and can be used internally on a local host or in a container deployment.
+It uses AWS or Scaleway to provision servers(instances), and can be used internally on a local host or in a container deployment.
 
 The system requires a management computer (Manager) - a computer that centralized all the execution.
 The Manager executes all the experiment phases, starting from install the experiment up to analyse it's results.
@@ -28,9 +28,7 @@ More on AMI can be found [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGu
 2. Elasticsearch service - The analysis done by Elasticsearch (ES). All the results are uploaded and stored at ES.
 Information on ES can be found [here](https://www.elastic.co/). We are also using the built in [Kibana](https://www.elastic.co/products/kibana)
 plugin to visualize our results.
-
-Basic architecture of MATRIX using AWS CP:  
-![alt text](../dev/Assets/BasicArchitecture.png)   
+  
 
 ## Installation
 MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [openpyxl](https://openpyxl.readthedocs.io/en/stable/).  
@@ -119,22 +117,23 @@ Sample configuration file can be found [here](../master/GlobalConfigurations/reg
 ### ProtocolsConfigurations
 MATRIX uses configuration file to set it execution. The configuration file is written in [json](https://en.wikipedia.org/wiki/JSON) format.  
 Each configuration file has the following fields:
-* amis - List of AMI(s).
-If using custom AWS AMI, the AMI need to be installed in all the regions that we want to test.
 * protocol - Name of protocol
-* numOfParties - Size of the parties
-* gitAddress - Git  repository path. MATRIX will clone the repository into all target servers, configure, 
-make and install. If installation of other libraries is needed to be done, see pre-process section of MATRIX for details.
-* awsInstType - AWS instance type. For details about the different instance types, you can read [here](https://aws.amazon.com/ec2/instance-types/).
-* awsBidPrice - Bid price for spot instances machine in USD
+* CloudProviders - for eac cloud provider we need to create a unique entry. each entry contains these fields:
+    * numOfParties - number of instances to create. 
+    * instanceType
+    * spotPrice - relevant only to AWS. For detailed explanation about spot instances, use this [link](https://aws.amazon.com/ec2/spot/) 
+    * git:
+        * gitAddress - Git  repository path. MATRIX will clone the repository into all target servers, configure, make and install. 
+        If installation of other libraries is needed to be done, see pre-process section of MATRIX for details.
+        * gitBranch - The branch the protocol uses.
+        
 * executableName - The name of the executable to execute
-* preProcessTask - ID of the pre process task that required.
+* preProcessTask - ID of the pre process task that required. Not relevant to all of the protocols.
 The available pre process tasks that defines in MATRIX can be found in this [script](../master/ExperimentExecute/pre_process.py)
 * Configurations - List of configurations to run. Each configuration is a set of CLI arguments to the executable.
 The arguments are separated between them by '@'. Party ID is added automatically
 * numOfRepetitions - How Many times MATRIX will execute the protocol
 * numOfInternalRepetitions - How many times the protocol will be executed on single run.
-* gitBranch - The branch the protocol uses. default value is `master`
 * isPublished - Indicate if the protocol was published.
 * isExternal - Indicate if the protocol external to libscapi library
 * regions - AWS regions to execute the protocol.
