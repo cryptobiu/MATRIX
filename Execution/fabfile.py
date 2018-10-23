@@ -110,7 +110,6 @@ def run_protocol(config_file, args, executable_name, working_directory):
                         else:
                             if len(regions) > 1:
                                 put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                                put('InstancesConfigurations/party%s/*' % (party_id - 1), run('pwd'))
                                 run('mv parties%s.conf parties.conf' % party_id)
                             else:
                                 put('InstancesConfigurations/parties.conf', run('pwd'))
