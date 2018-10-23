@@ -73,6 +73,7 @@ class Elastic:
     def upload_json_data(self, analysis_type, results_path):
 
         raw_configurations = self.config_file['configurations'][0].split('@')
+        protocol_name = self.config_file['protocol']
         # delete values, only the parameters are left
         del raw_configurations[1::2]
         raw_configurations = [rc[1:] for rc in raw_configurations]
@@ -81,7 +82,7 @@ class Elastic:
 
         dts = datetime.utcnow()
         # results_path += '/*%s*.json' % analysis_type
-        results_files = glob('%s/*%s*.json' % (results_path, analysis_type))
+        results_files = glob('%s/*%s*.json' % (expanduser(results_path), analysis_type))
         for file in results_files:
             config_values = basename(file).split('*')
             # remove the json extension
