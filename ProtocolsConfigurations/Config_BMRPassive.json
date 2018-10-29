@@ -17,7 +17,18 @@
   "executableName": ["run.sh"],
   "configurations":
   [
-    "circgen/03adder10bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14"
+    "circgen/03adder10bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/05adder11bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/07adder13bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/09adder13bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/11adder14bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/13adder14bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/15adder15bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/17adder15bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/19adder16bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/21adder16bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/23adder16bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/25adder16bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14"
   ],
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
