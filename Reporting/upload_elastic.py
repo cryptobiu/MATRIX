@@ -108,17 +108,35 @@ class Elastic:
                               body=doc)
 
     def upload_log_data(self, results_path):
-        raw_configurations = self.config_file['configurations'].values()[0].split('@')
+        raw_configurations = self.config_file['configurations'][0].split('@')
         del raw_configurations[1::2]
-        raw_configurations = [rc[1:] for rc in raw_configurations]
+        # raw_configurations = [rc[1:] for rc in raw_configurations]
         raw_configurations.insert(0, 'partyId')
         raw_configurations.insert(0, 'protocolName')
 
         dts = datetime.utcnow()
-        results_files = glob('%s/*.log' % results_path)
-        for results_file in results_files:
-            config_values = basename(results_file).split('*')
+        results_files = glob('%s/*.log' % expanduser(results_path))
+        protocol_name = self.config_file['protocol']
+        for file in results_files:
+            config_values = basename(file).split('*')
             config_values[-1] = config_values[-1][:-4]
+            config_values.insert(0, protocol_name)
+
+            with open(file) as results:
+                doc = OrderedDict()
+                for idx in range(len(raw_configurations)):
+                    doc[raw_configurations[idx]] = config_values[idx]
+                data = results.read().split('\n')
+                for d in data:
+                    if len(d) > 1:
+                        key = d.split(':')[0]
+                        values = list(map(int, d.split(':')[1].split(',')[:-1]))  # remove the last ',' to map
+                        doc[key] = sum(values) / len(values)
+                doc['executionTime'] = dts
+
+                self.es.index(index='cpuresults', doc_type='cpuresults', body=doc)
+
+
 
     def upload_all_data(self):
         is_external = json.loads(self.config_file['isExternal'].lower())
