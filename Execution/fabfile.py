@@ -53,7 +53,6 @@ def run_protocol(config_file, args, executable_name, working_directory):
     with open(config_file) as data_file:
         data = json.load(data_file, object_pairs_hook=OrderedDict)
         external_protocol = json.loads(data['isExternal'].lower())
-        external_protocol = eval(external_protocol)
         if 'aws' in data['CloudProviders']:
             regions = data['CloudProviders']['aws']['regions']
         elif 'scaleway' in data['CloudProviders']:
@@ -133,7 +132,6 @@ def run_protocol_profiler(config_file, args, executable_name, working_directory)
     with open(config_file) as data_file:
         data = json.load(data_file, object_pairs_hook=OrderedDict)
         external_protocol = json.loads(data['isExternal'].lower())
-        external_protocol = eval(external_protocol)
         if 'aws' in data['CloudProviders']:
             regions = data['CloudProviders']['aws']['regions']
         elif 'scaleway' in data['CloudProviders']:
