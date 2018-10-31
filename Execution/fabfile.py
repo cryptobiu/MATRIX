@@ -24,6 +24,7 @@ def install_git_project(git_branch, working_directory, git_address, external):
     if not exists('%s' % working_directory):
         run('git clone %s %s' % (git_address, working_directory))
 
+    external = eval(external)
     with cd('%s' % working_directory):
         run('git pull')
         run('git checkout %s ' % git_branch)
@@ -52,6 +53,7 @@ def run_protocol(config_file, args, executable_name, working_directory):
     with open(config_file) as data_file:
         data = json.load(data_file, object_pairs_hook=OrderedDict)
         external_protocol = json.loads(data['isExternal'].lower())
+        external_protocol = eval(external_protocol)
         if 'aws' in data['CloudProviders']:
             regions = data['CloudProviders']['aws']['regions']
         elif 'scaleway' in data['CloudProviders']:
@@ -131,6 +133,7 @@ def run_protocol_profiler(config_file, args, executable_name, working_directory)
     with open(config_file) as data_file:
         data = json.load(data_file, object_pairs_hook=OrderedDict)
         external_protocol = json.loads(data['isExternal'].lower())
+        external_protocol = eval(external_protocol)
         if 'aws' in data['CloudProviders']:
             regions = data['CloudProviders']['aws']['regions']
         elif 'scaleway' in data['CloudProviders']:
@@ -179,6 +182,7 @@ def run_protocol_profiler(config_file, args, executable_name, working_directory)
 @task
 def collect_results(results_server_directory, results_local_directory, is_external):
     local('mkdir -p %s' % results_local_directory)
+    is_external = eval(is_external)
     if not is_external:
         get('%s/*.json' % results_server_directory, results_local_directory)
     else:
