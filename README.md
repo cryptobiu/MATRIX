@@ -105,7 +105,8 @@ If you want to analyse by different parameter use the Elasticsearch option.
 
 MATRIX uses a header class logger [API](../master/Reporting/MatrixMeasurement.h).  
 The logging is done at the protocol code. The logger generate logs files that uploaded to [Elasticsearch](https://www.elastic.co/) server.  
-To use MATRIX logger class, just include `MatrixMeasurement.h` to your main class
+To use MATRIX logger class, just include `MatrixMeasurement.h` to your main class.  
+
 To measure task:
 ```
 #include "MatrixMeasurement.h"
