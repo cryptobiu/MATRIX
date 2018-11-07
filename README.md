@@ -104,7 +104,23 @@ The report module analyse the results files that was taken from the images by nu
 If you want to analyse by different parameter use the Elasticsearch option.
 
 MATRIX uses a header class logger [API](../master/Reporting/MatrixMeasurement.h).  
-The logging is done at the protocol code. The logger generate logs files that uploaded to ElasticSearch server. 
+The logging is done at the protocol code. The logger generate logs files that uploaded to [Elasticsearch](https://www.elastic.co/) server.  
+To use MATRIX logger class, just include `MatrixMeasurement.h` to your main class
+To measure task:
+```
+#include "MatrixMeasurement.h"
+...
+int main(int argc, char* argv[])
+{
+    MatrixMeasurement matrixLogger(argc,argv,vector<string>{"offline","online"}, numberOfIterations);
+...
+    matrixLogger.startSubTask("offline", iterationIdx);
+    offline.run();
+    matrixLogger.endSubTask("offline", iterationIdx);
+...
+}
+
+``` 
 
 ## MATRIX Configurations
 
