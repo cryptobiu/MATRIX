@@ -80,126 +80,123 @@ class AmazonCP(DeployCP):
 
     def deploy_instances(self):
         regions = self.protocol_config['CloudProviders']['aws']['regions']
-        if 'local' in regions or 'servers' in regions:
-            self.get_network_details()
+        machine_type = self.protocol_config['CloudProviders']['aws']['instanceType']
+        if 'spotPrice' in self.protocol_config['CloudProviders']['aws']:
+            spot_request = True
+            price_bids = self.protocol_config['CloudProviders']['aws']['spotPrice']
         else:
-            machine_type = self.protocol_config['CloudProviders']['aws']['instanceType']
-            if 'spotPrice' in self.protocol_config['CloudProviders']['aws']:
-                spot_request = True
-                price_bids = self.protocol_config['CloudProviders']['aws']['spotPrice']
-            else:
-                spot_request = False
-            number_of_parties = self.protocol_config['CloudProviders']['aws']['numOfParties']
-            number_duplicated_servers = 0
-            protocol_name = self.protocol_config['protocol']
-    
-            with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
-                global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
-    
-            if len(regions) > 1:
-                number_of_instances = number_of_parties // len(regions)
-                if number_of_parties % len(regions):
-                    number_duplicated_servers = number_of_parties % len(regions)
-            else:
-                number_of_instances = number_of_parties
-    
-            date = datetime.now() - timedelta(hours=3)
-            print('Current date : \n%s' % str(date))
-            new_date = date + timedelta(hours=6)
-    
-            for idx in range(len(regions)):
-                client = boto3.client('ec2', region_name=regions[idx][:-1])
-                disk_size = self.get_ami_disk_size(regions[idx][:-1])
-    
-                number_of_instances_to_deploy = self.check_running_instances(regions[idx][:-1], machine_type)
-                if idx < number_duplicated_servers:
-                    number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
-                else:
-                    number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
-    
-                print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
-                      'valid until : %s' % (regions[idx], number_of_instances_to_deploy,
-                                            global_config[regions[idx][:-1]]["ami"], machine_type, str(new_date)))
-    
-                if number_of_instances_to_deploy > 0:
-                    if spot_request:
-                        # check if price isn't too low
-                        winning_bid_price = self.check_latest_price(machine_type, regions[idx])
-                        request_bid = min(price_bids, winning_bid_price)
-                        try:
-                            response = client.request_spot_instances(
-                                    DryRun=False,
-                                    SpotPrice=str(request_bid),
-                                    InstanceCount=number_of_instances_to_deploy,
-                                    ValidUntil=new_date,
-                                    LaunchSpecification=
-                                    {
-                                        'ImageId': global_config[regions[idx][:-1]]["ami"],
-                                        'KeyName': global_config[regions[idx][:-1]]["key"],
-                                        'SecurityGroups': [global_config[regions[idx][:-1]]["securityGroup"]],
-                                        'InstanceType': machine_type,
-                                        'Placement':
-                                            {
-                                                'AvailabilityZone': regions[idx],
-                                            },
-                                    }
-                            )
-                            time.sleep(10)
-                            spot_requests_ids = []
-                            for request in response['SpotInstanceRequests']:
-                                spot_requests_ids.append(request['SpotInstanceRequestId'])
-                            instances_response = client.describe_spot_instance_requests(
-                                Filters=[{'Name': 'spot-instance-request-id', 'Values': spot_requests_ids}])
-                            instances_ids = []
-                            for instance_response in instances_response['SpotInstanceRequests']:
-                                instances_ids.append(instance_response['InstanceId'])
-                            client.create_tags(Resources=instances_ids,Tags=[{
-                                'Key': 'Name',
-                                'Value': protocol_name
-                            }])
+            spot_request = False
+        number_of_parties = self.protocol_config['CloudProviders']['aws']['numOfParties']
+        number_duplicated_servers = 0
+        protocol_name = self.protocol_config['protocol']
 
-                        except botocore.exceptions.ClientError as e:
-                            print(e.response['Error']['Message'].upper())
-                    else:
-                        client.run_instances(
-                            BlockDeviceMappings=
-                            [
+        with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
+            global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+
+        if len(regions) > 1:
+            number_of_instances = number_of_parties // len(regions)
+            if number_of_parties % len(regions):
+                number_duplicated_servers = number_of_parties % len(regions)
+        else:
+            number_of_instances = number_of_parties
+
+        date = datetime.now() - timedelta(hours=3)
+        print('Current date : \n%s' % str(date))
+        new_date = date + timedelta(hours=6)
+
+        for idx in range(len(regions)):
+            client = boto3.client('ec2', region_name=regions[idx][:-1])
+            disk_size = self.get_ami_disk_size(regions[idx][:-1])
+
+            number_of_instances_to_deploy = self.check_running_instances(regions[idx][:-1], machine_type)
+            if idx < number_duplicated_servers:
+                number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
+            else:
+                number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
+
+            print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
+                  'valid until : %s' % (regions[idx], number_of_instances_to_deploy,
+                                        global_config[regions[idx][:-1]]["ami"], machine_type, str(new_date)))
+
+            if number_of_instances_to_deploy > 0:
+                if spot_request:
+                    # check if price isn't too low
+                    winning_bid_price = self.check_latest_price(machine_type, regions[idx])
+                    request_bid = min(price_bids, winning_bid_price)
+                    try:
+                        response = client.request_spot_instances(
+                                DryRun=False,
+                                SpotPrice=str(request_bid),
+                                InstanceCount=number_of_instances_to_deploy,
+                                ValidUntil=new_date,
+                                LaunchSpecification=
                                 {
-                                    'DeviceName': '/dev/sda1',
-                                    'Ebs':
-                                    {
-                                        'DeleteOnTermination': True,
-                                        'VolumeSize': disk_size
-                                    }
-                                },
-                                {
-                                    'DeviceName': '/dev/sdf',
-                                    'NoDevice': ''
+                                    'ImageId': global_config[regions[idx][:-1]]["ami"],
+                                    'KeyName': global_config[regions[idx][:-1]]["key"],
+                                    'SecurityGroups': [global_config[regions[idx][:-1]]["securityGroup"]],
+                                    'InstanceType': machine_type,
+                                    'Placement':
+                                        {
+                                            'AvailabilityZone': regions[idx],
+                                        },
                                 }
-                            ],
-                            ImageId=global_config[regions[idx][:-1]]["ami"],
-                            KeyName=global_config[regions[idx][:-1]]["key"],
-                            MinCount=int(number_of_instances_to_deploy),
-                            MaxCount=int(number_of_instances_to_deploy),
-                            SecurityGroups=[global_config[regions[idx][:-1]]["securityGroup"]],
-                            InstanceType=machine_type,
-                            Placement=
-                            {
-                                'AvailabilityZone': regions[idx],
-                            },
-                            TagSpecifications=[{
-                                                'ResourceType': 'instance',
-                                                'Tags':
-                                                [{
-                                                        'Key': 'Name',
-                                                        'Value': protocol_name
-                                                }]
-                                            }]
                         )
-    
-            print('Waiting for the images to be deployed..')
-            time.sleep(240)
-            self.get_network_details()
+                        time.sleep(10)
+                        spot_requests_ids = []
+                        for request in response['SpotInstanceRequests']:
+                            spot_requests_ids.append(request['SpotInstanceRequestId'])
+                        instances_response = client.describe_spot_instance_requests(
+                            Filters=[{'Name': 'spot-instance-request-id', 'Values': spot_requests_ids}])
+                        instances_ids = []
+                        for instance_response in instances_response['SpotInstanceRequests']:
+                            instances_ids.append(instance_response['InstanceId'])
+                        client.create_tags(Resources=instances_ids,Tags=[{
+                            'Key': 'Name',
+                            'Value': protocol_name
+                        }])
+
+                    except botocore.exceptions.ClientError as e:
+                        print(e.response['Error']['Message'].upper())
+                else:
+                    client.run_instances(
+                        BlockDeviceMappings=
+                        [
+                            {
+                                'DeviceName': '/dev/sda1',
+                                'Ebs':
+                                {
+                                    'DeleteOnTermination': True,
+                                    'VolumeSize': disk_size
+                                }
+                            },
+                            {
+                                'DeviceName': '/dev/sdf',
+                                'NoDevice': ''
+                            }
+                        ],
+                        ImageId=global_config[regions[idx][:-1]]["ami"],
+                        KeyName=global_config[regions[idx][:-1]]["key"],
+                        MinCount=int(number_of_instances_to_deploy),
+                        MaxCount=int(number_of_instances_to_deploy),
+                        SecurityGroups=[global_config[regions[idx][:-1]]["securityGroup"]],
+                        InstanceType=machine_type,
+                        Placement=
+                        {
+                            'AvailabilityZone': regions[idx],
+                        },
+                        TagSpecifications=[{
+                                            'ResourceType': 'instance',
+                                            'Tags':
+                                            [{
+                                                    'Key': 'Name',
+                                                    'Value': protocol_name
+                                            }]
+                                        }]
+                    )
+
+        print('Waiting for the images to be deployed..')
+        time.sleep(240)
+        self.get_network_details()
 
         print('Finished to deploy machines')
 

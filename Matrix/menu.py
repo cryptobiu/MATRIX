@@ -38,7 +38,7 @@ class MatrixMenu:
 
     cloud_provider_menu_desc = (
         'Choose cloud provider',
-        ['AWS', 'Scaleway', 'Both', 'Return'],
+        ['AWS', 'Scaleway', 'Both', 'local', 'servers', 'Return'],
         'blue')
 
     deploy_menu_desc = (
@@ -198,8 +198,8 @@ class MatrixMenu:
         elif cp == 2:
             deploy = sde.ScalewayCP(self.protocol_config)
             menu_color = 'magenta'
-        elif cp == 3:
-            deploy = mde.MultiCP(self.protocol_config)
+        elif cp == 4 or cp == 5:
+            deploy = de.DeployCP(self.protocol_config)
             menu_color = 'blue'
         elif cp == 4:
             return

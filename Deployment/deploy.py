@@ -77,6 +77,7 @@ class DeployCP:
                 new_file.writelines(new_parties)
 
     def create_parties_file(self, ip_addresses, port_number, file_name, new_format=True, number_of_regions=1):
+        regions = []
         if len(self.protocol_config['CloudProviders']) > 1:
             mode = 'a+'
         else:
@@ -96,14 +97,14 @@ class DeployCP:
                     private_ip_file.write('party_%s_ip=%s\n' % (party_idx, ip_addresses[party_idx]))
 
                 for port_idx in range(len(ip_addresses)):
-                    if 'local' in regions:
+                    if len(regions) == 0:
                         private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_number + (port_idx * 20)))
                     else:
                         private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_number))
 
             else:
                 for party_idx in range(len(ip_addresses)):
-                    if 'local' in regions:
+                    if len(regions) == 0:
                         private_ip_file.write('%s:%s\n' % (ip_addresses[party_idx], port_number + (party_idx * 20)))
                     else:
                         private_ip_file.write('%s:8000\n' % ip_addresses[party_idx])
@@ -113,19 +114,9 @@ class DeployCP:
             self.create_parties_files_multi_regions(file_name)
 
     def get_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
-        if 'aws' in self.protocol_config['CloudProviders'] and 'scaleway' in self.protocol_config['CloudProviders']:
-            regions = self.protocol_config['CloudProviders']['aws']['regions'] + \
-                      self.protocol_config['CloudProviders']['scaleway']['regions']
-            number_of_parties = self.protocol_config['CloudProviders']['aws']['numOfParties'] + \
-                                self.protocol_config['CloudProviders']['scaleway']['numOfParties']
-        elif 'aws' in self.protocol_config['CloudProviders']:
-            regions = self.protocol_config['CloudProviders']['aws']['regions']
-            number_of_parties = self.protocol_config['CloudProviders']['aws']['numOfParties']
-        elif 'scaleway' in self.protocol_config['CloudProviders']:
-            regions = self.protocol_config['CloudProviders']['scaleway']['regions']
-            number_of_parties = self.protocol_config['CloudProviders']['scaleway']['numOfParties']
-
-        if 'local' in regions:
+        cp = self.protocol_config['CloudProviders']
+        if 'local' in cp:
+            number_of_parties = cp['local']['numOfParties']
             public_ip_address = []
             for ip_idx in range(number_of_parties):
                 public_ip_address.append('127.0.0.1')
@@ -134,8 +125,8 @@ class DeployCP:
                     local_ips.write('%s\n' % line)
             self.create_parties_file(public_ip_address, port_number, file_name, False)
 
-        # read servers configuration
-        elif 'servers' in regions:
+            # read servers configuration
+        elif 'servers' in cp:
             server_file = input('Enter your server file configuration: ')
             os.system('mv %s %s/InstancesConfigurations/public_ips' % (os.getcwd(), server_file))
 
@@ -144,3 +135,4 @@ class DeployCP:
                 for line in server_ips_file:
                     server_ips.append(line)
             self.create_parties_file(server_ips, port_number, file_name, False)
+
