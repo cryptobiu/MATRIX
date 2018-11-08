@@ -18,7 +18,7 @@ class MatrixMenu:
     method to start the menu.
     """
 
-    d = {'blue': colorama.Fore.BLUE,
+    d = {'blue': colorama.Fore.CYAN,
          'green': colorama.Fore.GREEN,
          'yellow': colorama.Fore.YELLOW,
          'red': colorama.Fore.RED,
@@ -134,28 +134,29 @@ class MatrixMenu:
             choice = num_items
         return choice
 
-    def run(self):
+    def run(self, config_path=None):
         """
         Start the client.
         """
         try:
             while self.protocol_config is None:
-                self.load_protocol_config()
+                self.load_protocol_config(config_path)
             self.main_menu()
         except KeyboardInterrupt:
             print('\nReceived KeyboardInterrupt, quitting ...')
 
-    def load_protocol_config(self):
+    def load_protocol_config(self, protocol_config_path=None):
         """
         Read relative path of a protocol configuration file.
         """
-        self.color_print('Enter configuration file(s):', 'blue')
-        cwd = os.getcwd()
-        prompt = 'Protocol configuration file path (current path is: {}): '.format(cwd)
-        try:
-            protocol_config_path = self.color_input(prompt,  'blue')
-        except EOFError:
-            return
+        if (protocol_config_path == None):
+            self.color_print('Enter configuration file(s):', 'blue')
+            cwd = os.getcwd()
+            prompt = 'Protocol configuration file path (current path is: {}): '.format(cwd)
+            try:
+                protocol_config_path = self.color_input(prompt,  'blue')
+            except EOFError:
+                return
         try:
             with open(protocol_config_path, 'r') as f:
                 self.protocol_config = json.load(f, object_pairs_hook=OrderedDict)
