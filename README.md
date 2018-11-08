@@ -71,7 +71,7 @@ After config file was created, You will need to deploy your images(instances). M
 
 #### Local Deployment
 
-To deploy MATRIX locally set `regions` parameter to `local` at the config [file](../master/ProtocolsConfigurations/Config_BMR.json)
+To deploy MATRIX locally in `CloudProviders` let the name of the provider be `local`. An example of a local deployment configuration can be found in  [file](ProtocolsConfigurations/Config_GMW.json)
 
 #### AWS Deployment
 
