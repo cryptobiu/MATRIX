@@ -21,7 +21,7 @@
   "numOfInternalRepetitions":1,
   "IsPublished": "true",
   "isExternal": "false",
-  "workingDirectory": ["~/libscapi/protocols/GMW"],
+  "workingDirectory": ["~/MPC-Benchmark/GMW"],
   "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
   "emails": ["liork.cryptobiu@gmail.com"],
   "institute":"Bar Ilan Cyber Center"
