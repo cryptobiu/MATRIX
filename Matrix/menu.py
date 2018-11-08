@@ -38,7 +38,7 @@ class MatrixMenu:
 
     cloud_provider_menu_desc = (
         'Choose cloud provider',
-        ['AWS', 'Scaleway', 'Both', 'local', 'servers', 'Return'],
+        ['AWS', 'Scaleway', 'Both', 'Local', 'Servers', 'Return'],
         'blue')
 
     deploy_menu_desc = (
