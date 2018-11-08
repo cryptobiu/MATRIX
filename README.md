@@ -71,7 +71,8 @@ After config file was created, You will need to deploy your images(instances). M
 
 #### Local Deployment
 
-To deploy MATRIX locally set `regions` parameter to `local` at the config [file](../master/ProtocolsConfigurations/Config_BMR.json)
+To deploy MATRIX locally set `regions` parameter to `local` at the config [file](../master/ProtocolsConfigurations/Config_GMW.json)
+
 
 #### AWS Deployment
 
@@ -90,6 +91,9 @@ The execution module supports these operations:
 4. Execute - execute the protocol.
 5. Results - Collect the results file from the images and analyse them. For more details see ExperimentReport section.
 6. analyse - analyse the results from given directory.
+
+**NOTE**: If you are using MATRIX on localhost, create your `parties.conf` file by using option `4` at the `Deploy menu` 
+before start executing the protocol.
 
 ### Reporting
 
