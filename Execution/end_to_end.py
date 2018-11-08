@@ -17,11 +17,17 @@ class E2E:
     def install_experiment(self):
         working_directory = self.protocol_config['workingDirectory']
         external_protocol = json.loads(self.protocol_config['isExternal'])
-        git_address = self.protocol_config['CloudProviders']['aws']['git']['gitAddress']
-        git_branch = self.protocol_config['CloudProviders']['aws']['git']['gitBranch']
-
+        cloud_providers = self.protocol_config['CloudProviders']
+        #
+        # THIS IS REALLY HACKY. Probably git-info should not be given on a per cloud provider basis
+        #
+        assert len(cloud_providers.keys()) > 0
+        provider = list(cloud_providers.keys())[0]
+        git_address = cloud_providers[provider]['git']['gitAddress']
+        git_branch = cloud_providers[provider]['git']['gitBranch']
+        
         for idx in range(len(working_directory)):
-            os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s --parallel'
+            os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s'
                       % (git_branch[idx], working_directory[idx], git_address[idx], external_protocol))
 
     def execute_experiment(self):
