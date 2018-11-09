@@ -71,7 +71,7 @@ After config file was created, You will need to deploy your images(instances). M
 
 #### Local Deployment
 
-To deploy MATRIX locally in `CloudProviders` let the name of the provider be `local`. An example of a local deployment configuration can be found in  [file](ProtocolsConfigurations/Config_GMW.json)
+To deploy MATRIX locally in `CloudProviders` let the name of the provider be `local`. An example of a local deployment configuration can be found in [here](ProtocolsConfigurations/Config_GMW.json)
 
 #### AWS Deployment
 
@@ -134,33 +134,34 @@ Sample configuration file can be found [here](../master/GlobalConfigurations/reg
 ### ProtocolsConfigurations
 MATRIX uses configuration file to set it execution. The configuration file is written in [json](https://en.wikipedia.org/wiki/JSON) format.  
 Each configuration file has the following fields:
-* protocol - Name of protocol
-* CloudProviders - for eac cloud provider we need to create a unique entry. each entry contains these fields:
-    * numOfParties - number of instances to create. 
-    * instanceType
-    * spotPrice - relevant only to AWS. For detailed explanation about spot instances, use this [link](https://aws.amazon.com/ec2/spot/) 
-    * git:
-        * gitAddress - Git  repository path. MATRIX will clone the repository into all target servers, configure, make and install. 
-        If installation of other libraries is needed to be done, see pre-process section of MATRIX for details.
-        * gitBranch - The branch the protocol uses.
+* `protocol` - Name of protocol
+* `CloudProviders` - for eac cloud provider we need to create a unique entry. each entry contains these fields:
+    * `numOfParties` - number of instances to create. 
+    * `instanceType`
+    * `spotPrice` - relevant only to AWS. For detailed explanation about spot instances, use this [link](https://aws.amazon.com/ec2/spot/) 
+    * `git`:
+        * `gitAddress` - Git  repository path. MATRIX will clone the repository into all target servers, configure, make and install. 
+        If installation of other libraries is needed to be done, see pre-process section of MATRIX for details. 
+        NOTE: pulling this should make a build script avilable in `MATRIX/build.sh` and the executeable defined in `executableName` available in the `workingDirectory`. Otherwise, MATRIX will flip out and throw things around the room!
+        * `gitBranch` - The branch the protocol uses.
         
-* executableName - The name of the executable to execute
-* preProcessTask - ID of the pre process task that required. Not relevant to all of the protocols.
-The available pre process tasks that defines in MATRIX can be found in this [script](../master/ExperimentExecute/pre_process.py)
-* Configurations - List of configurations to run. Each configuration is a set of CLI arguments to the executable.
+* `executableName` - The name of the executable to execute
+* `preProcessTask` - ID of the pre process task that required. Not relevant to all of the protocols.
+The available pre process tasks that defines in MATRIX can be found in this [script](Execution/pre_process.py)
+* `Configurations` - List of configurations to run. Each configuration is a set of CLI arguments to the executable.
 The arguments are separated between them by '@'. Party ID is added automatically
-* numOfRepetitions - How Many times MATRIX will execute the protocol
-* numOfInternalRepetitions - How many times the protocol will be executed on single run.
-* isPublished - Indicate if the protocol was published.
-* isExternal - Indicate if the protocol external to libscapi library
-* regions - AWS regions to execute the protocol.
-* workingDirectory - The directory of the protocol and the data related to the protocol.
-* resultsDirectory - Directory to copy to the results files from the servers. The directory is local directory at the MATRIX system computer.
-* emails - MATRIX will send notifications to this email addresses. Multiple email addresses are supported
-* institute - Research Group identifier
-* coordinatorConfig - If coordinator exists in the protocol, the configuration for him will described here.
+* `numOfRepetitions` - How Many times MATRIX will execute the protocol
+* `numOfInternalRepetitions` - How many times the protocol will be executed on single run.
+* `isPublished` - Indicate if the protocol was published.
+* `isExternal` - Indicate if the protocol external to libscapi library - NOTE: It is very important to set this option for any non-libscapi project or the MATRIX tool will explode and burn any small villages nearby including small furry pets living in said villages, very sad. 
+* `regions` - AWS regions to execute the protocol.
+* `workingDirectory` - The directory of the protocol and the data related to the protocol.
+* `resultsDirectory` - Directory to copy to the results files from the servers. The directory is local directory at the MATRIX system computer.
+* `emails` - MATRIX will send notifications to this email addresses. Multiple email addresses are supported
+* `institute` - Research Group identifier
+* `coordinatorConfig` - If coordinator exists in the protocol, the configuration for him will described here.
 The configuration need to be in the same format of 'configurations' field
-* coordinatorExecutable - The name of the coordinator executable
+* `coordinatorExecutable` - The name of the coordinator executable
 
 
 ### MATRIX Usage
