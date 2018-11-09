@@ -91,6 +91,9 @@ The execution module supports these operations:
 5. Results - Collect the results file from the images and analyse them. For more details see ExperimentReport section.
 6. analyse - analyse the results from given directory.
 
+**NOTE**: If you are using MATRIX on localhost, create your `parties.conf` file by using option `4` at the `Deploy menu` 
+before start executing the protocol.
+
 ### Reporting
 
 MATRIX analyse four parameters:
