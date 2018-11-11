@@ -3,9 +3,9 @@ import glob
 import json
 import time
 import smtplib
+from pathlib import Path
 from os.path import exists
 from os.path import basename
-from os.path import expanduser
 
 from openpyxl import Workbook
 from openpyxl import load_workbook
@@ -19,34 +19,31 @@ from email.mime.application import MIMEApplication
 
 
 class Analyze:
-    def __init__(self, conf_file):
-        self.config_file_path = conf_file
+    def __init__(self, protocol_config):
+        self.protocol_config = protocol_config
         self.protocol_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         self.style1 = NamedStyle(number_format='#.##')
 
     def download_data(self):
-        with open(self.config_file_path) as conf_file:
-            conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
-            remote_directory = conf_data['workingDirectory']
+        remote_directory = self.protocol_config['workingDirectory']
+        is_external = json.loads(self.protocol_config['isExternal'].lower())
 
-        results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
-        os.system('fab -f ExperimentExecute/fabfile.py collect_results:%s,%s --parallel --no-pty'
-                  % (remote_directory, results_path))
-        # wait for all clients to download data
-        time.sleep(10)
+        for dir in remote_directory:
+            results_path = self.protocol_config['resultsDirectory']
+            os.system('fab -f Execution/fabfile.py collect_results:%s,%s,%s --parallel --no-pty'
+                      % (dir, results_path, is_external))
+            # wait for all clients to download data
+            time.sleep(10)
 
     def send_email(self):
-        with open(self.config_file_path) as conf_file:
-            conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
-
-        protocol_name = conf_data['protocol']
-        users = list(conf_data['emails'].values())
-        configurations = list(conf_data['configurations'].values())
-        regions = list(conf_data['regions.json'].values())
+        protocol_name = self.protocol_config['protocol']
+        users = list(self.protocol_config['emails'].values())
+        configurations = list(self.protocol_config['configurations'].values())
+        regions = list(self.protocol_config['regions.json'].values())
         address_me = 'biu.cyber.experiments@gmail.com'
         me = 'BIU Cyber Experiments <biu.cyber.experiments@gmail.com>'
 
-        results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, protocol_time)
+        results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, self.protocol_time)
 
         message = MIMEMultipart()
         message['Subject'] = 'Experiment results for protocol %s' % protocol_name
@@ -84,15 +81,12 @@ class Analyze:
         server.quit()
 
     def analyze_results(self, files_list, analysis_type):
-        with open(self.config_file_path) as conf_file:
-            conf_data = json.load(conf_file, object_pairs_hook=OrderedDict)
+        protocol_name = self.protocol_config['protocol']
 
-        protocol_name = conf_data['protocol']
-
-        results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, protocol_time)
+        results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, self.protocol_time)
         parties = set()
         for file in files_list:
-            parties.add(int(basename(file.split('_')[3].split('.')[0].split('=')[1])))
+            parties.add(int(basename(file.split('*')[3])))
 
         parties = list(parties)
         parties.sort()
@@ -101,6 +95,7 @@ class Analyze:
         # Assumption : all the parties measure the same tasks
 
         tasks_names = dict()
+        print(files_list)
 
         # load one of the data files to receive the headers to the xlsx file
 
@@ -111,7 +106,7 @@ class Analyze:
         for i in range(len(data)):
             tasks_names[data[i]['name']] = list()
 
-        num_of_repetitions = conf_data['numOfInternalRepetitions']
+        num_of_repetitions = self.protocol_config['numOfInternalRepetitions']
 
         if not exists(results_file_name):
             wb = Workbook(write_only=False)
@@ -152,27 +147,24 @@ class Analyze:
         wb.save(results_file_name)
 
     def analyze_cpu(self, results_path):
-        files_list = glob.glob(expanduser('%s/*_cpu*.json' % results_path))
+        files_list = glob.glob(('%s/%s/*cpu*.json' % (Path.home(), results_path)))
         self.analyze_results(files_list, 'cpu')
 
     def analyze_comm_sent(self, results_path):
-        files_list = glob.glob(expanduser('%s/*_commSent*.json' % results_path))
+        files_list = glob.glob(('%s/%s/*commSent*.json' % (Path.home(), results_path)))
         self.analyze_results(files_list, 'sent')
 
     def analyze_comm_received(self, results_path):
-        files_list = glob.glob(expanduser('%s/*_commReceived*.json' % results_path))
+        files_list = glob.glob(('%s/%s/*commReceived*.json' % (Path.home(), results_path)))
         self.analyze_results(files_list, 'received')
 
     def analyze_memory(self, results_path):
-        files_list = glob.glob(expanduser('%s/*_memory*.json' % results_path))
+        files_list = glob.glob(('%s/%s/*memory*.json' % (Path.home(), results_path)))
         self.analyze_results(files_list, 'memory')
 
     def analyze_all(self):
         results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
         self.analyze_cpu(results_path)
-        self.analyze_comm_sent(results_path)
-        self.analyze_comm_received(results_path)
-        self.analyze_memory(results_path)
         to_send = input('Do you want to send the results to email? (y/n):')
         if to_send == 'y':
             self.send_email()

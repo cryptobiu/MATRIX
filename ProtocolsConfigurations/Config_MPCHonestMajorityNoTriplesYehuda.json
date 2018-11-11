@@ -1,0 +1,35 @@
+{
+  "protocol":"MPCHonestMajorityNoTriplesYehuda",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":300,
+      "instanceType":"c5.xlarge",
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["master"],
+        "gitAddress": ["https://github.com/cryptobiu/MPCHonestMajorityNoTriplesYehuda.git"]
+      }
+    }
+  },
+  "executableName":["MPCHonestMajorityNoTriplesYehuda"],
+  "configurations":
+  [
+  ],
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "IsPublished": "false",
+  "isExternal": "false",
+  "workingDirectory": ["~/MPCHonestMajorityNoTriplesYehuda"],
+  "resultsDirectory": "~/MATRIX/Reporting/Results_New",
+  "emails":
+  [
+    "Yehuda.Lindell@biu.ac.il",
+    "levymeit@gmail.com",
+    "abarak.cryptobiu@gmail.com",
+    "liork.cryptobiu@gmail.com"
+  ],
+  "institute":"Bar Ilan Cyber Center"
+}

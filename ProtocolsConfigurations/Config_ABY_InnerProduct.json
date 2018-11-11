@@ -1,0 +1,27 @@
+{
+  "protocol": "ABY",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":3,
+      "instanceType":"c5.large",
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["public"],
+        "gitAddress": ["https://github.com/cryptobiu/ABY.git"]
+      }
+    }
+  },
+  "executableName": ["run.sh"],
+  "configurations": ["-b@32"],
+  "numOfRepetitions": 1,
+  "numOfInternalRepetitions": 1,
+  "IsPublished": "false",
+  "isExternal": "true",
+  "workingDirectory": ["~/ABY"],
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "emails": ["liork.cryptobiu@gmail.com"],
+  "institute": "Bar Ilan Cyber Center"
+}

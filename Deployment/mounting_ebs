@@ -1,0 +1,14 @@
+#cloud-config
+repo_update: true
+repo_upgrade: all
+
+packages:
+- amazon-efs-utils
+
+runcmd:
+- file_system_id_01=fs-12345678
+- efs_directory=/mnt/efs
+
+- mkdir -p ${efs_directory}
+- echo "${file_system_id_01}:/ ${efs_directory} efs tls,_netdev" >> /etc/fstab
+- mount -a -t efs defaults

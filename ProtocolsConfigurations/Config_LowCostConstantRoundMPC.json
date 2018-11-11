@@ -1,0 +1,32 @@
+{
+  "protocol":"LowCostConstantRoundMPC",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":3,
+      "instanceType":"c4.large",
+      "spotPrice": 0.07,
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["master"],
+        "gitAddress": ["https://github.com/cryptobiu/LowCostConstantRoundMPC.git"]
+      }
+    }
+  },
+  "executableName": ["LowCostConstantRoundMPC"],
+  "configurations":
+  [
+    "-circuitFile@NigelAes3Parties.txt@-partiesFile@parties.conf@-inputsFile@AesInputs0.txt@-numThreads@2@-B@3@-internalIterationsNumber@1"
+  ],
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "IsPublished": "true",
+  "isExternal": "false",
+  "workingDirectory": ["~/LowCostConstantRoundMPC"],
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "emails": ["liork.cryptobiu@gmail.com"],
+  "institute":"Bar Ilan Cyber Center"
+}
+

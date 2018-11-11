@@ -1,0 +1,43 @@
+{
+  "protocol":"PSI",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":2,
+      "instanceType":"c4.large",
+      "spotPrice": 0.07,
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["master"],
+        "gitAddress": ["https://github.com/cryptobiu/PSI.git"]
+      }
+    }
+  },
+  "executableName":["PSI"],
+  "configurations":
+  [
+    "-groupID@0@-numOfItems@256@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@1@-partiesNumber@1",
+    "-groupID@0@-numOfItems@256@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@2@-partiesNumber@2",
+    "-groupID@0@-numOfItems@256@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@4@-partiesNumber@4",
+    "-groupID@0@-numOfItems@256@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@8@-partiesNumber@8",
+    "-groupID@0@-numOfItems@256@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@16@-partiesNumber@16",
+    "-groupID@0@-numOfItems@256@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@32@-partiesNumber@32",
+    "-groupID@0@-numOfItems@4096@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@1@-partiesNumber@1",
+    "-groupID@0@-numOfItems@4096@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@2@-partiesNumber@2",
+    "-groupID@0@-numOfItems@4096@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@4@-partiesNumber@4",
+    "-groupID@0@-numOfItems@4096@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@8@-partiesNumber@8",
+    "-groupID@0@-numOfItems@4096@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@16@-partiesNumber@16",
+    "-groupID@0@-numOfItems@4096@-partiesFile@parties.conf@-numOfSplits@3@-fieldSize@185@-internalIterationsNumber@1@-numOfThreads@32@-partiesNumber@32"
+  ],
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "IsPublished": "false",
+  "isExternal": "false",
+  "workingDirectory": ["~/PSI"],
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "emails":["liork.cryptobiu@gmail.com"],
+  "institute":"Bar Ilan Cyber Center"
+}
+

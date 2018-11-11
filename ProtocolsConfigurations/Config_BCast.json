@@ -1,0 +1,28 @@
+{
+  "protocol":"BCast",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":200,
+      "instanceType":"t2.medium",
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["master"],
+        "gitAddress": ["https://github.com/cryptobiu/BCast.git"]
+      }
+    }
+  },
+  "executableName": ["BCast"],
+  "configurations": ["-numParties@100@-partiesFile@parties.conf@-internalIterationsNumber@1"],
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "IsPublished": "false",
+  "isExternal": "false",
+  "workingDirectory": ["~/BCast"],
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "emails": ["liork.cryptobiu@gmail.com"],
+  "institute":"Bar Ilan Cyber Center"
+}
+

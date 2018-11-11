@@ -1,0 +1,32 @@
+{
+  "protocol":"Yao",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":2,
+      "instanceType":"c4.large",
+      "spotPrice": 0.031,
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["dev"],
+        "gitAddress": ["https://github.com/cryptobiu/libscapi.git"]
+      }
+    }
+  },
+  "executableName":["YaoSingleExecution"],
+  "configurations":
+  [
+    "-circuitFile@NigelAes.txt@-partiesFile@parties.conf@-inputFile@AesInputs0.txt@-internalIterationsNumber@1"
+  ],
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "IsPublished": "true",
+  "isExternal": "false",
+  "workingDirectory":["~/libscapi/protocols/YaoSingleExecution"],
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "emails":["liork.cryptobiu@gmail.com"],
+  "institute":"Bar Ilan Cyber Center"
+}
+

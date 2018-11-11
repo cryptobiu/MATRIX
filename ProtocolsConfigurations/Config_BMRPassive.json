@@ -1,0 +1,42 @@
+{
+  "protocol":"BMRPassive",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":25,
+      "instanceType":"c5.large",
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["dcops"],
+        "gitAddress": ["https://github.com/cryptobiu/Protocols.git"]
+      }
+    }
+  },
+  "executableName": ["run.sh"],
+  "configurations":
+  [
+    "circgen/03adder10bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/05adder11bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/07adder13bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/09adder13bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/11adder14bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/13adder14bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/15adder15bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/17adder15bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/19adder16bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/21adder16bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/23adder16bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14",
+    "circgen/25adder16bits.circ@circgen/input16bits.inp@parties@43739841701238781571456410093f41@14"
+  ],
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "IsPublished": "true",
+  "isExternal": "true",
+  "workingDirectory": ["~/Protocols/Concrete_Efficiency_Improvements_to_Multiparty_Garbling_with_an_Honest_Majority"],
+  "resultsDirectory": "~/MATRIX/Reporting/Results",
+  "emails": ["liork.cryptobiu@gmail.com"],
+  "institute":"Bar Ilan Cyber Center"
+}
+

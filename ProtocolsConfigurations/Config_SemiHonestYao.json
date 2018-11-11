@@ -1,0 +1,32 @@
+{
+  "protocol":"SemiHonestYao",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":2,
+      "instanceType":"c4.large",
+      "spotPrice": 0.07,
+      "regions": ["us-east-1a"],
+      "git":
+      {
+        "gitBranch": ["dev"],
+        "gitAddress": ["https://github.com/cryptobiu/libscapi.git"]
+      }
+    }
+  },
+  "executableName":["SemiHonestYao"],
+  "configurations":
+  [
+    "-configFileName@YaoConfig.txt@-partiesFileName@parties.conf"
+  ],
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "IsPublished": "true",
+  "isExternal": "false",
+  "workingDirectory":["~/libscapi/protocols/SemiHonestYao"],
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "emails":["liork.cryptobiu@gmail.com"],
+  "institute":"Bar Ilan Cyber Center"
+}
+

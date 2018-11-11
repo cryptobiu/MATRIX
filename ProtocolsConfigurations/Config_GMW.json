@@ -1,0 +1,29 @@
+{
+  "protocol":"GMW",
+  "CloudProviders":
+  {
+    "local":
+    {
+      "numOfParties":4,
+      "git":
+      {
+        "gitBranch": ["dev"],
+        "gitAddress": ["https://github.com/cryptobiu/libscapi.git"]
+      }
+    }
+  },
+  "executableName": ["GMW"],
+  "configurations":
+  [
+    "-circuitFile@NigelAes4Parties.txt@-partiesFile@parties.conf@-inputFile@AesInputs0.txt@-numThreads@2@-internalIterationsNumber@2"
+  ],
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "IsPublished": "true",
+  "isExternal": "false",
+  "workingDirectory": ["~/MPC-Benchmark/GMW"],
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "emails": ["liork.cryptobiu@gmail.com"],
+  "institute":"Bar Ilan Cyber Center"
+}
+
