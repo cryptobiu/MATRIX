@@ -197,11 +197,13 @@ class MatrixMenu:
             menu_color = 'red'
         elif cp == 2:
             deploy = sde.ScalewayCP(self.protocol_config)
-            menu_color = 'magenta'
+        elif cp == 3:
+            deploy = mde.MultiCP(self.protocol_config)
+            menu_color = 'blue'
         elif cp == 4 or cp == 5:
             deploy = de.DeployCP(self.protocol_config)
             menu_color = 'blue'
-        elif cp == 4:
+        elif cp == 6:
             return
 
         selection = self.print_menu(*self.deploy_menu_desc, menu_color)
