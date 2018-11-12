@@ -4,12 +4,23 @@
   {
     "aws":
     {
-      "numOfParties":300,
+      "numOfParties":60,
       "instanceType":"c5.xlarge",
       "regions": ["us-east-1a"],
       "git":
       {
         "gitBranch": ["master"],
+        "gitAddress": ["https://github.com/cryptobiu/MPCHonestMajorityNoTriplesYehuda.git"]
+      }
+    },
+    "scaleway":
+    {
+      "numOfParties":40,
+      "instanceType":"ARM64-2GB",
+      "regions": ["par1"],
+      "git":
+      {
+        "gitBranch": ["ARM"],
         "gitAddress": ["https://github.com/cryptobiu/MPCHonestMajorityNoTriplesYehuda.git"]
       }
     }
