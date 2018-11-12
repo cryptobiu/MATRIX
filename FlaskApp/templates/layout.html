@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <title>MATRIX</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css">
+
+    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-auth.js"></script>
+    <script>
+    var config = {
+        apiKey: "AIzaSyB0PQ0E_BuVBE2X6r-hXk88KLvi4ZwiRjc",
+        authDomain: "matrixwebui.firebaseapp.com",
+        databaseURL: "https://matrixwebui.firebaseio.com",
+        projectId: "matrixwebui",
+        storageBucket: "matrixwebui.appspot.com",
+        messagingSenderId: "547583715969"
+    };
+    firebase.initializeApp(config);
+    </script>
+
+
+
 </head>
 <body>
     {% include 'includes/_navbar.html' %}
