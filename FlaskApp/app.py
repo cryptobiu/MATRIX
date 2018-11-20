@@ -35,15 +35,17 @@ def about():
     return render_template('about.html', title='-About')
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def login():
-    if request.method == 'POST':
-        user = request.form
-        session['user'] = user
-        session['logged_in'] = True
-        return url_for('index')
-    if request.method == 'GET':
-        return render_template('login.html', title='-Login')
+    return render_template('login.html', title='-Login')
+
+
+@app.route('/<string:user>')
+def login(user):
+    user = request.form
+    session['user'] = user
+    session['logged_in'] = True
+    return redirect(url_for('index'))
 
 
 @app.route('/circuits')

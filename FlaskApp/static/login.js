@@ -55,17 +55,9 @@ firebase.auth().onAuthStateChanged(firebaseUser => {
       if(user != null) {
           let uid = user.uid;
           let httpRequest = new XMLHttpRequest();
-          httpRequest.open('POST', 'http://localhost:5000/', true);
-          httpRequest.onreadystatechange = function (){
-              if (httpRequest.readyState === 4 && httpRequest.status === 200 )
-              {
-                  console.log(uid);
-              }
-          };
-          httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-          let dataRequest = {'user': uid};
-          httpRequest.send(JSON.stringify(dataRequest));
-          httpRequest.location.href = 'http://localhost:5000/home';
+          httpRequest.open('GET', 'http://localhost:5000/' + uid, true);
+          httpRequest.send();
+          httpRequest.onreadystatechange = e => {console.log(httpRequest.responseText);};
           btnLogin.classList.add('hide');
           //liork@gmail.com
       }
