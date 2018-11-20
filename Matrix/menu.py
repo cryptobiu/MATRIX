@@ -202,7 +202,7 @@ class MatrixMenu:
         elif cp == 4 or cp == 5:
             deploy = de.DeployCP(self.protocol_config)
             menu_color = 'blue'
-        elif cp == 4:
+        else:
             return
 
         selection = self.print_menu(*self.deploy_menu_desc, menu_color)
