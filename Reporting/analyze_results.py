@@ -30,7 +30,7 @@ class Analyze:
 
         for dir in remote_directory:
             results_path = self.protocol_config['resultsDirectory']
-            os.system('fab -f Execution/fabfile.py collect_results:%s,%s,%s --parallel --no-pty'
+            os.system('fab -f Execution/fabfile.py collect_results:%s,%s,%s --no-pty'
                       % (dir, results_path, is_external))
             # wait for all clients to download data
             time.sleep(10)
@@ -164,7 +164,12 @@ class Analyze:
 
     def analyze_all(self):
         results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
-        self.analyze_cpu(results_path)
-        to_send = input('Do you want to send the results to email? (y/n):')
-        if to_send == 'y':
-            self.send_email()
+        cpu_path = ('%s/%s/*cpu*.json' % (os.getcwd, results_path))
+        files_list = glob.glob(cpu_path)
+        if (len(files_list) == 0):
+            print ('No files matching the pattern %s found', cpu_path)
+        else:
+            self.analyze_cpu(results_path)
+            to_send = input('Do you want to send the results to email? (y/n):')
+            if to_send == 'y':
+                self.send_email()
