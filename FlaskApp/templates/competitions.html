@@ -31,8 +31,9 @@
             <td>{{competition.startDate}}</td>
             <td>{{competition.endDate}}</td>
             <td>{{competition.status}}</td>
-            <td><a href="edit_file/{{file}}" class="btn btn-default pull-right"/>Participate</td>
-            <td><a href="edit_file/{{file}}" class="btn btn-default pull-right"/>Results</td>
+            <td><a href="register_competition/{{competition.competitionName}}" class="btn btn-default pull-right"/>
+                Participate</td>
+            <td><a href="" class="btn btn-default pull-right"/>Results</td>
         </tr>
         {% endfor %}
     </table>

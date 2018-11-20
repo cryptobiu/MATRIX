@@ -1,19 +1,31 @@
 import datetime
+from functools import wraps
+
 import bson
-import oauth2
 
 from pymongo import MongoClient
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, session
 from flask_login import LoginManager
 
-from FlaskApp.competition_form import CompetitionForm
+from FlaskApp.competition_forms import CompetitionForm, CompetitionRegistrationForm
 
 login_manager = LoginManager()
 app = Flask(__name__)
 login_manager.init_app(app)
 
 
-@app.route('/')
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized, Please login', 'danger')
+            return redirect(url_for('login'))
+    return wrap
+
+
+@app.route('/home')
 def index():
     return render_template('index.html')
 
@@ -23,13 +35,15 @@ def about():
     return render_template('about.html', title='-About')
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
-    consumer = oauth2.Consumer(key='ConsumeKey', secret='SecretKey')
-    token = oauth2.Token(key='key', secret='secret')
-    client = oauth2.Client(consumer, token)
-    resp, content = client.request('url', method='http_method', body='')
-    return render_template('login.html')
+    if request.method == 'POST':
+        user = request.form
+        session['user'] = user
+        session['logged_in'] = True
+        return url_for('index')
+    if request.method == 'GET':
+        return render_template('login.html', title='-Login')
 
 
 @app.route('/circuits')
@@ -38,6 +52,7 @@ def circuits():
 
 
 @app.route('/competitions')
+@is_logged_in
 def competitions():
     client = MongoClient()
     db = client['BIU']
@@ -45,7 +60,7 @@ def competitions():
     competitions_list = []
 
     for competition in collection.find({}):
-        competitions.append(competition)
+        competitions_list.append(competition)
 
     return render_template('competitions.html', title='-Competitions', competitions=competitions_list)
 
@@ -83,6 +98,15 @@ def competitions_management():
         return redirect(url_for('competitions'))
 
     return render_template('competitions_manage.html', title='-CompetitionsAdminPanel', form=form)
+
+
+@app.route('/register_competition/<string:competition_name>', methods=['GET', 'POST'])
+def register_competition(competition_name):
+    form = CompetitionRegistrationForm(request.form)
+    if request.method == 'POST':
+        return redirect(url_for('competitions'))
+
+    return render_template('register_competition.html', title='-%s Registration' % competition_name, form=form)
 
 
 if __name__ == '__main__':

@@ -10,3 +10,5 @@ class CompetitionForm(Form):
     status = StringField('Status', [validators.DataRequired()])
 
 
+class CompetitionRegistrationForm(Form):
+    address = StringField('Git Address', [validators.DataRequired('Please supply address to your public repository')])

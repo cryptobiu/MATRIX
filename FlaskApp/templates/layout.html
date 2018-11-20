@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>MATRIX{{title}}</title>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css">
+    <link rel="icon" href="data:,">
 
+    <!--firebase-->
     <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
-    <script src="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.js"></script>
-    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.css" />
+    <!--<script src="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.js"></script>-->
+    <!--<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.css" />-->
     <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-auth.js"></script>
+
     <script>
-    var config = {
+    const config = {
         apiKey: "AIzaSyB0PQ0E_BuVBE2X6r-hXk88KLvi4ZwiRjc",
         authDomain: "matrixwebui.firebaseapp.com",
         databaseURL: "https://matrixwebui.firebaseio.com",
@@ -22,6 +25,7 @@
         storageBucket: "matrixwebui.appspot.com",
         messagingSenderId: "547583715969"
     };
+    firebase.initializeApp(config)
     </script>
 
 

@@ -1,19 +1,34 @@
-{% extends 'layout.html' %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MATRIX-Login</title>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css">
+    <link rel="icon" href="data:,">
 
-{% block body %}
+    <!--firebase-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,500">
+    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.css" />
+    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase-auth.js"></script>
 
-    <h1>Login</h1>
-    <form method="POST" action="">
-        <div class="form-group">
-            <label>Username</label>
-            <input type="text" name="username" class="form-control" value={{request.form.username}}>
-        </div>
+<body>
+<h3>Login</h3>
+In order to use MATRIX features, you must login to the system. If you are not registered, please sign up. <br><br>
+<div class="container">
+  <input id="txtEmail" type="email" placeholder="Email"> <br>
+  <input id="txtPassword" type="password" placeholder="password"> <br> <br>
+  <button id="btnLogin" class="btn btn-primary ">Log in</button>
+  <button id="btnSignUp" class="btn btn-secondary ">Sign Up</button>
+  <button id="btnLogout" class="btn btn-action hide">Log out</button>
+</div>
 
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" class="form-control" value={{request.form.password}}>
-        </div>
-        <p><input type="submit" name="" class="btn btn-primary" value="Submit"></p>
-    </form>
-
-{% endblock %}
+<script type="text/javascript" src="../static/login.js"></script>
+</body>
+</head>
+</html>
