@@ -41,8 +41,7 @@ def login():
 
 
 @app.route('/<string:user>')
-def login(user):
-    user = request.form
+def login_user(user):
     session['user'] = user
     session['logged_in'] = True
     return redirect(url_for('index'))
@@ -54,7 +53,7 @@ def circuits():
 
 
 @app.route('/competitions')
-@is_logged_in
+# @is_logged_in
 def competitions():
     client = MongoClient()
     db = client['BIU']
@@ -106,9 +105,25 @@ def competitions_management():
 def register_competition(competition_name):
     form = CompetitionRegistrationForm(request.form)
     if request.method == 'POST':
+        client = MongoClient()
+        db = client['BIU']
+        collection = db['submissions']
+        git_address = form.address.data
+        submission = {
+            'competitionName': competition_name,
+            'gitAddress': git_address,
+            'hasValidated': 'false'
+        }
+        try:
+            submission_id = collection.insert_one(submission)
+            if submission_id.acknowledged:
+                flash('Submission added', 'success')
+        except bson.errors.InvalidDocument:
+            flash('Failed to create new submission', 'danger')
         return redirect(url_for('competitions'))
 
-    return render_template('register_competition.html', title='-%s Registration' % competition_name, form=form)
+    return render_template('register_competition.html', title='-%s Registration' % competition_name, form=form,
+                           competition_name=competition_name)
 
 
 if __name__ == '__main__':

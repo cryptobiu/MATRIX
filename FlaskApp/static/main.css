@@ -15,15 +15,11 @@
  */
 
 html, body {
-  font-family: 'Roboto', 'Helvetica', sans-serif;
-  background-color: #f5f5f5;
+  font-family: Roboto, 'Helvetica', 'sans-serif';
+  background: white;
 }
 a {
   text-decoration: none;
-}
-li a {
-  text-decoration: underline;
-  color: #0288d1;
 }
 .mdl-card {
   overflow: visible;
@@ -54,10 +50,13 @@ code {
   word-break: break-all;
 }
 h3 {
-  background: url('firebase-logo.png') no-repeat;
-  background-size: 40px;
-  padding-left: 50px;
+  color: black;
+  padding-top: 20px;
+}
+
+li {
   color: white;
+  text-decoration: underline;
 }
 #verification-code-form {
   display:none;

@@ -2,20 +2,20 @@
 
 {% block body %}
 
-    <div class="info">
-        <h1>Welcome to MATRIX </h1>
-        <p class="lead">
-            MATRIX is an MPC Test Automation Framework developed by
-            <a href="https://crypto.biu.ac.il/">Bar Ilan University Cryptography Research Group.</a>
-            <br>It automates the tedious process of deploying, running, monitoring and summarizing results.
-            <br>In order to use the MATRIX, please Register/Login.
-        </p>
-        <br>
+<div class="info">
+    <h1>Welcome to MATRIX </h1>
+    <p class="lead">
+        MATRIX is an MPC Test Automation Framework developed by
+        <a href="https://crypto.biu.ac.il/">Bar Ilan University Cryptography Research Group.</a>
+        <br>It automates the tedious process of deploying, running, monitoring and summarizing results.
+        <br>In order to use the MATRIX, please Register/Login.
+    </p>
+    <br>
 
-        {% if session.logged_in == NULL %}
-            <a href="/register" class="btn btn-primary btn-lg"> Register</a>
-            <a href="/login" class="btn btn-primary btn-lg"> Login</a>
-        {% endif %}
+    {% if session.logged_in == NULL %}
+        <a href="/register" class="btn btn-primary btn-lg"> Register</a>
+        <a href="/login" class="btn btn-primary btn-lg"> Login</a>
+    {% endif %}
     </div>
 
 {% endblock %}

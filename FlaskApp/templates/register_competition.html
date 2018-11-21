@@ -1,7 +1,12 @@
 {% extends 'layout.html' %}
 
 {% block body %}
+<h3> Register to {{competition_name}}</h3>
 
+<div class="info">
+    To submit a protocol for the competition, please insert your protocol repository address the form below.<br>
+    Your git repository must be <b>public</b>.
+</div>
 {% from "includes/_formhelpers.html" import render_field %}
 
 <form method="POST" action="">

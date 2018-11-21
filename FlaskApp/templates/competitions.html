@@ -7,8 +7,8 @@
     Welcome {{session.username}}
     <br>
     The MATRIX framework allows researchers/developers to benchmark their MPC protocols.
-    To integrate your protocol read
-    <a href="https://github.com/cryptobiu/MATRIX#matrix-configurations" target="_blank"> instructions </a> here.
+    To integrate your protocol read the
+    <a href="https://github.com/cryptobiu/MATRIX#matrix-configurations" target="_blank"> instructions </a>.
 </p>
 <br>
 
@@ -26,7 +26,7 @@
         </tr>
         {% for competition in competitions %}
         <tr>
-            <td>{{competition.competitionName}}</td>
+            <td><a href="">{{competition.competitionName}}</a></td>
             <td>{{competition.description}}</td>
             <td>{{competition.startDate}}</td>
             <td>{{competition.endDate}}</td>
