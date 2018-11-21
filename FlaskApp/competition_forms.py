@@ -12,3 +12,4 @@ class CompetitionForm(Form):
 
 class CompetitionRegistrationForm(Form):
     address = StringField('Git Address', [validators.DataRequired('Please supply address to your public repository')])
+    sanity_file = StringField('Sanity file', [validators.DataRequired('Please supply address to your sanity file')])

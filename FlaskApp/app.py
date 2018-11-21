@@ -6,8 +6,35 @@ import bson
 from pymongo import MongoClient
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from flask_login import LoginManager
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from FlaskApp.competition_forms import CompetitionForm, CompetitionRegistrationForm
+from FlaskApp.validate_submission import Submission
+
+
+def validate_submission():
+    client = MongoClient()
+    db = client['BIU']
+    collection = db['submissions']
+
+    # TODO: download the configuration file from MATRIX folder at the repo.
+    for submission in collection.find({'hasValidated': 'false'}):
+        try:
+            address = submission['gitAddress']
+            # config_file = submission['sanityFile']
+            config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/master/ProtocolsConfigurations/Config_HyperMPC.json'
+            protocol_name = address.split('/')[-1]
+            address += '.git'
+            validation = Submission(config_file)
+            validation.validate()
+        except KeyError as e:
+            print('Key %s not found ' % e)
+            continue
+
+
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(validate_submission, trigger='interval', seconds=10)
+sched.start()
 
 login_manager = LoginManager()
 app = Flask(__name__)
@@ -49,7 +76,15 @@ def login_user(user):
 
 @app.route('/circuits')
 def circuits():
-    return render_template('circuits.html', title='-Circuits')
+
+    client = MongoClient()
+    db = client['BIU']
+    collection = db['circuits']
+    circuits_list = []
+
+    for circuit in collection.find({}):
+        circuits_list.append(circuit)
+    return render_template('circuits.html', title='-Circuits', circuit_files=circuits_list)
 
 
 @app.route('/competitions')
@@ -109,10 +144,13 @@ def register_competition(competition_name):
         db = client['BIU']
         collection = db['submissions']
         git_address = form.address.data
+        sanity_file = form.sanity_file.data
         submission = {
             'competitionName': competition_name,
             'gitAddress': git_address,
-            'hasValidated': 'false'
+            'sanityFile': sanity_file,
+            'hasValidated': 'false',
+            'user': session['user']
         }
         try:
             submission_id = collection.insert_one(submission)
