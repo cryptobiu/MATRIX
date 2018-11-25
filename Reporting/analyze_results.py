@@ -3,8 +3,7 @@ import glob
 import json
 import time
 import smtplib
-from pathlib import Path
-from os.path import exists
+from os.path import exists, expanduser
 from os.path import basename
 
 from openpyxl import Workbook
@@ -80,91 +79,75 @@ class Analyze:
         server.sendmail(me, users, message.as_string())
         server.quit()
 
-    def analyze_results(self, files_list, analysis_type):
+    def analyze_results(self):
         protocol_name = self.protocol_config['protocol']
+        results_path = self.protocol_config['resultsDirectory']
 
-        results_file_name = 'ExperimentReport/Results_%s_%s.xlsx' % (protocol_name, self.protocol_time)
+        files_list = glob.glob(expanduser('%s/*.log' % results_path))
         parties = set()
-        for file in files_list:
-            parties.add(int(basename(file.split('*')[3])))
+        parties_files = OrderedDict()
+
+        # map between number of parties and file names
+        for idx in range(len(files_list)):
+            with open(files_list[idx]) as f:
+                data = [l.rstrip('\n') for l in f.readlines()]
+                if idx == 0:
+                    # read tasks names
+                    tasks_names = [l.split(':')[0] for l in data[1:]]
+                    tasks_names = {t: [] for t in tasks_names}
+
+                number_of_parties = data[0]
+                parties.add(number_of_parties)
+                if number_of_parties not in parties_files.keys():
+                    parties_files[number_of_parties] = []
+                parties_files[number_of_parties].append(files_list[idx])
 
         parties = list(parties)
-        parties.sort()
+        parties.sort()  # sort parties in ascending order
+        # define result file
+        result_file_name = expanduser('%s/Results_%s.xlsx' % (results_path, protocol_name))
 
-        # parsing tasks names from json file
-        # Assumption : all the parties measure the same tasks
+        wb = Workbook(write_only=False)  # append to file
 
-        tasks_names = dict()
-        print(files_list)
+        # write headers to excel file
 
-        # load one of the data files to receive the headers to the xlsx file
-
-        with open(files_list[0], 'r') as f:
-            data = json.load(f)
-
-        # init list values
-        for i in range(len(data)):
-            tasks_names[data[i]['name']] = list()
-
-        num_of_repetitions = self.protocol_config['numOfInternalRepetitions']
-
-        if not exists(results_file_name):
-            wb = Workbook(write_only=False)
-            ws = wb.active
-            wb.remove(ws)
-        else:
-            wb = load_workbook(results_file_name)
-
-        ws = wb.create_sheet(analysis_type)
+        ws = wb.create_sheet('Results')
+        wb.remove(wb['Sheet'])  # Remove the default sheet
         ws.cell(row=1, column=1, value='Phase/Number of Parties')
+        tasks_counter = 0
+        for t in tasks_names.keys():
+            ws.cell(row=tasks_counter + 2, column=1, value=t)
+            tasks_counter += 1
 
-        files_list.sort()
-
-        # counter = 0
         for party_idx in range(len(parties)):
-            ws.cell(row=1, column=party_idx + 2, value=parties[party_idx])
+            party_id = parties[party_idx]
+            ws.cell(row=1, column=party_idx + 2, value=party_id)
+            for idx in range(len(parties_files[str(party_id)])):
+                with open(parties_files[str(party_id)][idx]) as data_file:
+                    # get only the values for each task
+                    data = [l.rstrip('\n').split(':')[1].split(',')[:-1] for l in data_file.readlines()[1:]]
+                    counter = 0
+                    for key in tasks_names.keys():
+                        tasks_names[key].append(data[counter])
+                        counter += 1
 
-            for data_file in files_list:
-                if 'numOfParties=%s.json' % str(parties[party_idx]) in data_file:
-                    with open(data_file, 'r') as df:
-                        json_data = json.load(df, object_pairs_hook=OrderedDict)
-                        for json_size_idx in range(len(json_data)):
-                            for rep_idx in range(num_of_repetitions):
-                                tasks_names[json_data[json_size_idx]['name']].append(
-                                    json_data[json_size_idx]['iteration_%s' % str(rep_idx)])
-            # write data to excel
-            counter = 1
+            # write the values to file for the current party_number
+            data_counter = 1  # use for write the data to the correct location at the file
             for key in tasks_names.keys():
-                if len(tasks_names) > 0:
-                    ws.cell(row=counter + 1, column=1, value=key)
-                    ws.cell(row=counter + 1, column=party_idx + 2, value=sum(tasks_names[key]) / len(tasks_names[key]))
-                    counter += 1
+                flat_list = [item for sublist in tasks_names[key] for item in sublist]
+                flat_list = list(map(int, flat_list))
+                ws.cell(data_counter + 1, party_idx + 2, (sum(flat_list) / len(flat_list)))
+                data_counter += 1
 
-            # delete all the data from the lists after finish iterate al over party data
             for val in tasks_names.values():
                 val.clear()
 
-        wb.save(results_file_name)
+        # save the excel file
+        wb.save(result_file_name)
 
-    def analyze_cpu(self, results_path):
-        files_list = glob.glob(('%s/%s/*cpu*.json' % (Path.home(), results_path)))
-        self.analyze_results(files_list, 'cpu')
 
-    def analyze_comm_sent(self, results_path):
-        files_list = glob.glob(('%s/%s/*commSent*.json' % (Path.home(), results_path)))
-        self.analyze_results(files_list, 'sent')
 
-    def analyze_comm_received(self, results_path):
-        files_list = glob.glob(('%s/%s/*commReceived*.json' % (Path.home(), results_path)))
-        self.analyze_results(files_list, 'received')
 
-    def analyze_memory(self, results_path):
-        files_list = glob.glob(('%s/%s/*memory*.json' % (Path.home(), results_path)))
-        self.analyze_results(files_list, 'memory')
 
-    def analyze_all(self):
-        results_path = input('Enter results directory. current path is: %s): ' % os.getcwd())
-        self.analyze_cpu(results_path)
-        to_send = input('Do you want to send the results to email? (y/n):')
-        if to_send == 'y':
-            self.send_email()
+
+

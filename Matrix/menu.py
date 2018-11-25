@@ -255,11 +255,11 @@ class MatrixMenu:
 
         if selection == 1:
             a.download_data()
-            a.analyze_all()
+            a.analyze_results()
         elif selection == 2:
             a.download_data()
         elif selection == 3:
-            a.analyze_all()
+            a.analyze_results()
         elif selection == 4:
             e = ue.Elastic(self.protocol_config)
             e.upload_all_data()
