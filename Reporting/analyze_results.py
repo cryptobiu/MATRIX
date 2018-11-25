@@ -3,11 +3,10 @@ import glob
 import json
 import time
 import smtplib
-from os.path import exists, expanduser
+from os.path import expanduser
 from os.path import basename
 
 from openpyxl import Workbook
-from openpyxl import load_workbook
 from openpyxl.styles import NamedStyle
 
 from collections import OrderedDict
