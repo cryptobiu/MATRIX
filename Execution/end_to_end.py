@@ -1,6 +1,5 @@
 import os
 import json
-from collections import OrderedDict
 
 
 class E2E:
@@ -17,8 +16,9 @@ class E2E:
     def install_experiment(self):
         working_directory = self.protocol_config['workingDirectory']
         external_protocol = json.loads(self.protocol_config['isExternal'])
-        git_address = self.protocol_config['CloudProviders']['aws']['git']['gitAddress']
-        git_branch = self.protocol_config['CloudProviders']['aws']['git']['gitBranch']
+        cp = list(self.protocol_config['CloudProviders'].keys())
+        git_address = self.protocol_config['CloudProviders'][cp[0]]['git']['gitAddress']
+        git_branch = self.protocol_config['CloudProviders'][cp[0]]['git']['gitBranch']
 
         for idx in range(len(working_directory)):
             os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s --parallel'
