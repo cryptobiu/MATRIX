@@ -74,9 +74,14 @@ class Analyze:
             part['Content-Disposition'] = 'attachment; filename="%s"' % basename(results_file_name)
             message.attach(part)
 
+        with open('../GlobalConfigurations/tokens.json', 'r') as tokens:
+            data = json.load(tokens)
+            mail_username = data['mail']['user']
+            mail_password = data['mail']['password']
+
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.starttls()
-        server.login(address_me, 'Cyberexp1!')
+        server.login(mail_username, mail_password)
         server.sendmail(me, users, message.as_string())
         server.quit()
 
