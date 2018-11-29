@@ -5,21 +5,23 @@ import bson
 import json
 
 from pymongo import MongoClient
-from flask import Flask, render_template, request, flash, redirect, url_for, session
+from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify
 from flask_login import LoginManager
+from flask_cors import CORS
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from FlaskApp.competition_forms import CompetitionForm, CompetitionRegistrationForm
 from FlaskApp.validate_submission import Submission
 
-with open('../GlobalConfigurations/tokens.json', 'r') as tokens:
+with open('GlobalConfigurations/tokens.json', 'r') as tokens:
     data = json.load(tokens)
     db_username = data['mongo']['user']
     db_password = data['mongo']['password']
 
 
+@sched.scheduled_job('cron', day_of_the_week='mon-sun', hour=00)
 def validate_submission():
-    client = MongoClient(username=db_username, password=db_password)
+    client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
     db = client['BIU']
     collection = db['submissions']
 
@@ -38,12 +40,13 @@ def validate_submission():
             continue
 
 
-# sched = BackgroundScheduler(daemon=True)
-# sched.add_job(validate_submission, trigger='interval', seconds=10)
-# sched.start()
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(validate_submission, trigger='interval', seconds=10)
+sched.start()
 
 login_manager = LoginManager()
 app = Flask(__name__)
+CORS(app)
 login_manager.init_app(app)
 
 
@@ -58,9 +61,9 @@ def is_logged_in(f):
     return wrap
 
 
-@app.route('/home')
+@app.route('/main')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', title='')
 
 
 @app.route('/about')
@@ -73,7 +76,18 @@ def login():
     return render_template('login.html', title='-Login')
 
 
-@app.route('/<string:user>')
+@app.route('/getToken')
+def get_tokens():
+    with open('GlobalConfigurations/tokens.json', 'r') as json_file:
+        data = json.load(json_file)
+        response = app.response_class(
+            response=json.dumps(data),
+            mimetype='application/json'
+        )
+        return response
+
+
+@app.route('/login/<string:user>')
 def login_user(user):
     session['user'] = user
     session['logged_in'] = True
@@ -82,8 +96,7 @@ def login_user(user):
 
 @app.route('/circuits')
 def circuits():
-
-    client = MongoClient(username=db_username, password=db_password)
+    client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
     db = client['BIU']
     collection = db['circuits']
     circuits_list = []
@@ -94,9 +107,9 @@ def circuits():
 
 
 @app.route('/competitions')
-# @is_logged_in
+@is_logged_in
 def competitions():
-    client = MongoClient(username=db_username, password=db_password)
+    client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
     db = client['BIU']
     collection = db['competitions']
     competitions_list = []
@@ -119,7 +132,7 @@ def competitions_management():
         start_date = datetime.datetime.combine(start_date, datetime.datetime.min.time())
         end_date = datetime.datetime.combine(end_date, datetime.datetime.min.time())
 
-        client = MongoClient(username=db_username, password=db_password)
+        client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
         db = client['BIU']
         collection = db['competitions']
         competition = {
@@ -146,7 +159,7 @@ def competitions_management():
 def register_competition(competition_name):
     form = CompetitionRegistrationForm(request.form)
     if request.method == 'POST':
-        client = MongoClient(username=db_username, password=db_password)
+        client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
         db = client['BIU']
         collection = db['submissions']
         git_address = form.address.data
