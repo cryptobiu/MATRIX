@@ -13,7 +13,7 @@
                   </a>
               </li>
               <li class="nav-item active">
-                  <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                  <a class="nav-link" href="/main">Home <span class="sr-only">(current)</span></a>
               </li>
               <li class="nav-item">
                   <a class="nav-link" href="/about">About</a>
@@ -27,14 +27,6 @@
               <li class="nav-item">
                   <a class="nav-link" href="/competitions_manage">Admin Panel</a>
               </li>
-        </ul>
-
-        <ul class="nav navbar-nav navbar-right">
-            {% if session.logged_in %}
-                <li> <a class="nav-link" href="/logout">Logout</a></li>
-            {% else %}
-                <li> <a class="nav-link" href="/login">Login</a></li>
-            {% endif %}
         </ul>
           
       </div>

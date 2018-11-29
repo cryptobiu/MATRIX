@@ -16,6 +16,7 @@
 
 html, body {
   font-family: Roboto, 'Helvetica', 'sans-serif';
+  font-size: small;
   background: white;
 }
 a {

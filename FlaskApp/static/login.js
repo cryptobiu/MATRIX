@@ -1,10 +1,11 @@
 const config = {
-        apiKey: "insert_your_api_key",
-        authDomain: "insert_your_auth_domain",
-        databaseURL: "insert_your_database_url",
-        projectId: "insert_your_project_id",
-        storageBucket: "insert_your_storage_bucket",
-        messagingSenderId: "insert_your_messaging_sender_id"
+    apiKey: "insert_your_api_key",
+    authDomain: "insert_your_auth_domain",
+    databaseURL: "insert_your_database_url",
+    projectId: "insert_your_project_id",
+    storageBucket: "insert_your_storage_bucket",
+    messagingSenderId: "insert_your_messaging_sender_id"
+
     };
 firebase.initializeApp(config);
 
@@ -51,13 +52,12 @@ firebase.auth().onAuthStateChanged(firebaseUser => {
   if(firebaseUser) {
       btnLogout.classList.remove('hide');
       let user = firebase.auth().currentUser;
-      console.log(user);
       if(user != null) {
           let uid = user.uid;
           let httpRequest = new XMLHttpRequest();
-          httpRequest.open('GET', 'http://localhost:5000/' + uid, true);
+          httpRequest.open('GET', 'http://localhost:5000/login/' + uid, true);
           httpRequest.send();
-          httpRequest.onreadystatechange = e => {console.log(httpRequest.responseText);};
+          httpRequest.onreadystatechange = e => {window.location.href = 'http://localhost:5000/main';};
           btnLogin.classList.add('hide');
           //liork@gmail.com
       }
