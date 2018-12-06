@@ -83,7 +83,6 @@ def run_protocol(config_file, args, executable_name, working_directory):
 
         else:
             with cd(working_directory):
-
                 if env.user == 'root':
                     party_id = env.hosts.index('root@%s' % env.host)
                 else:
@@ -161,7 +160,56 @@ def run_protocol_profiler(config_file, args, executable_name, working_directory)
                 values_str += '%s ' % val
 
         with cd(working_directory):
+            if env.user == 'root':
+                party_id = env.hosts.index('root@%s' % env.host)
+            else:
+                party_id = env.hosts.index(env.host)
 
+            with warn_only():
+                sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name[idx])
+
+            if 'inputs0' in values_str:
+                values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
+
+            if not external_protocol:
+                if len(regions) > 1:
+                    put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
+                    run('mv parties%s.conf parties.conf' % party_id)
+                else:
+                    put('InstancesConfigurations/parties.conf', run('pwd'))
+                if party_id == 0:
+                    run('valgrind --tool=callgrind ./%s partyID %s %s'
+                        % (executable_name, party_id, values_str))
+                    get('callgrind.out.*', os.getcwd())
+                else:
+                    run('./%s partyID %s %s' % (executable_name, party_id, values_str))
+                    with open('Execution/execution_log.log', 'a+') as log_file:
+                        log_file.write('%s\n' % values_str)
+
+
+@task
+def run_protocol_with_latency(config_file, args, executable_name, working_directory):
+    with open(config_file) as data_file:
+        data = json.load(data_file, object_pairs_hook=OrderedDict)
+        external_protocol = json.loads(data['isExternal'].lower())
+        if 'aws' in data['CloudProviders']:
+            regions = data['CloudProviders']['aws']['regions']
+        elif 'scaleway' in data['CloudProviders']:
+            regions = data['CloudProviders']['scaleway']['regions']
+        else:
+            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['scaleway']['regions']
+        vals = args.split('@')
+        values_str = ''
+
+        for val in vals:
+            # for external protocols
+            if val == 'partyid':
+                values_str += '%s ' % str(env.hosts.index(env.host) - 1)
+            else:
+                values_str += '%s ' % val
+
+        with cd(working_directory):
+            sudo('tc qdisc add dev eth0 root netem delay 95ms')
             if env.user == 'root':
                 party_id = env.hosts.index('root@%s' % env.host)
             else:

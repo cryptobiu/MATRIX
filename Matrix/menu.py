@@ -62,6 +62,7 @@ class MatrixMenu:
             'Install Experiment',
             'Execute Experiment',
             'Execute Experiment with profiler',
+            'Execute Experiment with latency',
             'Update libscapi',
             'Return',
         ],
@@ -243,6 +244,8 @@ class MatrixMenu:
         elif selection == 4:
             ee.execute_experiment_callgrind()
         elif selection == 5:
+            ee.execute_experiment_with_latency()
+        elif selection == 6:
             ee.update_libscapi()
 
     def analysis_menu(self):

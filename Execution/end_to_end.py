@@ -48,6 +48,18 @@ class E2E:
                               % (self.protocol_config_path, configurations[idx2],
                                  executables[idx], working_directory[idx]))
 
+    def execute_experiment_with_latency(self):
+        number_of_repetitions = self.protocol_config['numOfRepetitions']
+        configurations = self.protocol_config['configurations']
+        working_directory = self.protocol_config['workingDirectory']
+        executables = self.protocol_config['executableName']
+        for i in range(number_of_repetitions):
+            for idx2 in range(len(configurations)):
+                for idx in range(len(executables)):
+                    os.system('fab -f Execution/fabfile.py run_protocol_with_latency:%s,%s,%s,%s --parallel'
+                              % (self.protocol_config_path, configurations[idx2],
+                                 executables[idx], working_directory[idx]))
+
     @staticmethod
     def update_libscapi():
         branch = input('Enter libscapi branch to update from:')
