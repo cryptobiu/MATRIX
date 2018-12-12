@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from collections import OrderedDict
 from fabric.api import *
 from fabric.contrib.files import exists
@@ -94,6 +95,13 @@ def run_protocol(config_file, args, executable_name, working_directory):
                 if 'inputs0' in values_str:
                     values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
 
+                # # apply delay if needed
+                #
+                # if 'delay' in data:
+                #     sudo('tc qdisc del dev ens5 root netem')
+                #     sudo('tc qdisc add dev ens5 root netem delay %sms' % data['delay'])
+                #     time.sleep(10)
+
                 if not external_protocol:
                     if len(regions) > 1:
                         put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
@@ -166,7 +174,7 @@ def run_protocol_profiler(config_file, args, executable_name, working_directory)
                 party_id = env.hosts.index(env.host)
 
             with warn_only():
-                sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name[idx])
+                sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
 
             if 'inputs0' in values_str:
                 values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
@@ -209,14 +217,17 @@ def run_protocol_with_latency(config_file, args, executable_name, working_direct
                 values_str += '%s ' % val
 
         with cd(working_directory):
-            sudo('tc qdisc add dev eth0 root netem delay 95ms')
+            # the warning required for multi executions.
+            # If you delete this line it will failed if you don't reboot the servers
+            with warn_only():
+                sudo('tc qdisc add dev ens5 root netem delay 300ms')
             if env.user == 'root':
                 party_id = env.hosts.index('root@%s' % env.host)
             else:
                 party_id = env.hosts.index(env.host)
 
             with warn_only():
-                sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name[idx])
+                sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
 
             if 'inputs0' in values_str:
                 values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
