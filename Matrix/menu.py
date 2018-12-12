@@ -52,6 +52,7 @@ class MatrixMenu:
             'Change machines types',
             'Start instances',
             'Stop instances',
+            'Copy AMI',
             'Return',
         ])
 
@@ -226,6 +227,8 @@ class MatrixMenu:
             deploy.start_instances()
         elif selection == 8:
             deploy.stop_instances()
+        elif selection == 9:
+            deploy.copy_ami()
 
     def execution_menu(self):
         """

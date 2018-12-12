@@ -1,90 +1,112 @@
 {
-  "us-east-1": {
-    "ami": "ami-06da2984a3ef734ee",
+  "us-east-1":
+  {
+    "ami": "ami-0b5c180a2a2a0bde0",
     "key": "Matrixuseast1",
     "securityGroup": "MatrixSGuseast1",
     "name": "N.Virginia"
   },
-  "us-east-2": {
-    "ami": "ami-c9310cac",
+  "us-east-2":
+  {
+    "ami": "ami-036b4afccfc677c07",
     "key": "Matrixuseast2-1",
     "securityGroup": "MatrixSGuseast2",
     "name": "Ohio"
   },
-  "us-west-1": {
-    "ami": "ami-65697705",
+  "us-west-1":
+  {
+    "ami": "ami-0c619478292bb8735",
     "key": "Matrixuswest1",
     "securityGroup": "MatrixSGuswest1",
     "name": "N.California"
   },
-  "us-west-2": {
-    "ami": "ami-4f166737",
+  "us-west-2":
+  {
+    "ami": "ami-083cfd994201fe185",
     "key": "Matrixuswest2-2",
     "securityGroup": "MatrixSGuswest2",
     "name": "Oregon"
   },
-  "ap-south-1": {
-    "ami": "ami-3428005b",
+  "ap-south-1":
+  {
+    "ami": "ami-08ae9b0c378888456",
     "key": "Matrixapsouth1",
     "securityGroup": "MatrixSGapsouth1",
     "name": "Mumbai"
   },
-  "ap-northeast-2": {
-    "ami": "ami-7609a018",
+  "ap-northeast-2":
+  {
+    "ami": "ami-0d7ddf35caa75d398",
     "key": "Matrixapnortheast2-1",
     "securityGroup": "MatrixSGapnortheast2",
     "name": "Seoul"
   },
-  "ap-southeast-1": {
-    "ami": "ami-99d0e5e5",
+  "ap-southeast-1":
+  {
+    "ami": "ami-0b69219d8b9569499",
     "key": "Matrixapsoutheast1",
     "securityGroup": "MatrixSGapsoutheast1",
     "name": "Singapore"
   },
-  "ap-southeast-2": {
-    "ami": "ami-fc1bcc9e",
+  "ap-southeast-2":
+  {
+    "ami": "ami-05ff15ce2bfbf27f7",
     "key": "Matrixapsoutheast2-2",
     "securityGroup": "MatrixSGapsoutheast2",
     "name": "Sydney"
   },
-  "ap-northeast-1": {
-    "ami": "ami-78bd5507",
+  "ap-northeast-1":
+  {
+    "ami": "ami-0f13db213225c4ab6",
     "key": "Matrixapnortheast1-1",
     "securityGroup": "MatrixSGapnortheast1",
     "name": "Tokyo"
   },
-  "ca-central-1": {
-    "ami": "ami-d88404bc",
+  "ca-central-1":
+  {
+    "ami": "ami-039a7314a08897189",
     "key": "Matrixcacentral1-1",
     "securityGroup": "MatrixSGcacentral1",
     "name": "Canada"
   },
-  "eu-central-1": {
-    "ami": "ami-8cae8c67",
+  "eu-central-1":
+  {
+    "ami": "ami-088ebe2fc372433aa",
     "key": "Matrixeucentral1",
     "securityGroup": "MatrixSGeucentral1",
     "name": "Frankfurt"
   },
-  "eu-west-1": {
-    "ami": "ami-1b5b6f62",
+  "eu-west-1":
+  {
+    "ami": "ami-06f6def0e8e01cdcf",
     "key": "Matrixeuwest1-6",
     "securityGroup": "MatrixSGeuwest1",
     "name": "Ireland"
   },
-  "eu-west-2": {
-    "ami": "ami-e47e9183",
+  "eu-west-2":
+  {
+    "ami": "ami-00cd5bef7ec190edf",
     "key": "Matrixeuwest2",
     "securityGroup": "MatrixSGeuwest2",
     "name": "London"
   },
-  "eu-west-3": {
-    "ami": "ami-749e2f09",
+  "eu-west-3":
+  {
+    "ami": "ami-0038e2335a6eb88e6",
     "key": "Matrixeuwest3-1",
     "securityGroup": "MatrixSGeuwest3",
     "name": "Paris"
   },
-  "sa-east-1": {
-    "ami": "ami-2699c44a",
+  "eu-north-1":
+  {
+    "ami": "ami-082d593181207e2ee",
+    "key": "Matrixeuwest3-1",
+    "securityGroup": "MatrixSGeuwest3",
+    "name": "Stockholm"
+  },
+  "sa-east-1":
+  {
+    "ami": "ami-050ef1863cc78accb",
     "key": "Matrixsaeast1",
     "securityGroup": "MatrixSGsaeast1",
     "name": "Sao Paulo"
