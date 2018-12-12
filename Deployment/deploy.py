@@ -1,9 +1,7 @@
 import os
-import json
 import copy
 import subprocess
 import shutil
-from collections import OrderedDict
 
 
 class DeployCP:
