@@ -1,0 +1,20 @@
+<table class="table table-bordered">
+  <tr>
+    <th>Competition Name</th>
+    <th>Description</th>
+    <th>Start Date</th>
+    <th>End Date</th>
+    <th></th>
+    <th></th>
+  </tr>
+  <tr *ngFor="let competition of competitions">
+    <td>{{competition.competitionName}}</td>
+    <td>{{competition.description}}</td>
+    <td>{{competition.startDate}}</td>
+    <td>{{competition.endDate}}</td>
+    <td><a href="register_competition/{{competition.competitionName}}" class="btn btn-default pull-right">
+      Participate</a></td>
+    <td><a href="" class="btn btn-default pull-right">Results</a></td>
+  </tr>
+</table>
+
