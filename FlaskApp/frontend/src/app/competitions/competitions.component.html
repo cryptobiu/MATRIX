@@ -4,6 +4,7 @@
     <th>Description</th>
     <th>Start Date</th>
     <th>End Date</th>
+    <th>Status</th>
     <th></th>
     <th></th>
   </tr>
@@ -12,7 +13,9 @@
     <td>{{competition.description}}</td>
     <td>{{competition.startDate}}</td>
     <td>{{competition.endDate}}</td>
-    <td><a href="register_competition/{{competition.competitionName}}" class="btn btn-default pull-right">
+    <td>{{competition.status}}</td>
+    <td *ngIf="competition.status == 'Open'">
+      <a href="register_competition/{{competition.competitionName}}" class="btn btn-default pull-right">
       Participate</a></td>
     <td><a href="" class="btn btn-default pull-right">Results</a></td>
   </tr>
