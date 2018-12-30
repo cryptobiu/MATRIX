@@ -1,25 +1,18 @@
-import {ICompetition} from "../competition";
-// import { CommonModule } from '@angular/common';
-import {Component, NgModule, OnInit} from '@angular/core';
-import {CompetitionService} from "../competition.service";
+import {Component, OnInit} from '@angular/core';
+import {DbService} from "../db.service";
 
-// @NgModule({
-//   imports: [CommonModule],
-//   exports: [],
-//   declarations: []
-// })
 
 @Component({
   selector: 'app-competitions',
   templateUrl: './competitions.component.html',
   styleUrls: ['./competitions.component.css'],
-  providers: [CompetitionService]
+  providers: [DbService]
 })
 
 export class CompetitionsComponent implements OnInit {
 
   public competitions = [];
-  constructor(private _competitionService: CompetitionService) { }
+  constructor(private _competitionService: DbService) { }
 
   ngOnInit() {
     this._competitionService.getCompetitions()
