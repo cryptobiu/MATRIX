@@ -12,10 +12,10 @@ import {DbService} from "../db.service";
 export class CompetitionsComponent implements OnInit {
 
   public competitions = [];
-  constructor(private _competitionService: DbService) { }
+  constructor(private dbService: DbService) { }
 
   ngOnInit() {
-    this._competitionService.getCompetitions()
+    this.dbService.getCompetitions()
       .subscribe(data => this.competitions = data);
   }
 
