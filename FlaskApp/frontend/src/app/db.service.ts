@@ -3,7 +3,7 @@ import {HttpClient, HttpClientModule} from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import {AppComponent} from "./app.component";
 import {Observable} from "rxjs";
-import {ICompetition} from "./competition";
+import {ICompetition, IProtocol} from "./interfaces";
 
 
 @NgModule({
@@ -16,13 +16,21 @@ import {ICompetition} from "./competition";
 @Injectable({
   providedIn: 'root'
 })
-export class CompetitionService {
+export class DbService {
 
-  private _getUrl: string = 'http://localhost:5000/competitions';
-  // constructor(private _http:Http) { }
+  private _urlApi: string = 'http://localhost:5000/';
+
   constructor(private _http:HttpClient) { }
 
   getCompetitions(): Observable<ICompetition[]> {
-    return this._http.get<ICompetition[]>(this._getUrl)
+    let url = this._urlApi + 'competitions';
+    return this._http.get<ICompetition[]>(url);
   }
+
+  getProtocols(): Observable<IProtocol[]> {
+    let url = this._urlApi + 'protocols';
+    return this._http.get<IProtocol[]>(url);
+  }
+
+
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {DbService} from "../db.service";
 
 @Component({
   selector: 'app-protocols',
@@ -7,9 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ProtocolsComponent implements OnInit {
 
-  constructor() { }
+  public protocols = [];
+  constructor(private dbService: DbService) { }
 
   ngOnInit() {
+    this.dbService.getProtocols()
+      .subscribe(data => this.protocols = data);
   }
 
 }

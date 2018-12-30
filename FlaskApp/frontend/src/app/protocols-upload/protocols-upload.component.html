@@ -1,0 +1,55 @@
+<div class="container-fluid mb-5">
+  <div class="alert alert-danger" *ngIf="errmsg">
+    {{ errmsg }}
+  </div>
+  <form #userForm="ngForm" *ngIf="!submitted" target="/protocols" novalidate (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label>Protocol Name</label>
+      <input type="text" required #name="ngModel"
+             [class.is-invalid]="name.invalid && name.touched" class="form-control"
+             name="protocolName" [(ngModel)]="protocolModel.protocolName">
+      <small class="text-danger" [class.d-none]="name.valid || name.untouched">Protocol name is required</small>
+    </div>
+
+    <div class="form-group">
+      <label>Git Repository</label>
+      <input type="text" required (blur)="validateAddress(repoAddress.value)"
+      (change)="validateAddress(repoAddress.value)" #repoAddress="ngModel"
+             [class.is-invalid]="repoAddress.invalid && repoAddress.touched"
+             class="form-control" name="repoAddress" [(ngModel)]="protocolModel.repoAddress">
+      <small class="text-danger" [class.d-none]="repoAddress.valid || repoAddress.untouched">
+        Git repository is required and must be valid http/https address</small>
+    </div>
+    <br>
+
+    <div class="form-group">
+      <select required (blur)="validateSl(security.value)" (change)="validateSl(security.value)"
+              #security="ngModel"
+              [class.is-invalid]="security.invalid && security.touched"
+              class="custom-select" name="securityLevel" [(ngModel)]="protocolModel.securityLevel">
+        <option value="default">Security Level</option>
+        <option *ngFor="let sl of securityLevel">{{ sl }}</option>
+      </select>
+      <small class="text-danger" [class.d-none]="!slHasError || security.untouched">
+        Please select value from the list</small>
+    </div>
+    <br>
+
+    <div class="form-group">
+      <select required (blur)="validateSt(thresholdLevel.value)" (change)="validateSt(thresholdLevel.value)"
+              #thresholdLevel="ngModel"
+              [class.is-invalid]="thresholdLevel.invalid && thresholdLevel.touched"
+              class="custom-select" name="thresholdLevel" [(ngModel)]="protocolModel.thresholdLevel">
+        <option value="default">Threshold for security level</option>
+        <option *ngFor="let st of securityThreshold">{{ st }}</option>
+      </select>
+      <small class="text-danger" [class.d-none]="!stHasError || thresholdLevel.untouched">
+        Please select value from the list</small>
+    </div>
+
+    <br>
+    <button [disabled]="userForm.form.invalid || slHasError" class="btn btn-primary" type="submit">Upload Protocol</button>
+
+  </form>
+</div>

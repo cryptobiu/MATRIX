@@ -7,9 +7,10 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
 import { HomeComponent } from './home/home.component';
 import { CompetitionsDetailsComponent } from './competitions-details/competitions-details.component';
 import { LoginComponent } from './login/login.component';
-import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
-import { ProtocolsComponent } from './protocols/protocols.component'
+import { ProtocolsComponent } from './protocols/protocols.component';
+import { ProtocolsUploadComponent } from './protocols-upload/protocols-upload.component'
+import {FormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -19,13 +20,14 @@ import { ProtocolsComponent } from './protocols/protocols.component'
     HomeComponent,
     CompetitionsDetailsComponent,
     LoginComponent,
-    ProtocolsComponent
+    ProtocolsComponent,
+    ProtocolsUploadComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    HttpModule
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

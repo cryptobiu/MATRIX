@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { DbService } from './db.service';
+import { FormSubmissionService } from './formSubmission.service';
 
-describe('CompetitionService', () => {
+describe('EnrollmentService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: DbService = TestBed.get(DbService);
+    const service: FormSubmissionService = TestBed.get(FormSubmissionService);
     expect(service).toBeTruthy();
   });
 });

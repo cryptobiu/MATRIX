@@ -1,3 +1,25 @@
-<p>
-  protocols works!
-</p>
+<div class="info">
+  The page contains all the protocols that benchmark with MATRIX.<br>
+  To upload a new protocol press the button below
+  <br><br>
+  <a href="/protocolsupload" >Upload new protocol</a>
+</div>
+
+  <table class="table table-bordered">
+  <tr>
+    <th>Protocol Name</th>
+    <th>Git Repository</th>
+    <th>Security Level</th>
+    <th>Threshold Level</th>
+    <th></th>
+    <th></th>
+  </tr>
+  <tr *ngFor="let protocol of protocols">
+    <td>{{protocol.name}}</td>
+    <td>{{protocol.repoAddress}}</td>
+    <td>{{protocol.securityLevel}}</td>
+    <td>{{protocol.securityThreshold}}</td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
