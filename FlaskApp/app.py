@@ -1,4 +1,6 @@
 import datetime
+import os
+import urllib
 
 import bson
 import json
@@ -7,7 +9,10 @@ from pymongo import MongoClient
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-with open('../GlobalConfigurations/tokens.json', 'r') as tokens:
+from Deployment.aws_deploy import AmazonCP
+from Execution.end_to_end import E2E
+
+with open('GlobalConfigurations/tokens.json', 'r') as tokens:
     data = json.load(tokens)
     db_username = data['mongo']['user']
     db_password = data['mongo']['password']
@@ -41,6 +46,21 @@ def get_competitions():
     return json.dumps(competitions_list)
 
 
+@app.route('/protocols')
+def get_protocols():
+    client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
+    db = client['BIU']
+    collection = db['protocols']
+    protocols_list = []
+
+    for protocols in collection.find({}, {'_id': 0}):
+        # convert all competition values to string since datetime cannot be jsonify
+        protocols = dict((k, str(v)) for k, v in protocols.items())
+        protocols_list.append(protocols)
+
+    return json.dumps(protocols_list)
+
+
 @app.route('/protocols/registerProtocol', methods=['POST'])
 def register_new_protocol():
     form = request.data
@@ -65,19 +85,54 @@ def register_new_protocol():
     return jsonify('form submitted')
 
 
-@app.route('/protocols')
-def get_protocols():
+@app.route('/getprotocoldata/<string:protocol_name>')
+def get_protocol_data(protocol_name):
+    protocol_data = {}
+    config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
+                  % protocol_name
+    raw_data = urllib.request.urlopen(config_file).read()
+    data = json.loads(raw_data)
+    raw_configurations = data['configurations']
+    configurations = []
+
+    for conf in raw_configurations:
+        configurations.append(conf.replace('@', ' '))
+
+    protocol_data['protocolName'] = data['protocol']
+    protocol_data['numberOfParties'] = data['CloudProviders']['aws']['numOfParties']
+    protocol_data['machineType'] = data['CloudProviders']['aws']['instanceType']
+    protocol_data['regions'] = data['CloudProviders']['aws']['regions']
+    protocol_data['configurations'] = configurations
+
+    return jsonify(protocol_data)
+
+
+@app.route('/protocols/<string:protocol_name>')
+def execute_protocol(protocol_name):
     client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
     db = client['BIU']
     collection = db['protocols']
-    protocols_list = []
+    protocols = collection.find({}, {'_id': 0, 'name': protocol_name})
+    for protocol in protocols:
+        print(protocol['name'])
 
-    for protocols in collection.find({}, {'_id': 0}):
-        # convert all competition values to string since datetime cannot be jsonify
-        protocols = dict((k, str(v)) for k, v in protocols.items())
-        protocols_list.append(protocols)
+    config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
+                  % protocol_name
+    raw_data = urllib.request.urlopen(config_file).read()
+    data = json.loads(raw_data)
+    config_file_path = '%s/%s.json' % (os.getcwd(), protocol_name)
 
-    return json.dumps(protocols_list)
+    # data needed to be saved as json file also for fabric
+    with open(config_file_path, 'w+') as fp:
+        json.dump(data, fp)
+
+    # deploy = AmazonCP(data)
+    # deploy.deploy_instances()
+
+    execution = E2E(data, config_file_path)
+    execution.install_experiment()
+    execution.execute_experiment()
+    return jsonify('data received')
 
 
 if __name__ == '__main__':

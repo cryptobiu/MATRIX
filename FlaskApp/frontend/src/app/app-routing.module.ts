@@ -8,12 +8,14 @@ import {CompetitionsDetailsComponent} from "./competitions-details/competitions-
 import {LoginComponent} from "./login/login.component";
 import {ProtocolsComponent} from "./protocols/protocols.component";
 import {ProtocolsUploadComponent} from "./protocols-upload/protocols-upload.component";
+import {ProtocolsDetailsComponent} from "./protocols-details/protocols-details.component";
 
 const routes: Routes = [
   {path: '', component:HomeComponent, pathMatch:'full'},
   { path: 'competitions', component:CompetitionsComponent, pathMatch:'full'},
-  { path: 'competitions/:id', component:CompetitionsDetailsComponent},
+  { path: 'competitions/:name', component:CompetitionsDetailsComponent},
   { path: 'protocols', component:ProtocolsComponent, pathMatch:'full'},
+  { path: 'protocols/:name', component: ProtocolsDetailsComponent, pathMatch: 'full'},
   { path: 'protocolsupload', component:ProtocolsUploadComponent, pathMatch:'full'},
   { path: 'circuits', component:CircuitsComponent, pathMatch:'full'},
   { path: 'login', component:LoginComponent, pathMatch:'full'},

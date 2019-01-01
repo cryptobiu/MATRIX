@@ -12,3 +12,12 @@ export interface IProtocol {
   securityLevel: string,
   securityThreshold: string
 }
+
+export interface IProtocolData {
+  protocolName: string;
+  numberOfParties: number;
+  machineType: string;
+  regions: string[];
+  configurations: string[];
+
+}

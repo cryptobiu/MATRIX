@@ -3,7 +3,7 @@ import {HttpClient, HttpClientModule} from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import {AppComponent} from "./app.component";
 import {Observable} from "rxjs";
-import {ICompetition, IProtocol} from "./interfaces";
+import {ICompetition, IProtocol, IProtocolData} from "./interfaces";
 
 
 @NgModule({
@@ -30,6 +30,16 @@ export class DbService {
   getProtocols(): Observable<IProtocol[]> {
     let url = this._urlApi + 'protocols';
     return this._http.get<IProtocol[]>(url);
+  }
+
+  getProtocolDate(protocolName: string): Observable<IProtocolData> {
+  let url = this._urlApi + 'getprotocoldata/' + protocolName;
+    return this._http.get<IProtocolData>(url);
+  }
+
+  executeProtocol(protocolName: string) {
+    let url = this._urlApi + 'protocols/' + protocolName;
+    return this._http.get(url);
   }
 
 
