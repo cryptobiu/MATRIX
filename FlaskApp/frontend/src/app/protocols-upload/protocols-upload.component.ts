@@ -26,15 +26,15 @@ export class ProtocolsUploadComponent implements OnInit {
   securityLevel = ['Semi Honest', 'Malicious'];
   securityThreshold = ['None', 'Honest Majority', '2/3 Majority'];
   protocolModel = new Protocol('', '', '', '');
-  adressHasError = true;
+  addressHasError = true;
   slHasError = true;
   stHasError = true;
   submitted = false;
   errmsg = '';
 
   validateAddress(value) {
-    if(!value.match(/^https?:\/\//)) this.adressHasError = true;
-    else this.adressHasError = false;
+    if(!value.match(/^https?:\/\//)) this.addressHasError = true;
+    else this.addressHasError = false;
   }
 
   validateSl(value){

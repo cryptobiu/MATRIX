@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-competitions-details',
@@ -8,12 +8,12 @@ import {ActivatedRoute, Router} from "@angular/router";
 })
 export class CompetitionsDetailsComponent implements OnInit {
 
-  public competitionId;
+  public competitionName;
   constructor(private router: ActivatedRoute) { }
 
   ngOnInit() {
-    let id = parseInt(this.router.snapshot.paramMap.get('id'));
-    this.competitionId = id;
+    let name = this.router.snapshot.paramMap.get('name');
+    this.competitionName = name;
   }
 
 
