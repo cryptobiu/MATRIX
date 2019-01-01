@@ -4,7 +4,7 @@
   {
     "aws":
     {
-      "numOfParties":5,
+      "numOfParties":10,
       "instanceType":"c5.xlarge",
       "regions":
       ["us-east-1a"],
