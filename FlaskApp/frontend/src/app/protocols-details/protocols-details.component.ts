@@ -12,6 +12,7 @@ export class ProtocolsDetailsComponent implements OnInit {
 
   private protocolName: string;
   private protocolData: IProtocolData;
+  private fileData: string;
   constructor(private ac_router: ActivatedRoute, private router:Router, private dbService: DbService) { }
 
   ngOnInit() {
@@ -23,7 +24,7 @@ export class ProtocolsDetailsComponent implements OnInit {
 
   onSubmit(){
     this.dbService.executeProtocol(this.protocolName).
-    subscribe(data => this.router.navigate(['/protocols']));
+    subscribe(data => this.router.navigate(['/protocols/execution/' + this.protocolName]));
   }
 
 }

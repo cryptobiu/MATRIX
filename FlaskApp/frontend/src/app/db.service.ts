@@ -42,5 +42,9 @@ export class DbService {
     return this._http.get(url);
   }
 
+  readTextFile(){
+    let url = 'assets/stdout_output';
+    return this._http.get(url, {responseType: 'text'});
+  }
 
 }

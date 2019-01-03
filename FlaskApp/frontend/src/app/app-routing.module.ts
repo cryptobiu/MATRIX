@@ -9,14 +9,16 @@ import {LoginComponent} from "./login/login.component";
 import {ProtocolsComponent} from "./protocols/protocols.component";
 import {ProtocolsUploadComponent} from "./protocols-upload/protocols-upload.component";
 import {ProtocolsDetailsComponent} from "./protocols-details/protocols-details.component";
+import {ProtocolsExecutionComponent} from "./protocols-execution/protocols-execution.component";
 
 const routes: Routes = [
   {path: '', component:HomeComponent, pathMatch:'full'},
   { path: 'competitions', component:CompetitionsComponent, pathMatch:'full'},
   { path: 'competitions/:name', component:CompetitionsDetailsComponent},
   { path: 'protocols', component:ProtocolsComponent, pathMatch:'full'},
+  { path: 'protocols/upload', component:ProtocolsUploadComponent, pathMatch:'full'},
+  { path: 'protocols/execution/:name', component: ProtocolsExecutionComponent, pathMatch: 'full'},
   { path: 'protocols/:name', component: ProtocolsDetailsComponent, pathMatch: 'full'},
-  { path: 'protocolsupload', component:ProtocolsUploadComponent, pathMatch:'full'},
   { path: 'circuits', component:CircuitsComponent, pathMatch:'full'},
   { path: 'login', component:LoginComponent, pathMatch:'full'},
   { path: '**', component:PageNotFoundComponent, pathMatch:'full'},

@@ -12,6 +12,7 @@ import { ProtocolsComponent } from './protocols/protocols.component';
 import { ProtocolsUploadComponent } from './protocols-upload/protocols-upload.component'
 import {FormsModule} from "@angular/forms";
 import { ProtocolsDetailsComponent } from './protocols-details/protocols-details.component';
+import { ProtocolsExecutionComponent } from './protocols-execution/protocols-execution.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { ProtocolsDetailsComponent } from './protocols-details/protocols-details
     LoginComponent,
     ProtocolsComponent,
     ProtocolsUploadComponent,
-    ProtocolsDetailsComponent
+    ProtocolsDetailsComponent,
+    ProtocolsExecutionComponent
   ],
   imports: [
     BrowserModule,
