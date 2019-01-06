@@ -21,7 +21,8 @@ class E2E:
         git_branch = self.protocol_config['CloudProviders']['aws']['git']['gitBranch']
 
         for idx in range(len(working_directory)):
-            os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s --parallel'
+            os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s --parallel |'
+                      ' tee FlaskApp/frontend/src/assets/stdout_output'
                       % (git_branch[idx], working_directory[idx], git_address[idx], external_protocol))
 
     def execute_experiment(self):
@@ -32,7 +33,8 @@ class E2E:
         for i in range(number_of_repetitions):
             for idx2 in range(len(configurations)):
                 for idx in range(len(executables)):
-                    os.system('fab -f Execution/fabfile.py run_protocol:%s,%s,%s,%s --parallel'
+                    os.system('fab -f Execution/fabfile.py run_protocol:%s,%s,%s,%s --parallel | '
+                              'tee FlaskApp/frontend/src/assets/stdout_output'
                               % (self.protocol_config_path, configurations[idx2],
                                  executables[idx], working_directory[idx]))
 

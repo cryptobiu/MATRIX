@@ -109,12 +109,6 @@ def get_protocol_data(protocol_name):
 
 @app.route('/protocols/<string:protocol_name>')
 def execute_protocol(protocol_name):
-    client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
-    db = client['BIU']
-    collection = db['protocols']
-    protocols = collection.find({}, {'_id': 0, 'name': protocol_name})
-    for protocol in protocols:
-        print(protocol['name'])
 
     config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
                   % protocol_name
@@ -129,9 +123,9 @@ def execute_protocol(protocol_name):
     # deploy = AmazonCP(data)
     # deploy.deploy_instances()
 
-    execution = E2E(data, config_file_path)
-    execution.install_experiment()
-    execution.execute_experiment()
+    # execution = E2E(data, config_file_path)
+    # execution.install_experiment()
+    # execution.execute_experiment()
     return jsonify('data received')
 
 

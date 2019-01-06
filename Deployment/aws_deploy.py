@@ -101,7 +101,8 @@ class AmazonCP(DeployCP):
             number_of_instances = number_of_parties
 
         date = datetime.now() - timedelta(hours=3)
-        print('Current date : \n%s' % str(date))
+        with open('stdout_output', 'w+') as output_file:
+            print('Current date : \n%s' % str(date), file=output_file)
         new_date = date + timedelta(hours=6)
 
         for idx in range(len(regions)):
@@ -113,10 +114,11 @@ class AmazonCP(DeployCP):
                 number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
             else:
                 number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
-
-            print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
-                  'valid until : %s' % (regions[idx], number_of_instances_to_deploy,
-                                        global_config[regions[idx][:-1]]["ami"], machine_type, str(new_date)))
+            with open('stdout_output', 'a+') as output_file:
+                print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
+                      'valid until : %s' % (regions[idx], number_of_instances_to_deploy,
+                                            global_config[regions[idx][:-1]]["ami"], machine_type, str(new_date)),
+                      file=output_file)
 
             if number_of_instances_to_deploy > 0:
                 if spot_request:
