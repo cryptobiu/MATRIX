@@ -116,6 +116,10 @@ def run_protocol(config_file, args, executable_name, working_directory):
                     with cd('MATRIX'):
                         if 'coordinatorConfig' in data:
                             # run protocols  with coordinator
+                            put('InstancesConfigurations/parties.conf', run('pwd'))
+                            # public ips are required for SCALE-MAMBA
+                            put('InstancesConfigurations/public_ips', run('pwd'))
+
                             if env.hosts.index(env.host) == 0:
                                 coordinator_executable = data['coordinatorExecutable']
                                 coordinator_args = data['coordinatorConfig'].split('@')
@@ -123,7 +127,13 @@ def run_protocol(config_file, args, executable_name, working_directory):
 
                                 for coordinator_val in coordinator_args:
                                     coordinator_values_str += '%s ' % coordinator_val
+
+                                with warn_only():
                                     sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % coordinator_executable)
+                                    # required for SCALE-MAMBA to rsync between AWS instances
+                                    put(env.key_filename[0], run('pwd'))
+
+
                                 run('./%s %s' % (coordinator_executable, coordinator_values_str))
                                 with open('Execution/execution_log.log', 'a+') as log_file:
                                     log_file.write('%s\n' % values_str)
@@ -131,8 +141,6 @@ def run_protocol(config_file, args, executable_name, working_directory):
                                 if len(regions) > 1:
                                     put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
                                     run('mv parties%s.conf parties.conf' % party_id)
-                                else:
-                                    put('InstancesConfigurations/parties.conf', run('pwd'))
 
                                 run('. ./%s %s %s' % (executable_name, party_id - 1, values_str))
                                 with open('Execution/execution_log.log', 'a+') as log_file:

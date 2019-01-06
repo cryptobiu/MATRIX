@@ -1,0 +1,32 @@
+{
+  "protocol": "SCALE-MAMBA",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":3,
+      "instanceType":"c4.2xlarge",
+      "regions": ["eu-west-2c"],
+      "git":
+      {
+        "gitBranch": ["matrix"],
+        "gitAddress": ["https://github.com/KULeuven-COSIC/SCALE-MAMBA"]
+      }
+    }
+  },
+  "executableName":["run.sh"],
+  "configurations":
+  [
+    "Programs/tutorial@-pnb@5000"
+  ],
+  "coordinatorExecutable": "coordinator.sh",
+  "coordinatorConfig": "20@",
+  "numOfRepetitions": 1,
+  "numOfInternalRepetitions": 1,
+  "IsPublished": "true",
+  "isExternal": "true",
+  "workingDirectory":["~/SCALE-MAMBA"],
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "emails": ["dragos.rotaru@esat.kuleuven.be"],
+  "institute": "KU Leuven"
+}
