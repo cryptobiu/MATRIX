@@ -5,7 +5,7 @@ import colorama
 from collections import OrderedDict
 from Deployment import deploy as de
 from Deployment import aws_deploy as awsde
-from Deployment import scaleway_deploy as sde
+from Deployment import azure_deploy as azde
 from Deployment import multi_cp_deploy as mde
 from Execution import end_to_end as e2e
 from Reporting import analyze_results as ar
@@ -22,7 +22,7 @@ class MatrixMenu:
          'green': colorama.Fore.GREEN,
          'yellow': colorama.Fore.YELLOW,
          'red': colorama.Fore.RED,
-         'magenta': colorama.Fore.MAGENTA}
+         'azure': colorama.Fore.LIGHTBLUE_EX}
 
     main_menu_desc = (
         'Welcome to MATRIX system.\nPlease Insert your choice:',
@@ -38,7 +38,7 @@ class MatrixMenu:
 
     cloud_provider_menu_desc = (
         'Choose cloud provider',
-        ['AWS', 'Scaleway', 'Both', 'local', 'servers', 'Return'],
+        ['AWS', 'Azure', 'Both', 'local', 'servers', 'Return'],
         'blue')
 
     deploy_menu_desc = (
@@ -196,12 +196,12 @@ class MatrixMenu:
             deploy = awsde.AmazonCP(self.protocol_config)
             menu_color = 'red'
         elif cp == 2:
-            deploy = sde.ScalewayCP(self.protocol_config)
-            menu_color = 'magenta'
+            deploy = azde.AzureCP(self.protocol_config)
+            menu_color = 'azure'
         elif cp == 4 or cp == 5:
             deploy = de.DeployCP(self.protocol_config)
             menu_color = 'blue'
-        elif cp == 4:
+        elif cp == 6:
             return
 
         selection = self.print_menu(*self.deploy_menu_desc, menu_color)
