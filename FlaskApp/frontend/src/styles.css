@@ -1,4 +1,5 @@
 /* Master Styles */
+
 h1 {
     color: #369;
     font-family: Arial, Helvetica, sans-serif;
@@ -8,9 +9,6 @@ h1 {
     color: #444;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: lighter;
-  }
-  body {
-    margin: 2em;
   }
   body, input[text], button {
     color: #888;
@@ -119,7 +117,24 @@ h1 {
     background-color: #CFD8DC;
     color: white;
   }
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+
+  mat-toolbar a {
+    display: inline-block;
+    margin: 0 10px;
+    color: white;
+    text-decoration: none;
+  }
+
   /* everywhere else */
   * {
     font-family: Arial, Helvetica, sans-serif;
   }
+
+
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

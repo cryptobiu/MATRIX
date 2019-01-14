@@ -13,6 +13,10 @@ import { ProtocolsUploadComponent } from './protocols-upload/protocols-upload.co
 import {FormsModule} from "@angular/forms";
 import { ProtocolsDetailsComponent } from './protocols-details/protocols-details.component';
 import { ProtocolsExecutionComponent } from './protocols-execution/protocols-execution.component';
+import { MainNavComponent } from './main-nav/main-nav.component';
+import { LayoutModule } from '@angular/cdk/layout';
+import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -25,13 +29,21 @@ import { ProtocolsExecutionComponent } from './protocols-execution/protocols-exe
     ProtocolsComponent,
     ProtocolsUploadComponent,
     ProtocolsDetailsComponent,
-    ProtocolsExecutionComponent
+    ProtocolsExecutionComponent,
+    MainNavComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    LayoutModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
