@@ -52,6 +52,7 @@ class MatrixMenu:
             'Change machines types',
             'Start instances',
             'Stop instances',
+            'Copy AMI',
             'Return',
         ])
 
@@ -62,6 +63,7 @@ class MatrixMenu:
             'Install Experiment',
             'Execute Experiment',
             'Execute Experiment with profiler',
+            'Execute Experiment with latency',
             'Update libscapi',
             'Return',
         ],
@@ -199,6 +201,9 @@ class MatrixMenu:
         elif cp == 2:
             deploy = sde.ScalewayCP(self.protocol_config)
             menu_color = 'magenta'
+        elif cp == 3:
+            deploy = mde.MultiCP(self.protocol_config)
+            menu_color = 'blue'
         elif cp == 4 or cp == 5:
             deploy = de.DeployCP(self.protocol_config)
             menu_color = 'blue'
@@ -224,6 +229,25 @@ class MatrixMenu:
                 deploy.start_instances()
             elif selection == 8:
                 deploy.stop_instances()
+                >>>>>>> variant B
+        if selection == 1:
+            deploy.deploy_instances()
+        elif selection == 2:
+            deploy.create_key_pair()
+        elif selection == 3:
+            deploy.create_security_group()
+        elif selection == 4:
+            deploy.get_network_details()
+        elif selection == 5:
+            deploy.terminate_instances()
+        elif selection == 6:
+            deploy.change_instance_types()
+        elif selection == 7:
+            deploy.start_instances()
+        elif selection == 8:
+            deploy.stop_instances()
+        elif selection == 9:
+            deploy.copy_ami()
         except NotImplementedError:
             MatrixMenu.color_print("Selected action '{}' is not implemented for the chosen deployment '{}'".format(self.deploy_menu_desc[1][selection - 1], self.cloud_provider_menu_desc[1][cp - 1]), menu_color)
             self.instances_management_menu()
@@ -245,6 +269,8 @@ class MatrixMenu:
         elif selection == 4:
             ee.execute_experiment_callgrind()
         elif selection == 5:
+            ee.execute_experiment_with_latency()
+        elif selection == 6:
             ee.update_libscapi()
 
     def analysis_menu(self):
@@ -257,11 +283,11 @@ class MatrixMenu:
 
         if selection == 1:
             a.download_data()
-            a.analyze_all()
+            a.analyze_results()
         elif selection == 2:
             a.download_data()
         elif selection == 3:
-            a.analyze_all()
+            a.analyze_results()
         elif selection == 4:
             e = ue.Elastic(self.protocol_config)
             e.upload_all_data()

@@ -349,3 +349,21 @@ class AmazonCP(DeployCP):
 
             client = boto3.client('ec2', region_name=region_name)
             client.terminate_instances(InstanceIds=instances)
+
+    @staticmethod
+    def copy_ami():
+        with open('GlobalConfigurations/regions.json', 'r') as regions_file:
+            data = json.load(regions_file, object_pairs_hook=OrderedDict)
+
+        source_region = input('enter source region:')
+        regions_list = list(data.keys())
+        regions_list.remove(source_region)
+
+        for region in regions_list:
+            client = boto3.client('ec2', region_name=region)
+            response = client.copy_image(Description='libscapi image', Name='libscapi',
+                                         SourceImageId=data[source_region]['ami'], SourceRegion=source_region)
+            data[region]['ami'] = response['ImageId']
+
+        with open('GlobalConfigurations/regions.json', 'w') as regions_file:
+            json.dump(data, regions_file)
