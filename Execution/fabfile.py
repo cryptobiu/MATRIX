@@ -6,16 +6,18 @@ from fabric.contrib.files import exists
 from pathlib import Path
 
 env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
-env.user = 'ubuntu'
+env.user = 'psn'
 # env.password=''
-env.key_filename = ['%s/Keys/matrix.pem' % Path.home()]
+manager_home_dir = "/Users/psn/Projects/MATRIX-EXP/manager"
+remote_home_dir = "/Users/psn/Projects/MATRIX-EXP/remote"
+env.key_filename = ['%s/Keys/matrix.pem' % manager_home_dir]
 
 
 @task
 def pre_process(working_directory, task_idx):
     sudo('apt-get install python3 -y')
     with cd(working_directory):
-        put('%s/ExperimentExecute/pre_process.py' % Path.home())
+        put('%s/ExperimentExecute/pre_process.py' % manager_home_dir)
         run('python3 pre_process.py %s' % task_idx)
 
 
@@ -202,7 +204,7 @@ def collect_results(results_server_directory, results_local_directory, is_extern
 @task
 def get_logs(working_directory):
     local('mkdir -p logs')
-    get('%s/logs/*.log' % working_directory, '%s/MATRIX/logs' % Path.home())
+    get('%s/logs/*.log' % working_directory, '%s/MATRIX/logs' % remote_home_dir)
 
 
 @task
