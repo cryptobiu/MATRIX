@@ -1,0 +1,28 @@
+{
+  "protocol":"FRESCO-SPDZ",
+  "CloudProviders":
+  {
+    "local":
+    {
+      "numOfParties":2,
+      "git":
+      {
+        "gitBranch": ["matrix-framework-test"],
+        "gitAddress": ["https://github.com/aicis/fresco.git"]
+      }
+    }
+  },
+  "executableName": ["MATRIX/run.sh"],
+  "configurations":
+  [
+    ""
+  ],
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "IsPublished": "true",
+  "isExternal": "true",
+  "workingDirectory": ["/Users/psn/Projects/MATRIX-EXP/fresco-test"],
+  "resultsDirectory": "/Users/psn/Projects/MATRIX-EXP/MATRIX",
+  "emails": ["peter.s.nordholt@alexandra.dk"],
+  "institute":"The Alexandra Institute"
+}
