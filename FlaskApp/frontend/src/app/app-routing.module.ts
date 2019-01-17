@@ -10,6 +10,8 @@ import {ProtocolsComponent} from "./protocols/protocols.component";
 import {ProtocolsUploadComponent} from "./protocols-upload/protocols-upload.component";
 import {ProtocolsDetailsComponent} from "./protocols-details/protocols-details.component";
 import {ProtocolsExecutionComponent} from "./protocols-execution/protocols-execution.component";
+import {ProtocolDeploymentComponent} from "./protocol-deployment/protocol-deployment.component";
+// import {ExecutionComponent} from "./execution/execution.component";
 
 const routes: Routes = [
   {path: '', component:HomeComponent, pathMatch:'full'},
@@ -19,6 +21,8 @@ const routes: Routes = [
   { path: 'protocols/upload', component:ProtocolsUploadComponent, pathMatch:'full'},
   { path: 'protocols/execution/:name', component: ProtocolsExecutionComponent, pathMatch: 'full'},
   { path: 'protocols/:name', component: ProtocolsDetailsComponent, pathMatch: 'full'},
+  { path: 'deployment', component: ProtocolDeploymentComponent, pathMatch: 'full'},
+  // { path: 'execution', component: ExecutionComponent, pathMatch: 'full'},
   { path: 'circuits', component:CircuitsComponent, pathMatch:'full'},
   { path: 'login', component:LoginComponent, pathMatch:'full'},
   { path: '**', component:PageNotFoundComponent, pathMatch:'full'},

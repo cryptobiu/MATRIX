@@ -13,13 +13,12 @@
       <a mat-list-item href="/execution">Execution</a>
     </mat-nav-list>
   </mat-sidenav>
+  <!--For elements outside the navbar-->
   <mat-sidenav-content>
     <mat-toolbar color="primary">
-      <button
+      <button mat-icon-button (click)="drawer.toggle()"
         type="button"
         aria-label="Toggle sidenav"
-        mat-icon-button
-        (click)="drawer.toggle()"
         *ngIf="isHandset$ | async">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>

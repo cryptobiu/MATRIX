@@ -15,8 +15,11 @@ import { ProtocolsDetailsComponent } from './protocols-details/protocols-details
 import { ProtocolsExecutionComponent } from './protocols-execution/protocols-execution.component';
 import { MainNavComponent } from './main-nav/main-nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
-import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
+import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTableModule, MatPaginatorModule, MatSortModule, MatSelectModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { DeploymentComponent } from './deployment/deployment.component';
+import { ProtocolDeploymentComponent } from './protocol-deployment/protocol-deployment.component';
+// import { ExecutionComponent } from './execution/execution.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +33,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ProtocolsUploadComponent,
     ProtocolsDetailsComponent,
     ProtocolsExecutionComponent,
-    MainNavComponent
+    MainNavComponent,
+    DeploymentComponent,
+    ProtocolDeploymentComponent,
+    // ExecutionComponent
   ],
   imports: [
     BrowserModule,
@@ -43,7 +49,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatSidenavModule,
     MatIconModule,
     MatListModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]
