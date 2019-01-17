@@ -7,10 +7,10 @@ import {IProtocol} from "../interfaces";
 
 @Component({
   selector: 'app-protocol-deployment',
-  templateUrl: './protocol-deployment.component.html',
-  styleUrls: ['./protocol-deployment.component.css']
+  templateUrl: './deployment.component.html',
+  styleUrls: ['./deployment.component.css']
 })
-export class ProtocolDeploymentComponent implements OnInit {
+export class DeploymentComponent implements OnInit {
   dataSource = new ProtocolDataSource(this.dbService);
   displayedColumns = ['name', 'action'];
   actions = ['Deploy Instance(s)', 'Create Key pair(s)', 'Update network details', 'Terminate machines',

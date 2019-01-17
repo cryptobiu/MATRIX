@@ -18,8 +18,7 @@ import { LayoutModule } from '@angular/cdk/layout';
 import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTableModule, MatPaginatorModule, MatSortModule, MatSelectModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DeploymentComponent } from './deployment/deployment.component';
-import { ProtocolDeploymentComponent } from './protocol-deployment/protocol-deployment.component';
-// import { ExecutionComponent } from './execution/execution.component';
+import { ExecutionComponent } from './execution/execution.component';
 
 @NgModule({
   declarations: [
@@ -35,8 +34,8 @@ import { ProtocolDeploymentComponent } from './protocol-deployment/protocol-depl
     ProtocolsExecutionComponent,
     MainNavComponent,
     DeploymentComponent,
-    ProtocolDeploymentComponent,
-    // ExecutionComponent
+    DeploymentComponent,
+    ExecutionComponent,
   ],
   imports: [
     BrowserModule,

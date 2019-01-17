@@ -7,19 +7,35 @@
 <br>
 <br>
 
-  <table class="table table-bordered">
-  <tr>
-    <th>Protocol Name</th>
-    <th>Security Level</th>
-    <th>Threshold Level</th>
-    <th></th>
-    <th></th>
-  </tr>
-  <tr *ngFor="let protocol of protocols">
-    <td>{{protocol.name}}</td>
-    <td>{{protocol.securityLevel}}</td>
-    <td>{{protocol.securityThreshold}}</td>
-    <td><a href="protocols/{{ protocol.name }}">Execute protocol</a></td>
-    <td></td>
-  </tr>
-</table>
+<div>
+  <mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef> Protocol Name </mat-header-cell>
+      <mat-cell *matCellDef="let protocol">  {{protocol.name}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="security">
+      <mat-header-cell *matHeaderCellDef> Security Level </mat-header-cell>
+      <mat-cell *matCellDef="let protocol"> {{protocol.securityLevel}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="threshold">
+      <mat-header-cell *matHeaderCellDef> Threshold Level </mat-header-cell>
+      <mat-cell *matCellDef="let protocol"> {{protocol.securityThreshold}} </mat-cell>
+    </ng-container>
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+</div>
+
+  <!--<table class="table table-bordered">-->
+  <!--<tr>-->
+    <!--<th>Protocol Name</th>-->
+    <!--<th>Security Level</th>-->
+    <!--<th>Threshold Level</th>-->
+  <!--</tr>-->
+  <!--<tr *ngFor="let protocol of protocols">-->
+    <!--<td>{{protocol.name}}</td>-->
+    <!--<td>{{protocol.securityLevel}}</td>-->
+    <!--<td>{{protocol.securityThreshold}}</td>-->
+    <!--<td></td>-->
+  <!--</tr>-->
+<!--</table>-->

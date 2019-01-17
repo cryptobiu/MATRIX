@@ -1,23 +1,41 @@
-<table class="table table-bordered">
-  <tr>
-    <th>Competition Name</th>
-    <th>Description</th>
-    <th>Start Date</th>
-    <th>End Date</th>
-    <th>Status</th>
-    <th></th>
-    <th></th>
-  </tr>
-  <tr *ngFor="let competition of competitions">
-    <td>{{competition.competitionName}}</td>
-    <td>{{competition.description}}</td>
-    <td>{{competition.startDate}}</td>
-    <td>{{competition.endDate}}</td>
-    <td>{{competition.status}}</td>
-    <td *ngIf="competition.status == 'Open'">
-      <a href="register_competition/{{competition.competitionName}}" class="btn btn-default pull-right">
-      Participate</a></td>
-    <td><a href="" class="btn btn-default pull-right">Results</a></td>
-  </tr>
-</table>
+<div>
+  <mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="competition name">
+      <mat-header-cell *matHeaderCellDef> Competition Name </mat-header-cell>
+      <mat-cell *matCellDef="let competition"> {{competition.competitionName}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="description">
+      <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+      <mat-cell *matCellDef="let competition"> {{competition.description}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="start date">
+      <mat-header-cell *matHeaderCellDef> Start Date </mat-header-cell>
+      <mat-cell *matCellDef="let competition"> {{competition.startDate}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="end date">
+      <mat-header-cell *matHeaderCellDef> End Date </mat-header-cell>
+      <mat-cell *matCellDef="let competition"> {{competition.endDate}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+      <mat-cell *matCellDef="let competition"> {{competition.description}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="registration">
+      <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+      <mat-cell *matCellDef="let competition">
+        <a *ngIf="competition.status === 'Open'" href="register_competition/{{competition.competitionName}}"
+           class="btn btn-default pull-right" disabled="true">
+          Participate</a>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+</div>
 
