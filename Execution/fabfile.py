@@ -78,6 +78,7 @@ def run_protocol(config_file, args, executable_name, working_directory):
         # local execution
         if len(regions) == 0:
             number_of_parties = len(env.hosts)
+            local('cp InstancesConfigurations/parties.conf %s' % working_directory)
             for idx in range(number_of_parties):
                 if external_protocol:
                     local('cd %s && ./%s %s %s &' % (working_directory, executable_name, idx, values_str))
