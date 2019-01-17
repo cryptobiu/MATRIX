@@ -1,8 +1,8 @@
 export interface ICompetition
 {
   name: string,
-  startData: Date,
-  endData: Date,
+  startDate: Date,
+  endDate: Date,
   description: string;
 }
 
