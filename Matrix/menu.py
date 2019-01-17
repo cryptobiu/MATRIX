@@ -229,25 +229,8 @@ class MatrixMenu:
                 deploy.start_instances()
             elif selection == 8:
                 deploy.stop_instances()
-                >>>>>>> variant B
-        if selection == 1:
-            deploy.deploy_instances()
-        elif selection == 2:
-            deploy.create_key_pair()
-        elif selection == 3:
-            deploy.create_security_group()
-        elif selection == 4:
-            deploy.get_network_details()
-        elif selection == 5:
-            deploy.terminate_instances()
-        elif selection == 6:
-            deploy.change_instance_types()
-        elif selection == 7:
-            deploy.start_instances()
-        elif selection == 8:
-            deploy.stop_instances()
-        elif selection == 9:
-            deploy.copy_ami()
+            elif selection == 9:
+                deploy.copy_ami()
         except NotImplementedError:
             MatrixMenu.color_print("Selected action '{}' is not implemented for the chosen deployment '{}'".format(self.deploy_menu_desc[1][selection - 1], self.cloud_provider_menu_desc[1][cp - 1]), menu_color)
             self.instances_management_menu()
