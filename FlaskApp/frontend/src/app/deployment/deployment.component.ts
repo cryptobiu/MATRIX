@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/';
 import {DataSource} from '@angular/cdk/collections';
 import {DbService} from "../db.service";
 import {IProtocol} from "../interfaces";
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -16,13 +17,13 @@ export class DeploymentComponent implements OnInit {
   actions = ['Deploy Instance(s)', 'Create Key pair(s)', 'Update network details', 'Terminate machines',
     'Change machines types', 'Start instances', 'Stop instances'];
 
-  constructor(private dbService:DbService) { }
+  constructor(private dbService:DbService, private router:Router) { }
 
   ngOnInit() {
   }
 
-  onChange(value, protocol){
-    //TODO: Implement the requested deployment action.
+  onChange(action, protocol){
+    this.router.navigate(['/deployment/' + protocol + '/' + action])
   }
 
 }

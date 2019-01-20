@@ -24,7 +24,7 @@ const routes: Routes = [
   { path: 'protocols/execution/:name', component: ProtocolsExecutionComponent, pathMatch: 'full'},
   { path: 'protocols/:name', component: ProtocolsDetailsComponent, pathMatch: 'full'},
   { path: 'deployment', component: DeploymentComponent, pathMatch: 'full'},
-  { path: 'deployment/{protocolName}/{action}', component: DeploymentResultComponent, pathMatch: 'full'},
+  { path: 'deployment/:protocolName/:action', component: DeploymentResultComponent, pathMatch: 'full'},
   { path: 'execution', component: ExecutionComponent, pathMatch: 'full'},
   { path: 'reporting', component: ReportingComponent, pathMatch: 'full'},
   { path: 'circuits', component:CircuitsComponent, pathMatch:'full'},
