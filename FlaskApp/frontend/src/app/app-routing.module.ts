@@ -12,6 +12,8 @@ import {ProtocolsDetailsComponent} from "./protocols-details/protocols-details.c
 import {ProtocolsExecutionComponent} from "./protocols-execution/protocols-execution.component";
 import {DeploymentComponent} from "./deployment/deployment.component";
 import {ExecutionComponent} from "./execution/execution.component";
+import {DeploymentResultComponent} from "./deployment-result/deployment-result.component";
+import {ReportingComponent} from "./reporting/reporting.component";
 
 const routes: Routes = [
   {path: '', component:HomeComponent, pathMatch:'full'},
@@ -22,7 +24,9 @@ const routes: Routes = [
   { path: 'protocols/execution/:name', component: ProtocolsExecutionComponent, pathMatch: 'full'},
   { path: 'protocols/:name', component: ProtocolsDetailsComponent, pathMatch: 'full'},
   { path: 'deployment', component: DeploymentComponent, pathMatch: 'full'},
+  { path: 'deployment/{protocolName}/{action}', component: DeploymentResultComponent, pathMatch: 'full'},
   { path: 'execution', component: ExecutionComponent, pathMatch: 'full'},
+  { path: 'reporting', component: ReportingComponent, pathMatch: 'full'},
   { path: 'circuits', component:CircuitsComponent, pathMatch:'full'},
   { path: 'login', component:LoginComponent, pathMatch:'full'},
   { path: '**', component:PageNotFoundComponent, pathMatch:'full'},

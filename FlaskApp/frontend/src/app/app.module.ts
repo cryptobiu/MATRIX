@@ -19,6 +19,8 @@ import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, Mat
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DeploymentComponent } from './deployment/deployment.component';
 import { ExecutionComponent } from './execution/execution.component';
+import { DeploymentResultComponent } from './deployment-result/deployment-result.component';
+import { ReportingComponent } from './reporting/reporting.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +38,8 @@ import { ExecutionComponent } from './execution/execution.component';
     DeploymentComponent,
     DeploymentComponent,
     ExecutionComponent,
+    DeploymentResultComponent,
+    ReportingComponent,
   ],
   imports: [
     BrowserModule,
