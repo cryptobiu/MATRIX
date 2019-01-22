@@ -4,23 +4,30 @@ import time
 from collections import OrderedDict
 from fabric.api import *
 from fabric.contrib.files import exists
-from pathlib import Path
+
 
 env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
-env.user = 'psn'
+# Set this to the username on the machines running the benchmark (possibly 'ubuntu')
+env.user = 'ubuntu'
 # env.password=''
-manager_home_dir = "/Users/psn/Projects/MATRIX-EXP/manager"
-remote_home_dir = "/Users/psn/Projects/MATRIX-EXP/remote"
-env.key_filename = ['%s/Keys/matrix.pem' % manager_home_dir]
+# Set this to point to where the AWS key is put by MATRIX (possibly ~/Keys/[KEYNAME])
+env.key_filename = ['YOUR-KEY']
+# Set this to point to where you put the MATRIX root
+path_to_matrix = 'YOU PATH TO MATRIX'
 
 
 @task
 def pre_process(working_directory, task_idx):
-    sudo('apt-get install python3 -y')
-    with cd(working_directory):
-        put('%s/ExperimentExecute/pre_process.py' % manager_home_dir)
-        run('python3 pre_process.py %s' % task_idx)
-
+    if not exists('%s' % working_directory):
+        print('Seems you are trying to install dependencies before you install your experiment. That totally makes sense, but that is not how MATRIX works. You need to install the experiment first. Please go do that now and come back.')
+    else:
+        sudo('apt-get update')
+        sudo('apt-get install python3 -y')
+        sudo('apt-get install python3-pip -y')
+        run('pip3 install boto3')
+        with cd(working_directory):
+            put('%s/Execution/pre_process.py' % path_to_matrix, working_directory)
+            run('python3 pre_process.py %s' % task_idx)
 
 @task
 def install_git_project(git_branch, working_directory, git_address, external):
@@ -78,10 +85,10 @@ def run_protocol(config_file, args, executable_name, working_directory):
         # local execution
         if len(regions) == 0:
             number_of_parties = len(env.hosts)
-            local('cp InstancesConfigurations/parties.conf %s' % working_directory)
+            local('cp InstancesConfigurations/parties.conf %s/MATRIX' % working_directory)
             for idx in range(number_of_parties):
                 if external_protocol:
-                    local('cd %s && ./%s %s %s &' % (working_directory, executable_name, idx, values_str))
+                    local('cd %s/MATRIX && ./%s %s %s &' % (working_directory, executable_name, idx, values_str))
                 else:
                     local('cd %s && ./%s partyID %s %s &' % (working_directory, executable_name, idx, values_str))
 
@@ -135,8 +142,6 @@ def run_protocol(config_file, args, executable_name, working_directory):
                                     sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % coordinator_executable)
                                     # required for SCALE-MAMBA to rsync between AWS instances
                                     put(env.key_filename[0], run('pwd'))
-
-
                                 run('./%s %s' % (coordinator_executable, coordinator_values_str))
                                 with open('Execution/execution_log.log', 'a+') as log_file:
                                     log_file.write('%s\n' % values_str)
@@ -159,7 +164,6 @@ def run_protocol(config_file, args, executable_name, working_directory):
                             run('. ./%s %s %s' % (executable_name, party_id, values_str))
                             with open('Execution/execution_log.log', 'a+') as log_file:
                                 log_file.write('%s\n' % values_str)
-
 
 @task
 def run_protocol_profiler(config_file, args, executable_name, working_directory):
@@ -271,12 +275,6 @@ def collect_results(results_server_directory, results_local_directory, is_extern
         get('%s/*.json' % results_server_directory, results_local_directory)
     else:
         get('%s/MATRIX/logs/*.log' % results_server_directory, results_local_directory)
-
-
-@task
-def get_logs(working_directory):
-    local('mkdir -p logs')
-    get('%s/logs/*.log' % working_directory, '%s/MATRIX/logs' % remote_home_dir)
 
 
 @task
