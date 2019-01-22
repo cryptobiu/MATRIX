@@ -89,7 +89,6 @@ class AmazonCP(DeployCP):
         number_of_parties = self.protocol_config['CloudProviders']['aws']['numOfParties']
         number_duplicated_servers = 0
         protocol_name = self.protocol_config['protocol']
-
         with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
             global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
 
@@ -179,6 +178,8 @@ class AmazonCP(DeployCP):
                         MinCount=int(number_of_instances_to_deploy),
                         MaxCount=int(number_of_instances_to_deploy),
                         SecurityGroups=[global_config[regions[idx][:-1]]["securityGroup"]],
+                        # Use the below if you have an old AWS account and get errors about a VPC
+                        #SubnetId=[global_config[regions[idx][:-1]]["subnetid"]],
                         InstanceType=machine_type,
                         Placement=
                         {
