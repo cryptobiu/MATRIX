@@ -11,8 +11,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { ProtocolsComponent } from './protocols/protocols.component';
 import { ProtocolsUploadComponent } from './protocols-upload/protocols-upload.component'
 import {FormsModule} from "@angular/forms";
-import { ProtocolsDetailsComponent } from './protocols-details/protocols-details.component';
-import { ProtocolsExecutionComponent } from './protocols-execution/protocols-execution.component';
 import { MainNavComponent } from './main-nav/main-nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTableModule, MatPaginatorModule, MatSortModule, MatSelectModule } from '@angular/material';
@@ -32,8 +30,6 @@ import { ReportingComponent } from './reporting/reporting.component';
     LoginComponent,
     ProtocolsComponent,
     ProtocolsUploadComponent,
-    ProtocolsDetailsComponent,
-    ProtocolsExecutionComponent,
     MainNavComponent,
     DeploymentComponent,
     DeploymentComponent,

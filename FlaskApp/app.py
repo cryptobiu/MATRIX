@@ -9,8 +9,8 @@ from pymongo import MongoClient
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+from Deployment.deploy import DeployCP
 from Deployment.aws_deploy import AmazonCP
-from Execution.end_to_end import E2E
 
 with open('GlobalConfigurations/tokens.json', 'r') as tokens:
     data = json.load(tokens)
@@ -107,8 +107,8 @@ def get_protocol_data(protocol_name):
     return jsonify(protocol_data)
 
 
-@app.route('/protocols/<string:protocol_name>')
-def execute_protocol(protocol_name):
+@app.route('/deploy/<string:protocol_name>/<string:operation>')
+def execute_deploy_operation(protocol_name, operation):
 
     config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
                   % protocol_name
@@ -116,16 +116,32 @@ def execute_protocol(protocol_name):
     data = json.loads(raw_data)
     config_file_path = '%s/%s.json' % (os.getcwd(), protocol_name)
 
+    if 'aws' in data['CloudProviders']:
+        deploy = AmazonCP(data)
+    else:
+        deploy = DeployCP(data)
+
+    if operation == 'Deploy Instance(s)':
+        deploy.deploy_instances()
+    elif operation == 'Create key pair(s)':
+        deploy.create_key_pair()
+    elif operation == 'Create security group':
+        deploy.create_security_group()
+    elif operation == 'Update network details':
+        deploy.get_network_details()
+    elif operation == 'Terminate machines':
+        deploy.terminate_instances()
+    elif operation == 'Change machines types':
+        deploy.change_instance_types()
+    elif operation == 'Start instances':
+        deploy.start_instances()
+    elif operation == 'Stop instances':
+        deploy.stop_instances()
+
     # data needed to be saved as json file also for fabric
     with open(config_file_path, 'w+') as fp:
         json.dump(data, fp)
 
-    # deploy = AmazonCP(data)
-    # deploy.deploy_instances()
-
-    # execution = E2E(data, config_file_path)
-    # execution.install_experiment()
-    # execution.execute_experiment()
     return jsonify('data received')
 
 

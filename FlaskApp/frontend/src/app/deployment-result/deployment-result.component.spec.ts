@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProtocolsExecutionComponent } from './protocols-execution.component';
+import { DeploymentResultComponent } from './deployment-result.component';
 
-describe('ProtocolsExecutionComponent', () => {
-  let component: ProtocolsExecutionComponent;
-  let fixture: ComponentFixture<ProtocolsExecutionComponent>;
+describe('DeploymentResultComponent', () => {
+  let component: DeploymentResultComponent;
+  let fixture: ComponentFixture<DeploymentResultComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ProtocolsExecutionComponent ]
+      declarations: [ DeploymentResultComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ProtocolsExecutionComponent);
+    fixture = TestBed.createComponent(DeploymentResultComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

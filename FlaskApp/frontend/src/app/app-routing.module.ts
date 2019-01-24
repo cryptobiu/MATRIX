@@ -8,8 +8,6 @@ import {CompetitionsDetailsComponent} from "./competitions-details/competitions-
 import {LoginComponent} from "./login/login.component";
 import {ProtocolsComponent} from "./protocols/protocols.component";
 import {ProtocolsUploadComponent} from "./protocols-upload/protocols-upload.component";
-import {ProtocolsDetailsComponent} from "./protocols-details/protocols-details.component";
-import {ProtocolsExecutionComponent} from "./protocols-execution/protocols-execution.component";
 import {DeploymentComponent} from "./deployment/deployment.component";
 import {ExecutionComponent} from "./execution/execution.component";
 import {DeploymentResultComponent} from "./deployment-result/deployment-result.component";
@@ -21,8 +19,6 @@ const routes: Routes = [
   { path: 'competitions/:name', component:CompetitionsDetailsComponent},
   { path: 'protocols', component:ProtocolsComponent, pathMatch:'full'},
   { path: 'protocols/upload', component:ProtocolsUploadComponent, pathMatch:'full'},
-  { path: 'protocols/execution/:name', component: ProtocolsExecutionComponent, pathMatch: 'full'},
-  { path: 'protocols/:name', component: ProtocolsDetailsComponent, pathMatch: 'full'},
   { path: 'deployment', component: DeploymentComponent, pathMatch: 'full'},
   { path: 'deployment/:protocolName/:action', component: DeploymentResultComponent, pathMatch: 'full'},
   { path: 'execution', component: ExecutionComponent, pathMatch: 'full'},
