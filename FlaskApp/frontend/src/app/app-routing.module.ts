@@ -1,17 +1,17 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import {CompetitionsComponent} from "./competitions/competitions.component";
-import {CircuitsComponent} from "./circuits/circuits.component";
-import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
-import {HomeComponent} from "./home/home.component";
-import {CompetitionsDetailsComponent} from "./competitions-details/competitions-details.component";
-import {LoginComponent} from "./login/login.component";
-import {ProtocolsComponent} from "./protocols/protocols.component";
-import {ProtocolsUploadComponent} from "./protocols-upload/protocols-upload.component";
-import {DeploymentComponent} from "./deployment/deployment.component";
-import {ExecutionComponent} from "./execution/execution.component";
-import {DeploymentResultComponent} from "./deployment-result/deployment-result.component";
-import {ReportingComponent} from "./reporting/reporting.component";
+import {CompetitionsComponent} from "./Components/competitions/competitions.component";
+import {CircuitsComponent} from "./Components/circuits/circuits.component";
+import {PageNotFoundComponent} from "./Components/page-not-found/page-not-found.component";
+import {HomeComponent} from "./Components/home/home.component";
+import {CompetitionsDetailsComponent} from "./Components/competitions-details/competitions-details.component";
+import {LoginComponent} from "./Components/login/login.component";
+import {ProtocolsComponent} from "./Components/protocols/protocols.component";
+import {ProtocolsUploadComponent} from "./Components/protocols-upload/protocols-upload.component";
+import {DeploymentComponent} from "./Components/deployment/deployment.component";
+import {ExecutionComponent} from "./Components/execution/execution.component";
+import {DeploymentResultComponent} from "./Components/deployment-result/deployment-result.component";
+import {ReportingComponent} from "./Components/reporting/reporting.component";
 
 const routes: Routes = [
   {path: '', component:HomeComponent, pathMatch:'full'},

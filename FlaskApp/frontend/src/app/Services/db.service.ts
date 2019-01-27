@@ -1,9 +1,9 @@
 import {Injectable, NgModule} from '@angular/core';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import {AppComponent} from "./app.component";
+import {AppComponent} from "../app.component";
 import {Observable, Observer, Subject} from "rxjs";
-import {ICompetition, IProtocol, IProtocolData} from "./interfaces";
+import {ICompetition, IProtocol, IProtocolData} from "./../interfaces";
 
 @NgModule({
   imports: [CommonModule, HttpClientModule],

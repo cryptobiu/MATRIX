@@ -19,5 +19,8 @@ export interface IProtocolData {
   machineType: string;
   regions: string[];
   configurations: string[];
+}
 
+export interface IMessage {
+  message: string;
 }

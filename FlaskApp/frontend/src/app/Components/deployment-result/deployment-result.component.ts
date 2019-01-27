@@ -1,10 +1,8 @@
 import {Component, Injectable, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
-import {DbService} from "../db.service";
+import {DbService} from "../../Services/db.service";
 import {timer} from 'rxjs';
-import {MessagesService} from "../messages.service";
-import {IMessage} from "../interfaces";
-import {ElasticsearchService} from "../elasticsearch.service";
+import {ElasticsearchService} from "../../Services/elasticsearch.service";
 
 @Component({
   selector: 'app-deployment-result',
@@ -21,16 +19,12 @@ export class DeploymentResultComponent implements OnInit {
   private fileData: string[];
 
 
-  constructor(private ac_router: ActivatedRoute, private dbService: DbService,
-              private messages: MessagesService) { }
+  constructor(private ac_router: ActivatedRoute, private dbService: DbService) { }
 
   ngOnInit() {
     this.protocolName = this.ac_router.snapshot.paramMap.get('protocolName');
     this.operation = this.ac_router.snapshot.paramMap.get('action');
     this.dbService.executeDeployOperation(this.protocolName, this.operation).subscribe();
-    this.messages.messages.subscribe(msg => {
-      this.fileData.push(msg);
-    })
   }
 
   // sendMsg(){

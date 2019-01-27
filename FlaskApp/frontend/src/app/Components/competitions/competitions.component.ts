@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/';
 import {DataSource} from '@angular/cdk/collections';
-import {DbService} from "../db.service";
-import {ICompetition} from "../interfaces";
+import {DbService} from "../../Services/db.service";
+import {ICompetition} from "../../interfaces";
 
 @Component({
   selector: 'app-competitions',

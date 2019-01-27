@@ -1,7 +1,7 @@
 import {Component, NgModule, OnInit} from '@angular/core';
 import {FormsModule} from "@angular/forms";
-import {Protocol} from "../protocol";
-import {FormSubmissionService} from "../formSubmission.service";
+import {Protocol} from "../../protocol";
+import {FormSubmissionService} from "../../Services/formSubmission.service";
 import {Router} from "@angular/router";
 
 @Component({
