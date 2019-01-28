@@ -19,15 +19,16 @@ export class DeploymentResultComponent implements OnInit {
   public deploymentData: Array<IDeploymentData>;
 
 
-  constructor(private ac_router: ActivatedRoute, private dbService: DbService, private es: ElasticsearchService) { }
-
-  ngOnInit() {
+  constructor(private ac_router: ActivatedRoute, private dbService: DbService, private es: ElasticsearchService) {
     this.protocolName = this.ac_router.snapshot.paramMap.get('protocolName');
     this.operation = this.ac_router.snapshot.paramMap.get('action');
     this.deploymentData = [];
     this.dbService.executeDeployOperation(this.protocolName, this.operation).subscribe(
       value => console.log(value),
       error => console.log(error));
+  }
+
+  ngOnInit() {
     this.readData();
   }
 
@@ -53,9 +54,3 @@ export class DeploymentResultComponent implements OnInit {
       err => console.log(err)); //error of timer
   }
 }
-
-
-
-
-
-
