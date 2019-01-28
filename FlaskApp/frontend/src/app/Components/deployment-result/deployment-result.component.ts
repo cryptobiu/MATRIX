@@ -8,8 +8,7 @@ import {IDeploymentData} from "../../interfaces";
 @Component({
   selector: 'app-deployment-result',
   templateUrl: './deployment-result.component.html',
-  styleUrls: ['./deployment-result.component.css'],
-  // providers: [ElasticsearchService]
+  styleUrls: ['./deployment-result.component.css']
 })
 
 @Injectable()
@@ -17,7 +16,7 @@ export class DeploymentResultComponent implements OnInit {
 
   public protocolName: string;
   private operation: string;
-  public fileData: Array<IDeploymentData>;
+  public deploymentData: Array<IDeploymentData>;
 
 
   constructor(private ac_router: ActivatedRoute, private dbService: DbService, private es: ElasticsearchService) { }
@@ -25,8 +24,7 @@ export class DeploymentResultComponent implements OnInit {
   ngOnInit() {
     this.protocolName = this.ac_router.snapshot.paramMap.get('protocolName');
     this.operation = this.ac_router.snapshot.paramMap.get('action');
-    console.log(this.protocolName, this.operation);
-    this.fileData = [];
+    this.deploymentData = [];
     this.dbService.executeDeployOperation(this.protocolName, this.operation).subscribe(
       value => console.log(value),
       error => console.log(error));
@@ -47,7 +45,7 @@ export class DeploymentResultComponent implements OnInit {
             message: hit._source.message,
             timestamp: new Date(hit._source.timestamp)
             };
-          this.fileData.push(data);
+          this.deploymentData.push(data);
         }
       }, error => {
         console.error(error); //error of es
