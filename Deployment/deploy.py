@@ -3,12 +3,16 @@ import json
 import copy
 import subprocess
 import shutil
+import certifi
 from collections import OrderedDict
+from elasticsearch import Elasticsearch
 
 
 class DeployCP:
     def __init__(self, protocol_config):
         self.protocol_config = protocol_config
+        self.es = Elasticsearch('https://search-escryptobiu-fyopgg3zepk6dtda4zerc53apy.us-east-1.es.amazonaws.com/',
+                                use_ssl=True, ca_certs=certifi.where())
 
     @staticmethod
     def generate_circuits():

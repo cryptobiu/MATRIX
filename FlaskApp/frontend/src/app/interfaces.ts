@@ -21,6 +21,9 @@ export interface IProtocolData {
   configurations: string[];
 }
 
-export interface IMessage {
+export interface IDeploymentData {
+  protocolName: string;
   message: string;
+  timestamp: Date;
 }
+

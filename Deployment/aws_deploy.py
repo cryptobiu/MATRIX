@@ -101,8 +101,6 @@ class AmazonCP(DeployCP):
             number_of_instances = number_of_parties
 
         date = datetime.now() - timedelta(hours=3)
-        with open('stdout_output', 'w+') as output_file:
-            print('Current date : \n%s' % str(date), file=output_file)
         new_date = date + timedelta(hours=6)
 
         for idx in range(len(regions)):
@@ -114,11 +112,17 @@ class AmazonCP(DeployCP):
                 number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
             else:
                 number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
-            with open('stdout_output', 'a+') as output_file:
-                print('Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : %s\ninstance_type : %s\n'
-                      'valid until : %s' % (regions[idx], number_of_instances_to_deploy,
-                                            global_config[regions[idx][:-1]]["ami"], machine_type, str(new_date)),
-                      file=output_file)
+
+            doc = {}
+            doc['protocolName'] = protocol_name
+            doc['message'] = 'Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : ' \
+                             '%s\ninstance_type : %s\n valid until : %s' \
+                             % (regions[idx], number_of_instances_to_deploy,
+                                global_config[regions[idx][:-1]]["ami"], machine_type, str(new_date))
+            doc['timestamp'] = datetime.utcnow()
+            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+
+            doc = {}
 
             if number_of_instances_to_deploy > 0:
                 if spot_request:
@@ -152,7 +156,7 @@ class AmazonCP(DeployCP):
                         instances_ids = []
                         for instance_response in instances_response['SpotInstanceRequests']:
                             instances_ids.append(instance_response['InstanceId'])
-                        client.create_tags(Resources=instances_ids,Tags=[{
+                        client.create_tags(Resources=instances_ids, Tags=[{
                             'Key': 'Name',
                             'Value': protocol_name
                         }])
@@ -196,11 +200,20 @@ class AmazonCP(DeployCP):
                                         }]
                     )
 
-        print('Waiting for the images to be deployed..')
+        doc = {}
+        doc['protocolName'] = protocol_name
+        doc['message'] = 'Waiting for the images to be deployed..'
+        doc['timestamp'] = datetime.utcnow()
+        self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
         time.sleep(240)
+
         self.get_network_details()
 
-        print('Finished to deploy machines')
+        doc = {}
+        doc['protocolName'] = protocol_name
+        doc['message'] = 'Finished to deploy machines'
+        doc['timestamp'] = datetime.utcnow()
+        self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
 
     def get_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
         regions = self.protocol_config['CloudProviders']['aws']['regions']

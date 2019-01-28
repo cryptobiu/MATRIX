@@ -114,7 +114,6 @@ def execute_deploy_operation(protocol_name, operation):
                   % protocol_name
     raw_data = urllib.request.urlopen(config_file).read()
     data = json.loads(raw_data)
-    config_file_path = '%s/%s.json' % (os.getcwd(), protocol_name)
 
     if 'aws' in data['CloudProviders']:
         deploy = AmazonCP(data)
@@ -137,10 +136,6 @@ def execute_deploy_operation(protocol_name, operation):
         deploy.start_instances()
     elif operation == 'Stop instances':
         deploy.stop_instances()
-
-    # data needed to be saved as json file also for fabric
-    with open(config_file_path, 'w+') as fp:
-        json.dump(data, fp)
 
     return jsonify('data received')
 
