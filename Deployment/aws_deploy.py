@@ -357,6 +357,12 @@ class AmazonCP(DeployCP):
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         machines_name = self.protocol_config['protocol']
 
+        doc = {}
+        doc['protocolName'] = machines_name
+        doc['message'] = 'Terminating %s ' % machines_name
+        doc['timestamp'] = datetime.utcnow()
+        self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
 

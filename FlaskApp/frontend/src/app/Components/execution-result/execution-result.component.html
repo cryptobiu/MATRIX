@@ -1,0 +1,11 @@
+<p>
+  protocol {{ protocolName }} execution.
+  waiting fot execution operation to be finished..
+</p>
+
+
+<div class="info">
+  <ul *ngFor="let d of executionData">
+    <li>{{ d.protocolName }} sends {{ d.message }} at time: {{ d.timestamp }} </li>
+  </ul>
+</div>

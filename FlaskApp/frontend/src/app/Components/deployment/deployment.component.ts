@@ -22,8 +22,8 @@ export class DeploymentComponent implements OnInit {
   ngOnInit() {
   }
 
-  onChange(action, protocol){
-    this.router.navigate(['/deployment/' + protocol + '/' + action])
+  onChange(operation, protocol){
+    this.router.navigate(['/deployment/' + protocol + '/' + operation])
   }
 
 }

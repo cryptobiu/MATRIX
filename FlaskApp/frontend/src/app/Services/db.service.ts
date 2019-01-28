@@ -31,19 +31,14 @@ export class DbService {
     return this._http.get<IProtocol[]>(url);
   }
 
-  getProtocolDate(protocolName: string): Observable<IProtocolData> {
-  let url = this._urlApi + 'getprotocoldata/' + protocolName;
-    return this._http.get<IProtocolData>(url);
-  }
-
   executeDeployOperation(protocolName: string, operation:string) {
     let url = this._urlApi + 'deploy/' + protocolName + '/' + operation;
     return this._http.get(url);
   }
 
-  readTextFile(){
-    let url = 'assets/stdout_output';
-    return this._http.get(url, {responseType: 'text'});
+  executeExecutionOperation(protocolName: string, operation:string) {
+    let url = this._urlApi + 'execute/' + protocolName + '/' + operation;
+    return this._http.get(url);
   }
 
 }

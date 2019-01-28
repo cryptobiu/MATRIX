@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/';
 import {DataSource} from '@angular/cdk/collections';
 import {DbService} from "../../Services/db.service";
 import {IProtocol} from "../../interfaces";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-execution',
@@ -15,13 +16,13 @@ export class ExecutionComponent implements OnInit {
   displayedColumns = ['name', 'action'];
   actions = ['Install Experiment', 'Execute Experiment', 'Execute Experiment with profiler', 'Update libscapi'];
 
-  constructor(private dbService:DbService) { }
+  constructor(private dbService:DbService, private router:Router) { }
 
   ngOnInit() {
   }
 
-  onChange(value, protocol){
-    //TODO: Implement the requested execution action.
+  onChange(operation, protocol){
+    this.router.navigate(['/execution/' + protocol + '/' + operation])
   }
 
 }

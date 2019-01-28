@@ -11,6 +11,7 @@ from flask_cors import CORS
 
 from Deployment.deploy import DeployCP
 from Deployment.aws_deploy import AmazonCP
+from Execution.end_to_end import E2E
 
 with open('GlobalConfigurations/tokens.json', 'r') as tokens:
     data = json.load(tokens)
@@ -137,7 +138,28 @@ def execute_deploy_operation(protocol_name, operation):
     elif operation == 'Stop instances':
         deploy.stop_instances()
 
-    return jsonify('data received')
+    return jsonify('deployment operation %s succeeded' % operation)
+
+
+@app.route('/execute/<string:protocol_name>/<string:operation>')
+def execute_execution_operation(protocol_name, operation):
+    config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
+                  % protocol_name
+    raw_data = urllib.request.urlopen(config_file).read()
+    data = json.loads(raw_data)
+
+    ee = E2E(data, os.getcwd())
+
+    if operation == 'Install Experiment':
+        ee.install_experiment()
+    elif operation == 'Execute Experiment':
+        ee.execute_experiment()
+    elif operation == 'Execute Experiment with profiler':
+        ee.execute_experiment_callgrind()
+    elif operation == 'Update libscapi':
+        ee.update_libscapi()
+
+    return jsonify('execution operation %s succeeded' % operation)
 
 
 if __name__ == '__main__':

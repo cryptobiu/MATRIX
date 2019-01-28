@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import {Client} from 'elasticsearch-browser';
-import {IDeploymentData} from "../interfaces";
 
 @Injectable({
   providedIn: 'root'
@@ -20,12 +19,31 @@ export class ElasticsearchService {
     }
   }
 
-  getDocuments(_index, _type): any {
+  getDocuments(_index, _type, protocolName): any {
 
     let requestBody = {
       'query': {
-        'match_all': {}
+        'bool': {
+          'must': [
+            { 'match' : { 'protocolName': protocolName }}
+          ],
+          'filter': [
+            { 'range': { 'timestamp': { 'gte': 'now-15m/m', 'lt': 'now' } } }
+          ]
+        }
       }
+      // 'query': {
+      //   'match_phrase_prefix': {
+      //     [protocolName]: protocolName,
+      //   },
+      //   'range': {
+      //     'timestamp':
+      //       {
+      //         'gte': 'now-15m/m',
+      //         'lt': 'now'
+      //       }
+      //   }
+      // }
     };
     return this.esClient.search({
       index: _index,

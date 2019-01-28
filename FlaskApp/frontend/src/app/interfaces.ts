@@ -27,3 +27,8 @@ export interface IDeploymentData {
   timestamp: Date;
 }
 
+export interface IExecutionData {
+  protocolName: string;
+  message: string;
+  timestamp: Date;
+}

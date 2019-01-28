@@ -12,6 +12,7 @@ import {DeploymentComponent} from "./Components/deployment/deployment.component"
 import {ExecutionComponent} from "./Components/execution/execution.component";
 import {DeploymentResultComponent} from "./Components/deployment-result/deployment-result.component";
 import {ReportingComponent} from "./Components/reporting/reporting.component";
+import {ExecutionResultComponent} from "./Components/execution-result/execution-result.component";
 
 const routes: Routes = [
   {path: '', component:HomeComponent, pathMatch:'full'},
@@ -22,6 +23,7 @@ const routes: Routes = [
   { path: 'deployment', component: DeploymentComponent, pathMatch: 'full'},
   { path: 'deployment/:protocolName/:action', component: DeploymentResultComponent, pathMatch: 'full'},
   { path: 'execution', component: ExecutionComponent, pathMatch: 'full'},
+  { path: 'execution/:protocolName/:action', component: ExecutionResultComponent, pathMatch: 'full'},
   { path: 'reporting', component: ReportingComponent, pathMatch: 'full'},
   { path: 'circuits', component:CircuitsComponent, pathMatch:'full'},
   { path: 'login', component:LoginComponent, pathMatch:'full'},
