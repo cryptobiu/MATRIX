@@ -12,7 +12,7 @@ export class ElasticsearchService {
     if(!this.esClient)
     {
       this.esClient = new Client({
-        host: 'https://search-escryptobiu-fyopgg3zepk6dtda4zerc53apy.us-east-1.es.amazonaws.com/',
+        host: '3.81.191.221:9200',
         log: 'trace',
         use_ssl: true
       });
@@ -32,18 +32,6 @@ export class ElasticsearchService {
           ]
         }
       }
-      // 'query': {
-      //   'match_phrase_prefix': {
-      //     [protocolName]: protocolName,
-      //   },
-      //   'range': {
-      //     'timestamp':
-      //       {
-      //         'gte': 'now-15m/m',
-      //         'lt': 'now'
-      //       }
-      //   }
-      // }
     };
     return this.esClient.search({
       index: _index,

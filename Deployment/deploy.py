@@ -11,8 +11,7 @@ from elasticsearch import Elasticsearch
 class DeployCP:
     def __init__(self, protocol_config):
         self.protocol_config = protocol_config
-        self.es = Elasticsearch('https://search-escryptobiu-fyopgg3zepk6dtda4zerc53apy.us-east-1.es.amazonaws.com/',
-                                use_ssl=True, ca_certs=certifi.where())
+        self.es = Elasticsearch('3.81.191.221:9200', ca_certs=certifi.where())
 
     @staticmethod
     def generate_circuits():

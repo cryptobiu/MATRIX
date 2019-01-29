@@ -148,7 +148,12 @@ def execute_execution_operation(protocol_name, operation):
     raw_data = urllib.request.urlopen(config_file).read()
     data = json.loads(raw_data)
 
-    ee = E2E(data, os.getcwd())
+    config_file_path = '%s/%s.json' % (os.getcwd(), protocol_name)
+
+    ee = E2E(data, config_file_path)
+
+    with open(config_file_path, 'w+') as fp:
+        json.dump(data, fp)
 
     if operation == 'Install Experiment':
         ee.install_experiment()

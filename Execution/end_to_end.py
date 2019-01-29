@@ -9,8 +9,7 @@ class E2E:
     def __init__(self, protocol_config, protocol_config_path):
         self.protocol_config = protocol_config
         self.protocol_config_path = protocol_config_path
-        self.es = Elasticsearch('https://search-escryptobiu-fyopgg3zepk6dtda4zerc53apy.us-east-1.es.amazonaws.com/',
-                                use_ssl=True, ca_certs=certifi.where())
+        self.es = Elasticsearch('3.81.191.221:9200', ca_certs=certifi.where())
 
     def pre_process(self):
         working_directory = self.protocol_config['workingDirectory']
