@@ -395,7 +395,8 @@ class AmazonCP(DeployCP):
 
             # Start the instance
             client.start_instances(InstanceIds=instances)
-            self.get_network_details()
+
+        self.get_network_details()
 
     def terminate_instances(self):
         regions = self.protocol_config['CloudProviders']['aws']['regions']
