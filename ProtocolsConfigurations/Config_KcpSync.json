@@ -1,0 +1,49 @@
+{
+  "protocol":"Kcp-Sync",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":30,
+      "instanceType":"c5.xlarge",
+      "regions": ["us-east-1a", "ap-south-1b", "eu-west-2a"],
+      "git":
+      {
+        "gitBranch": ["master"],
+        "gitAddress": ["https://github.com/cryptobiu/KCP-INF.git"]
+      }
+    }
+  },
+  "executableName": ["tools/execute_from_matrix.py"],
+  "configurations":
+  [
+    "-n30@-p10000@--log-filename@sync@--log-level@7",
+    "-n300@-p10000@--log-filename@sync@--log-level@7",
+    "-n30@--num-rounds@1@--data-size@1024@-p10000@--log-filename@r1_d1024@--log-level@5",
+    "-n30@--num-rounds@5@--data-size@1024@-p10000@--log-filename@r5_d1024@--log-level@5",
+    "-n30@--num-rounds@10@--data-size@1024@-p10000@--log-filename@r10_d1024@--log-level@5",
+    "-n30@--num-rounds@10@--data-size@4096@-p10000@--log-filename@r10_d4096@--log-level@5",
+    "-n300@--num-rounds@1@--data-size@1024@-p10000@--log-filename@r1_d1024@--log-level@5",
+    "-n300@--num-rounds@5@--data-size@1024@-p10000@--log-filename@r5_d1024@--log-level@5",
+    "-n300@--num-rounds@10@--data-size@1024@-p10000@--log-filename@r10_d1024@--log-level@5",
+    "-n300@--num-rounds@10@--data-size@4096@-p10000@--log-filename@r10_d4096@--log-level@5",
+    "-n600@--num-rounds@1@--data-size@1024@-p10000@--log-filename@r1_d1024@--log-level@4",
+    "-n600@--num-rounds@5@--data-size@1024@-p10000@--log-filename@r5_d1024@--log-level@4",
+    "-n600@--num-rounds@10@--data-size@1024@-p10000@--log-filename@r10_d1024@--log-level@4",
+    "-n600@--num-rounds@10@--data-size@4096@-p10000@--log-filename@r10_d4096@--log-level@4",
+    "-n1000@--num-rounds@1@--data-size@1024@-p10000@--log-filename@r1_d1024@--log-level@4",
+    "-n1000@--num-rounds@5@--data-size@1024@-p10000@--log-filename@r5_d1024@--log-level@4",
+    "-n1000@--num-rounds@10@--data-size@1024@-p10000@--log-filename@r10_d1024@--log-level@4",
+    "-n1000@--num-rounds@10@--data-size@4096@-p10000@--log-filename@r10_d4096@--log-level@4",
+    "-n1000@--num-rounds@10@--data-size@32768@-p10000@--log-filename@r10_d32768@--log-level@4",
+  ],
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "IsPublished": "true",
+  "isExternal": "false",
+  "workingDirectory": ["~/KCP-INF"],
+  "logDirectory": ["~/KCP-INF/logs"],
+  "resultsDirectory": "~/MATRIX/ExperimentReport/Results",
+  "emails": ["liork.cryptobiu@gmail.com", "roee.sefi@gmail.com"],
+  "institute":"Bar Ilan Cyber Center"
+}
