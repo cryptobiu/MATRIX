@@ -126,7 +126,7 @@ def execute_deploy_operation(protocol_name, operation):
         print('Error while fetching configuration file: %s' % e.response.reason)
         return jsonify('Error!!!')
 
-    data = json.loads(raw_data)
+    data = json.loads(raw_data.content)
 
     if 'aws' in data['CloudProviders']:
         deploy = AmazonCP(data)
@@ -163,7 +163,7 @@ def execute_execution_operation(protocol_name, operation):
     except requests.exceptions.HTTPError as e:
         print('Error while fetching configuration file: %s' % e.response.reason)
         return jsonify('Error!!!')
-    data = json.loads(raw_data)
+    data = json.loads(raw_data.content)
 
     config_file_path = '%s/%s.json' % (os.getcwd(), protocol_name)
 

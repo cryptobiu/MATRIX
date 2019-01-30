@@ -378,7 +378,8 @@ class AmazonCP(DeployCP):
 
             doc = {}
             doc['protocolName'] = protocol_name
-            doc['message'] = 'changing protocol: %s machine types to %s instances ' % (protocol_name, instance_type)
+            doc['message'] = 'changing protocol: %s machine types to %s instances at regions %s' \
+                             % (protocol_name, instance_type, region_name)
             doc['timestamp'] = datetime.utcnow()
             self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
 
