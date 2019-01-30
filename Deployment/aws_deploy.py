@@ -222,6 +222,12 @@ class AmazonCP(DeployCP):
         instance_type = self.protocol_config['CloudProviders']['aws']['instanceType']
         protocol_name = self.protocol_config['protocol']
 
+        doc = {}
+        doc['protocolName'] = protocol_name
+        doc['message'] = 'Fetching network topology for protocol: %s' % protocol_name
+        doc['timestamp'] = datetime.utcnow()
+        self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+
         instances_ids = []
         public_ip_address = []
         private_ip_address = []
@@ -317,8 +323,15 @@ class AmazonCP(DeployCP):
             region_name = regions[idx][:-1]
             instances = self.describe_instances(region_name, machines_name)
 
+            doc = {}
+            doc['protocolName'] = machines_name
+            doc['message'] = 'starting protocol: %s instances ' % machines_name
+            doc['timestamp'] = datetime.utcnow()
+            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+
             client = boto3.client('ec2', region_name=region_name)
             client.start_instances(InstanceIds=instances)
+            self.get_network_details()
 
     def stop_instances(self):
         regions = self.protocol_config['CloudProviders']['aws']['regions']
@@ -328,17 +341,46 @@ class AmazonCP(DeployCP):
             region_name = regions[idx][:-1]
             instances = self.describe_instances(region_name, machines_name)
 
+            doc = {}
+            doc['protocolName'] = machines_name
+            doc['message'] = 'stopping protocol: %s instances ' % machines_name
+            doc['timestamp'] = datetime.utcnow()
+            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+
             client = boto3.client('ec2', region_name=region_name)
             client.stop_instances(InstanceIds=instances)
+
+    def reboot_instances(self):
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        machines_name = self.protocol_config['protocol']
+
+        for idx in range(len(regions)):
+            region_name = regions[idx][:-1]
+            instances = self.describe_instances(region_name, machines_name)
+
+            doc = {}
+            doc['protocolName'] = machines_name
+            doc['message'] = 'rebooting protocol: %s instances ' % machines_name
+            doc['timestamp'] = datetime.utcnow()
+            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+
+            client = boto3.client('ec2', region_name=region_name)
+            client.reboot_instances(InstancesIds=instances)
 
     def change_instance_types(self):
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         protocol_name = self.protocol_config['protocol']
-        instance_type = self.protocol_config['aWSInstType']
+        instance_type = self.protocol_config['CloudProviders']['aws']['instanceType']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
             instances = self.describe_instances(region_name, protocol_name)
+
+            doc = {}
+            doc['protocolName'] = protocol_name
+            doc['message'] = 'changing protocol: %s machine types to %s instances ' % (protocol_name, instance_type)
+            doc['timestamp'] = datetime.utcnow()
+            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
 
             client = boto3.client('ec2', region_name=region_name)
             client.stop_instances(InstanceIds=instances)
@@ -352,6 +394,7 @@ class AmazonCP(DeployCP):
 
             # Start the instance
             client.start_instances(InstanceIds=instances)
+            self.get_network_details()
 
     def terminate_instances(self):
         regions = self.protocol_config['CloudProviders']['aws']['regions']

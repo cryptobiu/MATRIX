@@ -1,6 +1,6 @@
 import datetime
 import os
-import urllib
+import requests
 
 import bson
 import json
@@ -91,7 +91,13 @@ def get_protocol_data(protocol_name):
     protocol_data = {}
     config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
                   % protocol_name
-    raw_data = urllib.request.urlopen(config_file).read()
+    raw_data = requests.get(config_file)
+    try:
+        raw_data.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print('Error while fetching configuration file: %s' % e.response.reason)
+        return jsonify('Error!!!')
+
     data = json.loads(raw_data)
     raw_configurations = data['configurations']
     configurations = []
@@ -113,7 +119,13 @@ def execute_deploy_operation(protocol_name, operation):
 
     config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
                   % protocol_name
-    raw_data = urllib.request.urlopen(config_file).read()
+    raw_data = requests.get(config_file)
+    try:
+        raw_data.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print('Error while fetching configuration file: %s' % e.response.reason)
+        return jsonify('Error!!!')
+
     data = json.loads(raw_data)
 
     if 'aws' in data['CloudProviders']:
@@ -145,7 +157,12 @@ def execute_deploy_operation(protocol_name, operation):
 def execute_execution_operation(protocol_name, operation):
     config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
                   % protocol_name
-    raw_data = urllib.request.urlopen(config_file).read()
+    raw_data = requests.get(config_file)
+    try:
+        raw_data.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print('Error while fetching configuration file: %s' % e.response.reason)
+        return jsonify('Error!!!')
     data = json.loads(raw_data)
 
     config_file_path = '%s/%s.json' % (os.getcwd(), protocol_name)
@@ -161,6 +178,8 @@ def execute_execution_operation(protocol_name, operation):
         ee.execute_experiment()
     elif operation == 'Execute Experiment with profiler':
         ee.execute_experiment_callgrind()
+    elif operation == 'Get Logs':
+        ee.get_logs()
     elif operation == 'Update libscapi':
         ee.update_libscapi()
 

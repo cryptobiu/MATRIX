@@ -8,7 +8,8 @@ from pathlib import Path
 env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
-env.key_filename = ['%s/Keys/matrix.pem' % Path.home()]
+env.key_filename = ['%s/Keys/Matrixuseast1.pem' % Path.home(), '%s/Keys/Matrixapsouth1.pem' % Path.home(),
+                    '%s/Keys/Matrixeuwest2.pem' % Path.home()]
 
 
 @task
@@ -20,9 +21,9 @@ def pre_process(working_directory, task_idx):
 
 
 @task
-def install_git_project(git_branch, working_directory, git_address, external):
+def install_git_project(username, password, git_branch, working_directory, git_address, external):
     if not exists('%s' % working_directory):
-        run('git clone %s %s' % (git_address, working_directory))
+        run('git clone %s %s --recursive' % (git_address.format(username, password), working_directory))
 
     external = eval(external)
     with cd('%s' % working_directory):
@@ -101,6 +102,7 @@ def run_protocol(config_file, args, executable_name, working_directory):
                         run('mv parties%s.conf parties.conf' % party_id)
                     else:
                         put('InstancesConfigurations/parties.conf', run('pwd'))
+                    sudo('chmod +x %s' % executable_name)
                     run('./%s partyID %s %s' % (executable_name, party_id, values_str))
                     with open('Execution/execution_log.log', 'a+') as log_file:
                         log_file.write('%s\n' % values_str)
@@ -200,9 +202,9 @@ def collect_results(results_server_directory, results_local_directory, is_extern
 
 
 @task
-def get_logs(working_directory):
+def get_logs(logs_directory):
     local('mkdir -p logs')
-    get('%s/logs/*.log' % working_directory, '%s/MATRIX/logs' % Path.home())
+    get('%s/*.log' % logs_directory, '%s/MATRIX/logs' % Path.home())
 
 
 @task

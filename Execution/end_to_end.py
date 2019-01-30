@@ -18,6 +18,14 @@ class E2E:
                   % (working_directory, pre_process_task))
 
     def install_experiment(self):
+
+        # read git credentials configuration
+
+        with open('GlobalConfigurations/tokens.json', 'r') as tokens_file:
+            data = json.load(tokens_file)
+            username = data['GitHub']['user']
+            password = data['GitHub']['password']
+
         protocol_name = self.protocol_config['protocol']
         working_directory = self.protocol_config['workingDirectory']
         external_protocol = json.loads(self.protocol_config['isExternal'])
@@ -30,8 +38,9 @@ class E2E:
             doc['message'] = 'Installing %s at %s' % (protocol_name, working_directory)
             doc['timestamp'] = datetime.utcnow()
             self.es.index(index='execution_matrix_ui', doc_type='execution_matrix_ui', body=doc)
-            os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s --parallel'
-                      % (git_branch[idx], working_directory[idx], git_address[idx], external_protocol))
+            os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s,%s,%s --parallel'
+                      % (username, password, git_branch[idx],
+                         working_directory[idx], git_address[idx], external_protocol))
 
     def execute_experiment(self):
         protocol_name = self.protocol_config['protocol']
@@ -52,6 +61,7 @@ class E2E:
                                  executables[idx], working_directory[idx]))
 
     def execute_experiment_callgrind(self):
+        protocol_name = self.protocol_config['protocol']
         number_of_repetitions = self.protocol_config['numOfRepetitions']
         configurations = self.protocol_config['configurations']
         working_directory = self.protocol_config['workingDirectory']
@@ -59,6 +69,12 @@ class E2E:
         for i in range(number_of_repetitions):
             for idx2 in range(len(configurations)):
                 for idx in range(len(executables)):
+                    doc = {}
+                    doc['protocolName'] = protocol_name
+                    doc['message'] = 'Executing profiler for %s with configuration: %s' \
+                                     % (executables[idx], configurations[idx2])
+                    doc['timestamp'] = datetime.utcnow()
+                    self.es.index(index='execution_matrix_ui', doc_type='execution_matrix_ui', body=doc)
                     os.system('fab -f Execution/fabfile.py run_protocol_profiler:%s,%s,%s,%s --parallel'
                               % (self.protocol_config_path, configurations[idx2],
                                  executables[idx], working_directory[idx]))
@@ -68,3 +84,7 @@ class E2E:
         branch = input('Enter libscapi branch to update from:')
         os.system('fab -f Execution/fabfile.py update_libscapi:%s --parallel' % branch)
 
+    def get_logs(self):
+        logs_directory = self.protocol_config['logDirectory']
+        for idx in range(len(logs_directory)):
+            os.system('fab -f Execution/fabfile.py get_logs:%s --parallel' % logs_directory[idx])
