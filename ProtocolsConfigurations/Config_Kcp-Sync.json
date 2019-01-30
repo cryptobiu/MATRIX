@@ -10,7 +10,7 @@
       "git":
       {
         "gitBranch": ["master"],
-        "gitAddress": ["https://github.com/cryptobiu/KCP-INF.git"]
+        "gitAddress": ["https://{}.{}@github.com/cryptobiu/KCP-INF.git"]
       }
     }
   },
