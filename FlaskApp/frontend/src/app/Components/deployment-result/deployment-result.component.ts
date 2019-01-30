@@ -38,6 +38,7 @@ export class DeploymentResultComponent implements OnInit {
     timerObservable.subscribe(value => this.es.getDocuments('deployment_matrix_ui',
       'deployment_matrix_ui', this.protocolName).then(
       response => {
+        this.deploymentData.length = 0; // clear the data before assign new data
         for (let hit of response.hits.hits)
         {
           let data :IDeploymentData =

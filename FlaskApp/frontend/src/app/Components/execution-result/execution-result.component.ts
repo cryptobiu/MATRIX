@@ -34,6 +34,7 @@ export class ExecutionResultComponent implements OnInit {
     timerObservable.subscribe(value => this.es.getDocuments('execution_matrix_ui',
       'execution_matrix_ui', this.protocolName).then(
       response => {
+        this.executionData.length = 0; // clear the data before assign new data
         for (let hit of response.hits.hits)
         {
           let data :IExecutionData =

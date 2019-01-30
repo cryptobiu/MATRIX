@@ -28,7 +28,7 @@ export class ElasticsearchService {
             { 'match' : { 'protocolName': protocolName }}
           ],
           'filter': [
-            { 'range': { 'timestamp': { 'gte': 'now-15m/m', 'lt': 'now' } } }
+            { 'range': { 'timestamp': { 'gte': 'now-3m/m', 'lt': 'now' } } }
           ]
         }
       }
