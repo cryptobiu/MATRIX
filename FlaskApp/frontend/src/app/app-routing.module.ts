@@ -13,11 +13,13 @@ import {ExecutionComponent} from "./Components/execution/execution.component";
 import {DeploymentResultComponent} from "./Components/deployment-result/deployment-result.component";
 import {ReportingComponent} from "./Components/reporting/reporting.component";
 import {ExecutionResultComponent} from "./Components/execution-result/execution-result.component";
+import {CompetitionsRegistrationComponent} from "./Components/competitions-registration/competitions-registration.component";
 
 const routes: Routes = [
   {path: '', component:HomeComponent, pathMatch:'full'},
   { path: 'competitions', component:CompetitionsComponent, pathMatch:'full'},
   { path: 'competitions/:name', component:CompetitionsDetailsComponent},
+  { path: 'competitions/registration/:name', component:CompetitionsRegistrationComponent},
   { path: 'protocols', component:ProtocolsComponent, pathMatch:'full'},
   { path: 'protocols/upload', component:ProtocolsUploadComponent, pathMatch:'full'},
   { path: 'deployment', component: DeploymentComponent, pathMatch: 'full'},

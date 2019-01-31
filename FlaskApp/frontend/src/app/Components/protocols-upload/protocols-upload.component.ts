@@ -1,6 +1,6 @@
 import {Component, NgModule, OnInit} from '@angular/core';
 import {FormsModule} from "@angular/forms";
-import {Protocol} from "../../protocol";
+import {Protocol} from "../../classes";
 import {FormSubmissionService} from "../../Services/formSubmission.service";
 import {Router} from "@angular/router";
 
@@ -49,7 +49,7 @@ export class ProtocolsUploadComponent implements OnInit {
 
   onSubmit(){
     this.submitted = true;
-    this._formService.submitForm(this.protocolModel).subscribe(
+    this._formService.submitUploadProtocolForm(this.protocolModel).subscribe(
       data => this.router.navigate(['/protocols']),
       error => this.errmsg = error.statuesText
     )

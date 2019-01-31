@@ -25,11 +25,19 @@
       <mat-cell *matCellDef="let competition"> {{competition.description}} </mat-cell>
     </ng-container>
 
+    <ng-container matColumnDef="competition details">
+      <mat-header-cell *matHeaderCellDef> Competition Details </mat-header-cell>
+      <mat-cell *matCellDef="let competition">
+        <a href="/competitions/{{competition.competitionName}}"
+           class="badge badge-info">View</a>
+      </mat-cell>
+    </ng-container>
+
     <ng-container matColumnDef="registration">
       <mat-header-cell *matHeaderCellDef> </mat-header-cell>
       <mat-cell *matCellDef="let competition">
-        <a *ngIf="competition.status === 'Open'" href="register_competition/{{competition.competitionName}}"
-           class="btn btn-default pull-right" disabled="true">
+        <a *ngIf="competition.status === 'Open'" href="competitions/registration/{{competition.competitionName}}"
+           class="badge badge-primary" disabled="true">
           Participate</a>
       </mat-cell>
     </ng-container>

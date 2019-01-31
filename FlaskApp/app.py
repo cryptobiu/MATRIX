@@ -167,10 +167,10 @@ def execute_execution_operation(protocol_name, operation):
 
     config_file_path = '%s/%s.json' % (os.getcwd(), protocol_name)
 
-    ee = E2E(data, config_file_path)
-
-    with open(config_file_path, 'w+') as fp:
+    with open(config_file_path, 'w') as fp:
         json.dump(data, fp)
+
+    ee = E2E(data, config_file_path)
 
     if operation == 'Install Experiment':
         ee.install_experiment()

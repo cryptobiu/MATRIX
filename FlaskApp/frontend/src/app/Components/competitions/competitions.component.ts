@@ -14,7 +14,8 @@ import {ICompetition} from "../../interfaces";
 export class CompetitionsComponent implements OnInit {
 
   dataSource = new CompetitionDataSource(this.dbService);
-  displayedColumns = ['competition name', 'description', 'start date', 'end date', 'status', 'registration'];
+  displayedColumns = ['competition name', 'description', 'start date', 'end date', 'status', 'competition details',
+    'registration'];
   constructor(private dbService: DbService) { }
 
   ngOnInit() {}

@@ -9,7 +9,7 @@
       <input type="text" required #name="ngModel"
              [class.is-invalid]="name.invalid && name.touched" class="form-control"
              name="protocolName" [(ngModel)]="protocolModel.protocolName">
-      <small class="text-danger" [class.d-none]="name.valid || name.untouched">Protocol name is required</small>
+      <small class="text-danger" [class.d-none]="name.valid || name.untouched">Classes name is required</small>
     </div>
 
     <div class="form-group">
@@ -24,6 +24,7 @@
     <br>
 
     <div class="form-group">
+      <label>Security Level</label>
       <select required (blur)="validateSl(security.value)" (change)="validateSl(security.value)"
               #security="ngModel"
               [class.is-invalid]="security.invalid && security.touched"
@@ -37,6 +38,7 @@
     <br>
 
     <div class="form-group">
+      <label>Security Threshold</label>
       <select required (blur)="validateSt(thresholdLevel.value)" (change)="validateSt(thresholdLevel.value)"
               #thresholdLevel="ngModel"
               [class.is-invalid]="thresholdLevel.invalid && thresholdLevel.touched"
@@ -50,7 +52,7 @@
 
     <br>
     <button [disabled]="userForm.form.invalid || slHasError" class="btn btn-primary" type="submit">
-      Upload Protocol
+      Upload Classes
     </button>
 
   </form>

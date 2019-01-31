@@ -2,7 +2,7 @@
   The page contains all the protocols that benchmark with MATRIX.<br>
   To upload a new protocol press the button below.
   <br><br>
-  <a href="/protocols/upload">Upload new protocol</a>
+  <a href="protocols/upload" class="badge badge-primary" >Upload new protocol</a>
 </div>
 <br>
 <br>
@@ -10,7 +10,7 @@
 <div>
   <mat-table [dataSource]="dataSource">
     <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef> Protocol Name </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef> Classes Name </mat-header-cell>
       <mat-cell *matCellDef="let protocol">  {{protocol.name}} </mat-cell>
     </ng-container>
     <ng-container matColumnDef="security">

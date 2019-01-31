@@ -1,0 +1,28 @@
+<div class="container-fluid mb-5">
+
+  <div class="alert alert-danger" *ngIf="errmsg"> {{ errmsg }}</div>
+
+  <form #userForm="ngForm" *ngIf="!submitted" target="/competitions" novalidate (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label>Protocol Name</label>
+      <input type="text" required #name="ngModel"
+             [class.is-invalid]="name.invalid && name.touched" class="form-control"
+             name="protocolName" [(ngModel)]="cr.protocolName">
+      <small class="text-danger" [class.d-none]="name.valid || name.untouched">Protocol name is required</small>
+    </div>
+
+    <div class="form-group">
+      <label>Institute</label>
+      <input type="text" required #institute="ngModel"
+             [class.is-invalid]="institute.invalid && institute.touched" class="form-control"
+             name="institute" [(ngModel)]="cr.institute">
+      <small class="text-danger" [class.d-none]="name.valid || name.untouched">Institute name is required</small>
+    </div>
+
+    <button [disabled]="userForm.form.invalid" class="btn btn btn-primary" type="submit">
+    Register to competition
+    </button>
+  </form>
+
+</div>

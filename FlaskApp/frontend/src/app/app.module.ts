@@ -20,6 +20,7 @@ import { ExecutionComponent } from './Components/execution/execution.component';
 import { DeploymentResultComponent } from './Components/deployment-result/deployment-result.component';
 import { ReportingComponent } from './Components/reporting/reporting.component';
 import { ExecutionResultComponent } from './Components/execution-result/execution-result.component';
+import { CompetitionsRegistrationComponent } from './Components/competitions-registration/competitions-registration.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { ExecutionResultComponent } from './Components/execution-result/executio
     DeploymentResultComponent,
     ReportingComponent,
     ExecutionResultComponent,
+    CompetitionsRegistrationComponent,
   ],
   imports: [
     BrowserModule,

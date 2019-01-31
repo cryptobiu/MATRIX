@@ -6,3 +6,10 @@ export class Protocol {
     public thresholdLevel: string,
   ){}
 }
+export class CompetitionRegistration {
+  constructor(
+    public protocolName: string,
+    public institute: string,
+  ){}
+}
+
