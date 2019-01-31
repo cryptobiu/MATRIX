@@ -5,7 +5,7 @@
     "aws":
     {
       "numOfParties":30,
-      "instanceType":"c5.xlarge",
+      "instanceType":"c5.4xlarge",
       "regions": ["us-east-1a", "ap-south-1b", "eu-west-2a"],
       "git":
       {
