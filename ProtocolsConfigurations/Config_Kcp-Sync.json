@@ -17,7 +17,15 @@
   "executableName": ["tools/execute_from_matrix.py"],
   "configurations":
   [
-    "-n300@--num-rounds@1@--data-size@1024@-p10000@--log-filename@r1_d1024@--log-level@7"
+    "-n300@--num-rounds@1@--data-size@1024@-p10000@--log-filename@r1_d1024@--log-level@7",
+    "-n300@--num-rounds@10@--data-size@1024@-p10000@--log-filename@r10_d1024@--log-level@5",
+    "-n300@--num-rounds@10@--data-size@4096@-p10000@--log-filename@r10_d4096@--log-level@5",
+    "-n600@--num-rounds@1@--data-size@1024@-p10000@--log-filename@r1_d1024@--log-level@4",
+    "-n600@--num-rounds@10@--data-size@1024@-p10000@--log-filename@r10_d1024@--log-level@4",
+    "-n600@--num-rounds@10@--data-size@4096@-p10000@--log-filename@r10_d4096@--log-level@4",
+    "-n1000@--num-rounds@1@--data-size@1024@-p10000@--log-filename@r1_d1024@--log-level@4",
+    "-n1000@--num-rounds@10@--data-size@1024@-p10000@--log-filename@r10_d1024@--log-level@4",
+    "-n1000@--num-rounds@10@--data-size@4096@-p10000@--log-filename@r10_d4096@--log-level@4"
   ],
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
