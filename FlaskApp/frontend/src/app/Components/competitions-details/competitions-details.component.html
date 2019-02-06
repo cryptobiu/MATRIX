@@ -1,3 +1,11 @@
-<p>
-  Welcome to competition with id : {{ competitionName }}
-</p>
+<div>
+  Welcome to {{ competition.name }} competition. <br>
+  The competitions tests {{ competition.description }}. <br>
+  The Competition takes times from {{ competition.startDate }} to {{ competition.endDate }} <br>
+
+  The protocol(s) that participate in these competition are:
+  <ul *ngFor="let participants of competition.participants">
+    <li>Protocol {{ participants.protocolName }} from {{ participants.institute }}</li>
+  </ul>
+
+</div>

@@ -2,8 +2,8 @@ import {Injectable, NgModule} from '@angular/core';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import {AppComponent} from "../app.component";
-import {Observable, Observer, Subject} from "rxjs";
-import {ICompetition, IProtocol, IProtocolData} from "./../interfaces";
+import {Observable} from "rxjs";
+import {ICompetition, IProtocol} from "../interfaces";
 
 @NgModule({
   imports: [CommonModule, HttpClientModule],
@@ -24,6 +24,12 @@ export class DbService {
   getCompetitions(): Observable<ICompetition[]> {
     let url = this._urlApi + 'competitions';
     return this._http.get<ICompetition[]>(url);
+  }
+
+  getCompetition(competitionName: string)
+  {
+    let url = this._urlApi + 'competitions/' + competitionName;
+    return this._http.get<ICompetition>(url);
   }
 
   getProtocols(): Observable<IProtocol[]> {

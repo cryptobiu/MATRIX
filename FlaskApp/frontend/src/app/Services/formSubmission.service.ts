@@ -21,9 +21,9 @@ export class FormSubmissionService {
     return throwError(error);
   }
 
-  submitcompetitionRegistrationForm(cr: CompetitionRegistration)
+  submitCompetitionRegistrationForm(cr: CompetitionRegistration, competitionName: string)
   {
-    let _url = 'http://localhost:5000/competitions/registerCompetition';
+    let _url = 'http://localhost:5000/competitions/registerCompetition/' + competitionName;
     return this._http.post<any>(_url, cr).
     pipe(catchError(this.errorHandler))
   }

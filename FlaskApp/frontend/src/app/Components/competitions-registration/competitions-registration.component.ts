@@ -1,7 +1,7 @@
 import {Component, NgModule, OnInit} from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {FormSubmissionService} from "../../Services/formSubmission.service";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {CompetitionRegistration} from "../../classes";
 
 @Component({
@@ -18,7 +18,12 @@ import {CompetitionRegistration} from "../../classes";
 
 export class CompetitionsRegistrationComponent implements OnInit {
 
-  constructor(private formService:FormSubmissionService, private router: Router) { }
+  private competitionName: string;
+
+  constructor(private formService:FormSubmissionService, private router: Router, private acRouter: ActivatedRoute)
+  {
+    this.competitionName = this.acRouter.snapshot.paramMap.get('name');
+  }
 
   ngOnInit() {
   }
@@ -29,7 +34,7 @@ export class CompetitionsRegistrationComponent implements OnInit {
 
   onSubmit(){
     this.submitted = true;
-    this.formService.submitcompetitionRegistrationForm(this.cr).subscribe(
+    this.formService.submitCompetitionRegistrationForm(this.cr, this.competitionName).subscribe(
       data => this.router.navigate(['/competitions']),
       error => this.errmsg = error.statusText
     );

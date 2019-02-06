@@ -4,6 +4,7 @@ export interface ICompetition
   startDate: Date,
   endDate: Date,
   description: string;
+  participants: [];
 }
 
 export interface IProtocol {

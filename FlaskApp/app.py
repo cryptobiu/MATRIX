@@ -86,32 +86,39 @@ def register_new_protocol():
     return jsonify('form submitted')
 
 
-@app.route('/getprotocoldata/<string:protocol_name>')
-def get_protocol_data(protocol_name):
-    protocol_data = {}
-    config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
-                  % protocol_name
-    raw_data = requests.get(config_file)
+@app.route('/competitions/registerCompetition/<string:competition_name>', methods=['POST'])
+def register_to_competition(competition_name):
+    form = request.data
+    form_data = json.loads(form.decode('utf-8'))
+    protocol_name = form_data['protocolName']
+    institute = form_data['institute']
+    client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
+    db = client['BIU']
+    collection = db['competitions']
+    competition = collection.find({'competitionName': competition_name}, {'participants': []})
     try:
-        raw_data.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        print('Error while fetching configuration file: %s' % e.response.reason)
-        return jsonify('Error!!!')
+        for comp in competition:
+            if len(comp.keys()) == 1:
+                participants = []
+            else:
+                participants = comp['participants']
+            participants.append({'protocolName': protocol_name, 'institute': institute})
+        collection.update({'competitionName': competition_name}, {'$set': {'participants': participants}})
+    except bson.errors.InvalidDocument as e:
+        return jsonify(e.with_traceback()), 500
+    return jsonify('form submitted')
 
-    data = json.loads(raw_data)
-    raw_configurations = data['configurations']
-    configurations = []
 
-    for conf in raw_configurations:
-        configurations.append(conf.replace('@', ' '))
+@app.route('/competitions/<string:competition_name>')
+def get_competition_data(competition_name):
+    client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
+    db = client['BIU']
+    collection = db['competitions']
+    competition = collection.find({'competitionName': competition_name}, {'_id': 0})
+    for comp in competition:
+        return jsonify(comp)
 
-    protocol_data['protocolName'] = data['protocol']
-    protocol_data['numberOfParties'] = data['CloudProviders']['aws']['numOfParties']
-    protocol_data['machineType'] = data['CloudProviders']['aws']['instanceType']
-    protocol_data['regions'] = data['CloudProviders']['aws']['regions']
-    protocol_data['configurations'] = configurations
-
-    return jsonify(protocol_data)
+    return jsonify('Error retrieve competition')
 
 
 @app.route('/deploy/<string:protocol_name>/<string:operation>')
