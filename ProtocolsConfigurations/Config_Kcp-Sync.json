@@ -17,9 +17,6 @@
   "executableName": ["tools/execute_from_matrix.py"],
   "configurations":
   [
-    "-n300@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@7",
-    "-n900@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
-    "-n1200@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
     "-n1800@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
     "-n2400@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
     "-n3000@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@4",
