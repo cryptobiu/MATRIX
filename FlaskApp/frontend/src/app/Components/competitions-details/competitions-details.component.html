@@ -1,11 +1,26 @@
-<div>
+<p>
   Welcome to {{ competition.name }} competition. <br>
   The competitions tests {{ competition.description }}. <br>
   The Competition takes times from {{ competition.startDate }} to {{ competition.endDate }} <br>
+</p>
 
+<div>
   The protocol(s) that participate in these competition are:
-  <ul *ngFor="let participants of competition.participants">
-    <li>Protocol {{ participants.protocolName }} from {{ participants.institute }}</li>
-  </ul>
+  <br><br>
+  <mat-table [dataSource]="competition.participants">
+
+    <ng-container matColumnDef="protocol name">
+      <mat-header-cell *matHeaderCellDef>Protocol Name</mat-header-cell>
+      <mat-cell *matCellDef="let participant"> {{participant.protocolName}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="institute">
+      <mat-header-cell *matHeaderCellDef>Institute</mat-header-cell>
+      <mat-cell *matCellDef="let participant"> {{participant.institute}}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
 
 </div>

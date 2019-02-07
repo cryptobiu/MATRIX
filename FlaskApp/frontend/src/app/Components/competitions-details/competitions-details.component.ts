@@ -13,6 +13,7 @@ export class CompetitionsDetailsComponent implements OnInit {
 
   public competitionName;
   public competition: Competition;
+  displayedColumns = ['protocol name', 'institute'];
   constructor(private router: ActivatedRoute, private dbService: DbService) { }
 
   ngOnInit() {

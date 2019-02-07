@@ -1,16 +1,7 @@
-import {Injectable, NgModule} from '@angular/core';
-import {HttpClient, HttpClientModule} from '@angular/common/http';
-import { CommonModule } from '@angular/common';
-import {AppComponent} from "../app.component";
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 import {Observable} from "rxjs";
 import {ICompetition, IProtocol} from "../interfaces";
-
-@NgModule({
-  imports: [CommonModule, HttpClientModule],
-  exports: [],
-  declarations: [ AppComponent ],
-  bootstrap:    [ AppComponent ]
-})
 
 @Injectable({
   providedIn: 'root'

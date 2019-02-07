@@ -12,9 +12,9 @@ import {ElasticsearchService} from "../../Services/elasticsearch.service";
 })
 export class ExecutionResultComponent implements OnInit {
 
-  private protocolName: string;
-  private operation: string;
-  private executionData: Array<IExecutionData>;
+  public protocolName: string;
+  public operation: string;
+  public executionData: Array<IExecutionData>;
 
   constructor(private ac_router: ActivatedRoute, private dbService: DbService, private es: ElasticsearchService) {
     this.protocolName = this.protocolName = this.ac_router.snapshot.paramMap.get('protocolName');
