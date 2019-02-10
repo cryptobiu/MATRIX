@@ -17,17 +17,6 @@
   "executableName": ["tools/execute_from_matrix.py"],
   "configurations":
   [
-    "-n300@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
-    "-n600@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
-    "-n900@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
-    "-n1200@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
-    "-n1500@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
-    "-n1800@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
-    "-n2100@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
-    "-n2400@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
-    "-n2700@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
-    "-n3000@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
-    "-n3300@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
     "-n3600@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
     "-n3900@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5",
     "-n4200@--num-rounds@5@--data-size@2048@-p10000@--log-filename@r5_d2048@--log-level@5"
