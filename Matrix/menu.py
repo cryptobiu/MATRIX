@@ -5,7 +5,7 @@ import colorama
 from collections import OrderedDict
 from Deployment import deploy as de
 from Deployment import aws_deploy as awsde
-from Deployment import azure_deploy as azde
+# from Deployment import azure_deploy as azde
 from Deployment import multi_cp_deploy as mde
 from Execution import end_to_end as e2e
 from Reporting import analyze_results as ar
@@ -196,7 +196,7 @@ class MatrixMenu:
             deploy = awsde.AmazonCP(self.protocol_config)
             menu_color = 'red'
         elif cp == 2:
-            deploy = azde.AzureCP(self.protocol_config)
+            # deploy = azde.AzureCP(self.protocol_config)
             menu_color = 'azure'
         elif cp == 4 or cp == 5:
             deploy = de.DeployCP(self.protocol_config)
