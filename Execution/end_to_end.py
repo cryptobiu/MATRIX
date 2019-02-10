@@ -79,12 +79,26 @@ class E2E:
                               % (self.protocol_config_path, configurations[idx2],
                                  executables[idx], working_directory[idx]))
 
-    @staticmethod
-    def update_libscapi():
-        branch = input('Enter libscapi branch to update from:')
-        os.system('fab -f Execution/fabfile.py update_libscapi:%s --parallel' % branch)
+    def update_libscapi(self):
+        protocol_name = self.protocol_config['protocol']
+
+        doc = {}
+        doc['protocolName'] = protocol_name
+        doc['message'] = 'Update libscapi for %s protocol' % protocol_name
+        doc['timestamp'] = datetime.utcnow()
+        self.es.index(index='execution_matrix_ui', doc_type='execution_matrix_ui', body=doc)
+
+        os.system('fab -f Execution/fabfile.py update_libscapi:dev --parallel')
 
     def get_logs(self):
+        protocol_name = self.protocol_config['protocol']
+
+        doc = {}
+        doc['protocolName'] = protocol_name
+        doc['message'] = 'Get logs for protocol %s' % protocol_name
+        doc['timestamp'] = datetime.utcnow()
+        self.es.index(index='execution_matrix_ui', doc_type='execution_matrix_ui', body=doc)
+
         logs_directory = self.protocol_config['logDirectory']
         for idx in range(len(logs_directory)):
             os.system('fab -f Execution/fabfile.py get_logs:%s --parallel' % logs_directory[idx])
