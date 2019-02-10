@@ -1,10 +1,8 @@
 import os
-import json
 import copy
 import subprocess
 import shutil
 import certifi
-from collections import OrderedDict
 from elasticsearch import Elasticsearch
 
 

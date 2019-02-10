@@ -70,7 +70,7 @@ class ScalewayCP(DeployCP):
                     res = api.query().servers.post({
                         'name': protocol_name,
                         'organization': self.account_id,
-                        'image': '9a6253b0-d03c-44c9-a151-e647f82760e6',
+                        'image': 'accc8537-84fa-4cd8-b4d4-dd35388c7165',
                         'commercial_type': machine_type
                     })
                     server_id = res['server']['id']

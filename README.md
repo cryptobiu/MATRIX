@@ -2,7 +2,7 @@
 
 MATRIX is an MPC Test Automation Framework developed by [Bar Ilan University Cryptography Research Group](http://crypto.biu.ac.il/).
 It automates the tedious process of deploying, running, monitoring and summarizing results.
-It uses AWS or Scaleway to provision servers(instances), and can be used internally on a local host or in a container deployment.
+It uses AWS or Scaleway to provision servers(instances), and can be used internally on a local host or in a container deployment. A [paper](https://eprint.iacr.org/2018/751) featuring MATRIX was prensented in ACM-CCS18 
 
 The system requires a management computer (Manager) - a computer that centralized all the execution.
 The Manager executes all the experiment phases, starting from install the experiment up to analyse it's results.

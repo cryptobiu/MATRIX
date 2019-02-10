@@ -5,7 +5,7 @@ import colorama
 from collections import OrderedDict
 from Deployment import deploy as de
 from Deployment import aws_deploy as awsde
-# from Deployment import azure_deploy as azde
+from Deployment import azure_deploy as azde
 from Deployment import multi_cp_deploy as mde
 from Execution import end_to_end as e2e
 from Reporting import analyze_results as ar
@@ -52,6 +52,7 @@ class MatrixMenu:
             'Change machines types',
             'Start instances',
             'Stop instances',
+            'Copy AMI',
             'Return',
         ])
 
@@ -62,6 +63,7 @@ class MatrixMenu:
             'Install Experiment',
             'Execute Experiment',
             'Execute Experiment with profiler',
+            'Execute Experiment with latency',
             'Update libscapi',
             'Return',
         ],
@@ -196,8 +198,11 @@ class MatrixMenu:
             deploy = awsde.AmazonCP(self.protocol_config)
             menu_color = 'red'
         elif cp == 2:
-            # deploy = azde.AzureCP(self.protocol_config)
             menu_color = 'azure'
+            deploy = azde.AzureCP(self.protocol_config)
+        elif cp == 3:
+            deploy = mde.MultiCP(self.protocol_config)
+            menu_color = 'blue'
         elif cp == 4 or cp == 5:
             deploy = de.DeployCP(self.protocol_config)
             menu_color = 'blue'
@@ -222,6 +227,8 @@ class MatrixMenu:
             deploy.start_instances()
         elif selection == 8:
             deploy.stop_instances()
+        elif selection == 9:
+            deploy.copy_ami()
 
     def execution_menu(self):
         """
@@ -240,6 +247,8 @@ class MatrixMenu:
         elif selection == 4:
             ee.execute_experiment_callgrind()
         elif selection == 5:
+            ee.execute_experiment_with_latency()
+        elif selection == 6:
             ee.update_libscapi()
 
     def analysis_menu(self):
@@ -252,11 +261,11 @@ class MatrixMenu:
 
         if selection == 1:
             a.download_data()
-            a.analyze_all()
+            a.analyze_results()
         elif selection == 2:
             a.download_data()
         elif selection == 3:
-            a.analyze_all()
+            a.analyze_results()
         elif selection == 4:
             e = ue.Elastic(self.protocol_config)
             e.upload_all_data()

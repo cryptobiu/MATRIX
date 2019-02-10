@@ -38,9 +38,10 @@ private:
     vector<vector<long>> m_cpuEndTimes;
     string m_arguments = "";
     vector<string> m_tasksNames;
+    int m_partiesNumber = 0;
 
 public:
-    MatrixMeasurement(size_t argc, char* argv[], vector<string> tasksNames, int numberOfIterations):
+    MatrixMeasurement(size_t argc, char* argv[], int partiesNumber, vector<string> tasksNames, int numberOfIterations):
             m_cpuStartTimes(vector<vector<long>>(tasksNames.size(), vector<long>(numberOfIterations))),
             m_cpuEndTimes(vector<vector<long>>(tasksNames.size(), vector<long>(numberOfIterations)))
     {
@@ -55,6 +56,8 @@ public:
         }
 
         m_tasksNames = tasksNames;
+        m_partiesNumber = partiesNumber;
+
     }
 
     void startSubTask(string taskName, int currentIterationNumber)
@@ -84,6 +87,9 @@ public:
             ofstream logFile(logFileName);
             if (logFile.is_open())
             {
+                //write parties number to file
+                logfile << to_string(m_partiesNumber) + "\n";
+
                 //write to file
                 int numberOfIterations = m_cpuEndTimes[0].size();
                 for (size_t idx = 0; idx < m_tasksNames.size(); ++idx)

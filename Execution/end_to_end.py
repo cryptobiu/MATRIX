@@ -29,8 +29,9 @@ class E2E:
         protocol_name = self.protocol_config['protocol']
         working_directory = self.protocol_config['workingDirectory']
         external_protocol = json.loads(self.protocol_config['isExternal'])
-        git_address = self.protocol_config['CloudProviders']['aws']['git']['gitAddress']
-        git_branch = self.protocol_config['CloudProviders']['aws']['git']['gitBranch']
+        cp = list(self.protocol_config['CloudProviders'].keys())
+        git_address = self.protocol_config['CloudProviders'][cp[0]]['git']['gitAddress']
+        git_branch = self.protocol_config['CloudProviders'][cp[0]]['git']['gitBranch']
 
         for idx in range(len(working_directory)):
             doc = {}
@@ -79,6 +80,18 @@ class E2E:
                               % (self.protocol_config_path, configurations[idx2],
                                  executables[idx], working_directory[idx]))
 
+    def execute_experiment_with_latency(self):
+        number_of_repetitions = self.protocol_config['numOfRepetitions']
+        configurations = self.protocol_config['configurations']
+        working_directory = self.protocol_config['workingDirectory']
+        executables = self.protocol_config['executableName']
+        for i in range(number_of_repetitions):
+            for idx2 in range(len(configurations)):
+                for idx in range(len(executables)):
+                    os.system('fab -f Execution/fabfile.py run_protocol_with_latency:%s,%s,%s,%s --parallel'
+                              % (self.protocol_config_path, configurations[idx2],
+                                 executables[idx], working_directory[idx]))
+
     def update_libscapi(self):
         protocol_name = self.protocol_config['protocol']
 
@@ -98,7 +111,3 @@ class E2E:
         doc['message'] = 'Get logs for protocol %s' % protocol_name
         doc['timestamp'] = datetime.utcnow()
         self.es.index(index='execution_matrix_ui', doc_type='execution_matrix_ui', body=doc)
-
-        logs_directory = self.protocol_config['logDirectory']
-        for idx in range(len(logs_directory)):
-            os.system('fab -f Execution/fabfile.py get_logs:%s --parallel' % logs_directory[idx])
