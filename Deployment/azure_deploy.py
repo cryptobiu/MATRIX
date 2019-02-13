@@ -1,4 +1,5 @@
 import json
+import time
 from random import shuffle
 
 from azure.mgmt.compute import ComputeManagementClient
@@ -59,6 +60,8 @@ class AzureCP(DeployCP):
         try:
             self.compute_client.availability_sets.create_or_update(self.resource_group, '%sAVSet' % protocol_name,
                                                                    avset_params)
+            av_set_id = self.compute_client.availability_sets.get(self.resource_group, '%sAVSet' % protocol_name).id
+            return av_set_id
         except CloudError as e:
             print('Error while creating availability_set', e.message)
 
@@ -154,7 +157,6 @@ class AzureCP(DeployCP):
             data = json.load(gc)
             key_data = data['eastus']['keyData']
 
-        region_name = 'eastus'
         regions = self.protocol_config['CloudProviders']['azure']['regions']
         machine_type = self.protocol_config['CloudProviders']['azure']['instanceType']
         protocol_name = self.protocol_config['protocol']
@@ -179,39 +181,38 @@ class AzureCP(DeployCP):
             if number_of_instances_to_deploy > 0:
 
                 # create availability set, vnet and subnet
-                self.create_availability_set(region_name, protocol_name)
-                self.create_vnet(region_name, protocol_name)
+                av_set_id = self.create_availability_set(regions[idx], protocol_name)
+                self.create_vnet(regions[idx], protocol_name)
                 self.create_subnet(protocol_name)
+                nsg = self.network_client.network_security_groups.get(self.resource_group, 'MatrixNSG').id
 
                 for idx2 in range(number_of_instances_to_deploy):
 
-                    self.create_public_ip_address(region_name, '%s_%d' % (protocol_name, idx2))
-                    # save the public ip
-                    self.public_ips.append(self.network_client.public_ip_addresses.get(self.resource_group,
-                                                                                       '%s_%d_IP' % (protocol_name, idx2)))
-                    nic = self.create_nic(region_name, protocol_name, '%s_%d_IP' % (protocol_name, idx2))
-                    self.private_ips.append(nic.ip_configurations[0].private_ip_address)
+                    self.create_public_ip_address(regions[idx], '%s_%d' % (protocol_name, idx2))
+                    nic = self.create_nic(regions[idx], protocol_name, '%s_%d_IP' % (protocol_name, idx2))
 
                     vm_params = {
-                        'location': region_name,
-                        'hardware_profile':
-                            {
+                        'location': regions[idx],
+                        'hardware_profile': {
                                 'vm_size': machine_type
                             },
-                        'storage_profile':
-                            {
-                                'image_reference':
-                                    {
+                        'storage_profile': {
+                                'image_reference': {
                                         'id': '/subscriptions/e500fb85-1759-463b-b828-0d4e0b38a305/resourceGroups/'
                                               'MatrixRG/providers/Microsoft.Compute/images/libscapiImageEastUS'
                                     }
                             },
-                        'network_profile':
-                            {
+                        'network_profile': {
                                 'network_interfaces': [{
                                     'id': nic.id
                                 }]
                             },
+                        'availability_set': {
+                                'id': av_set_id
+                            },
+                        'network_security_group': {
+                            'id': nsg
+                        },
                         'osProfile': {
                             'adminUsername': 'ubuntu',
                             'computerName': '%s%d' % (protocol_name, idx2),
@@ -228,6 +229,8 @@ class AzureCP(DeployCP):
                     }
                     vm = self.compute_client.virtual_machines.create_or_update('MatrixRG', '%s%d'
                                                                                % (protocol_name, idx2), vm_params)
+        # wait for the machine will be online
+        time.sleep(300)
         self.get_network_details()
 
     def get_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
@@ -238,7 +241,19 @@ class AzureCP(DeployCP):
         :param new_format:
         :return:
         """
+        protocol_name = self.protocol_config['protocol']
         regions = self.protocol_config['CloudProviders']['azure']['regions']
+        number_of_parties = self.protocol_config['CloudProviders']['azure']['numOfParties']
+        for idx in range(len(regions)):
+            for idx2 in range(number_of_parties):
+                # save the public ip
+                self.public_ips.append(self.network_client.public_ip_addresses.get(self.resource_group,
+                                                                                   '%s_%d_IP'
+                                                                                   % (protocol_name, idx2)).ip_address)
+                nic = self.network_client.network_interfaces.get(self.resource_group, '%s_%d_Nic'
+                                                                 % (protocol_name, idx2))
+                self.private_ips.append(nic.ip_configurations[0].private_ip_address)
+
         if len(regions) > 1:
             shuffle(self.public_ips)
             self.create_parties_file(self.public_ips, port_number, file_name, new_format, len(regions))
@@ -301,12 +316,6 @@ class AzureCP(DeployCP):
 
         for idx in range(len(response)):
             disk_name = response[idx].storage_profile.os_disk.name
-            nic_name = response[idx].network_profile.network_interfaces[0].id.split('/')[-1]
-            network_interface_details = self.network_client.network_interfaces.get(self.resource_group, nic_name)\
-                .ip_configurations
-            for x in network_interface_details:
-                print(x.private_ip_address)
-                print(x.public_ip_address.ip_address)
 
             delete_vm = self.compute_client.virtual_machines.delete(self.resource_group, response[idx].name)
             delete_vm.wait()
@@ -329,8 +338,9 @@ class AzureCP(DeployCP):
             '%sSubnet' % protocol_name
         )
         self.network_client.subnets.delete(self.resource_group, '%sVNet' % protocol_name, subnet_info.name)
-
         self.network_client.virtual_networks.delete(self.resource_group, '%sVNet' % protocol_name)
+
+        # delete availability set
         self.compute_client.availability_sets.delete(self.resource_group, '%sAVSet' % protocol_name)
 
     def change_instance_types(self):

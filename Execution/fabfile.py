@@ -9,8 +9,7 @@ from pathlib import Path
 env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
-env.key_filename = ['%s/Keys/Matrixuseast1.pem' % Path.home(), '%s/Keys/Matrixapsouth1.pem' % Path.home(),
-                    '%s/Keys/Matrixeuwest2.pem' % Path.home()]
+env.key_filename = ['%s/Keys/azure' % Path.home()]
 
 
 @task
@@ -24,7 +23,7 @@ def pre_process(working_directory, task_idx):
 @task
 def install_git_project(username, password, git_branch, working_directory, git_address, external):
     if not exists('%s' % working_directory):
-        run('git clone %s %s --recursive' % (git_address.format(username, password), working_directory))
+        run('git clone %s %s' % (git_address.format(username, password), working_directory))
 
     external = eval(external)
     with cd('%s' % working_directory):
@@ -57,8 +56,8 @@ def run_protocol(config_file, args, executable_name, working_directory):
         external_protocol = json.loads(data['isExternal'].lower())
         if 'aws' in data['CloudProviders']:
             regions = data['CloudProviders']['aws']['regions']
-        elif 'scaleway' in data['CloudProviders']:
-            regions = data['CloudProviders']['scaleway']['regions']
+        elif 'azure' in data['CloudProviders']:
+            regions = data['CloudProviders']['azure']['regions']
         elif len(data['CloudProviders']) > 1:
             regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['scaleway']['regions']
         else:
@@ -96,13 +95,6 @@ def run_protocol(config_file, args, executable_name, working_directory):
                 if 'inputs0' in values_str:
                     values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
 
-                # # apply delay if needed
-                #
-                # if 'delay' in data:
-                #     sudo('tc qdisc del dev ens5 root netem')
-                #     sudo('tc qdisc add dev ens5 root netem delay %sms' % data['delay'])
-                #     time.sleep(10)
-
                 if not external_protocol:
                     if len(regions) > 1:
                         put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
@@ -134,7 +126,6 @@ def run_protocol(config_file, args, executable_name, working_directory):
                                     sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % coordinator_executable)
                                     # required for SCALE-MAMBA to rsync between AWS instances
                                     put(env.key_filename[0], run('pwd'))
-
 
                                 run('./%s %s' % (coordinator_executable, coordinator_values_str))
                                 with open('Execution/execution_log.log', 'a+') as log_file:
