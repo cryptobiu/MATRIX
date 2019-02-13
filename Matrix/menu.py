@@ -193,21 +193,20 @@ class MatrixMenu:
         """
         Show instances management menu.
         """
-        cp = self.print_menu(*self.cloud_provider_menu_desc)
-        if cp == 1:
-            deploy = awsde.AmazonCP(self.protocol_config)
-            menu_color = 'red'
-        elif cp == 2:
-            menu_color = 'azure'
-            deploy = azde.AzureCP(self.protocol_config)
-        elif cp == 3:
+        cp = list(self.protocol_config['CloudProviders'].keys())
+        if len(cp) > 1:
             deploy = mde.MultiCP(self.protocol_config)
             menu_color = 'blue'
-        elif cp == 4 or cp == 5:
+
+        elif 'azure' in cp:
+            menu_color = 'azure'
+            deploy = azde.AzureCP(self.protocol_config)
+        elif 'aws' in cp:
+            deploy = awsde.AmazonCP(self.protocol_config)
+            menu_color = 'red'
+        elif 'local' in cp or 'servers' in cp:
             deploy = de.DeployCP(self.protocol_config)
             menu_color = 'blue'
-        elif cp == 6:
-            return
 
         selection = self.print_menu(*self.deploy_menu_desc, menu_color)
 
