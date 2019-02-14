@@ -153,10 +153,6 @@ class AzureCP(DeployCP):
 
     def deploy_instances(self):
 
-        with open('GlobalConfigurations/azureRegions.json', 'r') as gc:
-            data = json.load(gc)
-            key_data = data['eastus']['keyData']
-
         regions = self.protocol_config['CloudProviders']['azure']['regions']
         machine_type = self.protocol_config['CloudProviders']['azure']['instanceType']
         protocol_name = self.protocol_config['protocol']
@@ -185,6 +181,12 @@ class AzureCP(DeployCP):
                 self.create_vnet(regions[idx], protocol_name)
                 self.create_subnet(protocol_name)
                 nsg = self.network_client.network_security_groups.get(self.resource_group, 'MatrixNSG').id
+                with open('GlobalConfigurations/azureTokens.json', 'r') as tokens:
+                    data = json.load(tokens)
+                    key_data = data[regions[idx]]['keyData']
+                with open('GlobalConfigurations/azureRegions.json', 'r') as regions_file:
+                    images = json.load(regions_file)
+                    image_name = data[regions[idx]]['imageName']
 
                 for idx2 in range(number_of_instances_to_deploy):
 
@@ -199,7 +201,7 @@ class AzureCP(DeployCP):
                         'storage_profile': {
                                 'image_reference': {
                                         'id': '/subscriptions/e500fb85-1759-463b-b828-0d4e0b38a305/resourceGroups/'
-                                              'MatrixRG/providers/Microsoft.Compute/images/libscapiImageEastUS'
+                                              'MatrixRG/providers/Microsoft.Compute/images/%s' % image_name
                                     }
                             },
                         'network_profile': {

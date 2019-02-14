@@ -16,5 +16,4 @@ InstancesConfigurations/Parties_gfp.txt
 FlaskApp/Uploads
 Execution/execution_log.log
 GlobalConfigurations/tokens.json
-GlobalConfigurations/azureRegions.json
-
+GlobalConfigurations/azureTokens.json
