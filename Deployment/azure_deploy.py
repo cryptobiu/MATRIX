@@ -1,6 +1,7 @@
 import json
 import time
 from random import shuffle
+from datetime import datetime
 
 from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.network import NetworkManagementClient
@@ -177,6 +178,12 @@ class AzureCP(DeployCP):
             if number_of_instances_to_deploy > 0:
 
                 # create availability set, vnet and subnet
+                doc = {}
+                doc['protocolName'] = protocol_name
+                doc['message'] = 'Deploying availability set, virtual network and subnet'
+                doc['timestamp'] = datetime.utcnow()
+                self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+
                 av_set_id = self.create_availability_set(regions[idx], protocol_name)
                 self.create_vnet(regions[idx], protocol_name)
                 self.create_subnet(protocol_name)
@@ -186,7 +193,7 @@ class AzureCP(DeployCP):
                     key_data = data[regions[idx]]['keyData']
                 with open('GlobalConfigurations/azureRegions.json', 'r') as regions_file:
                     images = json.load(regions_file)
-                    image_name = data[regions[idx]]['imageName']
+                    image_name = images[regions[idx]]['imageName']
 
                 for idx2 in range(number_of_instances_to_deploy):
 
@@ -229,6 +236,11 @@ class AzureCP(DeployCP):
                             }
                         }
                     }
+                    doc = {}
+                    doc['protocolName'] = protocol_name
+                    doc['message'] = 'Deploy machine %s%d' % (protocol_name, idx2)
+                    doc['timestamp'] = datetime.utcnow()
+                    self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
                     vm = self.compute_client.virtual_machines.create_or_update('MatrixRG', '%s%d'
                                                                                % (protocol_name, idx2), vm_params)
         # wait for the machine will be online
@@ -246,6 +258,13 @@ class AzureCP(DeployCP):
         protocol_name = self.protocol_config['protocol']
         regions = self.protocol_config['CloudProviders']['azure']['regions']
         number_of_parties = self.protocol_config['CloudProviders']['azure']['numOfParties']
+
+        doc = {}
+        doc['protocolName'] = protocol_name
+        doc['message'] = 'Fetching network topology for protocol: %s' % protocol_name
+        doc['timestamp'] = datetime.utcnow()
+        self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+
         for idx in range(len(regions)):
             for idx2 in range(number_of_parties):
                 # save the public ip
@@ -302,51 +321,75 @@ class AzureCP(DeployCP):
 
     def start_instances(self):
         protocol_name = self.protocol_config['protocol']
-        response = self.describe_instances('eastus', protocol_name)
-        for machine in response:
-            m = self.compute_client.virtual_machines.start(self.resource_group, machine.name)
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        for region in regions:
+            response = self.describe_instances(region, protocol_name)
+
+            doc = {}
+            doc['protocolName'] = protocol_name
+            doc['message'] = 'starting protocol: %s vms ' % protocol_name
+            doc['timestamp'] = datetime.utcnow()
+            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+
+            for machine in response:
+                self.compute_client.virtual_machines.start(self.resource_group, machine.name)
 
     def stop_instances(self):
         protocol_name = self.protocol_config['protocol']
-        response = self.describe_instances('eastus', protocol_name)
-        for machine in response:
-            m = self.compute_client.virtual_machines.deallocate(self.resource_group, machine.name)
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        for region in regions:
+            response = self.describe_instances(region, protocol_name)
+
+            doc = {}
+            doc['protocolName'] = protocol_name
+            doc['message'] = 'stopping protocol: %s vms ' % protocol_name
+            doc['timestamp'] = datetime.utcnow()
+            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+
+            for machine in response:
+                self.compute_client.virtual_machines.deallocate(self.resource_group, machine.name)
 
     def terminate_instances(self):
         protocol_name = self.protocol_config['protocol']
-        response = self.describe_instances('eastus', protocol_name)
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        for region in regions:
+            response = self.describe_instances(region, protocol_name)
 
-        for idx in range(len(response)):
-            disk_name = response[idx].storage_profile.os_disk.name
+            for idx in range(len(response)):
 
-            delete_vm = self.compute_client.virtual_machines.delete(self.resource_group, response[idx].name)
-            delete_vm.wait()
+                doc = {}
+                doc['protocolName'] = protocol_name
+                doc['message'] = 'terminate machine: %s%d' % (protocol_name, idx)
+                doc['timestamp'] = datetime.utcnow()
+                self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
 
-            # delete disk
-            self.compute_client.disks.delete(self.resource_group, disk_name)
+                disk_name = response[idx].storage_profile.os_disk.name
 
-            # delete nic
-            nic = self.network_client.network_interfaces.get(self.resource_group, '%s_%d_Nic' % (protocol_name, idx))
-            self.network_client.network_interfaces.delete(self.resource_group, nic.name)
+                delete_vm = self.compute_client.virtual_machines.delete(self.resource_group, response[idx].name)
+                delete_vm.wait()
 
-            # delete IP
-            ip = self.network_client.public_ip_addresses.get(self.resource_group, '%s_%d_IP' % (protocol_name, idx))
-            self.network_client.public_ip_addresses.delete(self.resource_group, ip.name)
+                # delete disk
+                self.compute_client.disks.delete(self.resource_group, disk_name)
 
-        # delete vnet
-        subnet_info = self.network_client.subnets.get(
-            self.resource_group,
-            '%sVNet' % protocol_name,
-            '%sSubnet' % protocol_name
-        )
-        self.network_client.subnets.delete(self.resource_group, '%sVNet' % protocol_name, subnet_info.name)
-        self.network_client.virtual_networks.delete(self.resource_group, '%sVNet' % protocol_name)
+                # delete nic
+                nic = self.network_client.network_interfaces.get(self.resource_group, '%s_%d_Nic' % (protocol_name, idx))
+                self.network_client.network_interfaces.delete(self.resource_group, nic.name)
 
-        # delete availability set
-        self.compute_client.availability_sets.delete(self.resource_group, '%sAVSet' % protocol_name)
+                # delete IP
+                ip = self.network_client.public_ip_addresses.get(self.resource_group, '%s_%d_IP' % (protocol_name, idx))
+                self.network_client.public_ip_addresses.delete(self.resource_group, ip.name)
+
+            # delete vnet
+            subnet_info = self.network_client.subnets.get(
+                self.resource_group,
+                '%sVNet' % protocol_name,
+                '%sSubnet' % protocol_name
+            )
+            self.network_client.subnets.delete(self.resource_group, '%sVNet' % protocol_name, subnet_info.name)
+            self.network_client.virtual_networks.delete(self.resource_group, '%sVNet' % protocol_name)
+
+            # delete availability set
+            self.compute_client.availability_sets.delete(self.resource_group, '%sAVSet' % protocol_name)
 
     def change_instance_types(self):
         raise NotImplementedError
-
-
-# TODO: https://github.com/Azure-Samples/virtual-machines-python-manage/blob/master/example.py
