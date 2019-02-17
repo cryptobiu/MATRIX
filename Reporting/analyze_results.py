@@ -28,7 +28,7 @@ class Analyze:
 
         for dir in remote_directory:
             results_path = self.protocol_config['resultsDirectory']
-            os.system('fab -f Execution/fabfile.py collect_results:%s,%s,%s --parallel --no-pty'
+            os.system('fab -f Execution/fabfile.py collect_results:%s,%s,%s --no-pty'
                       % (dir, results_path, is_external))
             # wait for all clients to download data
             time.sleep(10)

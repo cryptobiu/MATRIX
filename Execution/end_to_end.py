@@ -10,8 +10,9 @@ class E2E:
     def pre_process(self):
         working_directory = self.protocol_config['workingDirectory']
         pre_process_task = self.protocol_config['preProcessTask']
-        os.system('fab -f Execution/fabfile.py pre_process:%s,%s --parallel'
-                  % (working_directory, pre_process_task))
+        for idx in range(len(working_directory)):
+            os.system('fab -f Execution/fabfile.py pre_process:%s,%s --parallel'
+                      % (working_directory[idx], pre_process_task))
 
     def install_experiment(self):
         working_directory = self.protocol_config['workingDirectory']
@@ -21,7 +22,7 @@ class E2E:
         git_branch = self.protocol_config['CloudProviders'][cp[0]]['git']['gitBranch']
 
         for idx in range(len(working_directory)):
-            os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s --parallel'
+            os.system('fab -f Execution/fabfile.py install_git_project:%s,%s,%s,%s'
                       % (git_branch[idx], working_directory[idx], git_address[idx], external_protocol))
 
     def execute_experiment(self):

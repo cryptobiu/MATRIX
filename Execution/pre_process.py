@@ -6,6 +6,9 @@ from collections import OrderedDict
 from shutil import copyfile
 from pathlib import Path
 
+def install_java_maven():
+    os.system('sudo apt-get update')
+    os.system('sudo apt-get install -y openjdk-11-jdk maven')
 
 def install_ntl():
     os.system('wget http://www.shoup.net/ntl/ntl-9.10.0.tar.gz')
@@ -175,5 +178,7 @@ elif task_name == '6':
     create_inputs_for_mpcfromsd()
 elif task_name == '7':
     create_inputs_for_statistics()
+elif task_name == '8':
+    install_java_maven()
 else:
     raise ValueError('Invalid choice')
