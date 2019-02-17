@@ -8,27 +8,17 @@ The system requires a management computer (Manager) - a computer that centralize
 The Manager executes all the experiment phases, starting from install the experiment up to analyse it's results.
 The Manager is a stand alone workstation and it's not part of the workstations that participate in the experiment.
 
-In order to use all MATRIX capabilities, a cloud account is required.
+In order to use all MATRIX capabilities, a cloud account is required.  
 MATRIX uses two cloud providers(CP):
 1. AWS
-2. Scaleway - for ARM computing resources
+2. Azure
 
 To create account at AWS: 
 * Sign up for [AWS](https://portal.aws.amazon.com/billing/signup#/start).   
 * Define your [credentials](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) at the Manager computer.
 
 To create account at Scaleway:
-* Sign up for [Scaleway](https://www.scaleway.com/)
-
-MATRIX uses two services of AWS:
-1. Spot instances - The execution of the protocols is done by deploy spot instances. All the instances have the same AMI(Amazon Machine Image).
-In most cases we are using a custom AMI that contains [libscapi](https://github.com/cryptobiu/libscapi). AMI are defined per region.
-If you are executing an experiment on two different regions(locations), you will need to copy the AMI to the requested regions.
-More on AMI can be found [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html).
-2. Elasticsearch service - The analysis done by Elasticsearch (ES). All the results are uploaded and stored at ES.
-Information on ES can be found [here](https://www.elastic.co/). We are also using the built in [Kibana](https://www.elastic.co/products/kibana)
-plugin to visualize our results.
-  
+* Sign up for [Azure](https://azure.microsoft.com/en-us/)
 
 ## Installation
 MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [openpyxl](https://openpyxl.readthedocs.io/en/stable/).  
@@ -71,7 +61,8 @@ After config file was created, You will need to deploy your images(instances). M
 
 #### Local Deployment
 
-To deploy MATRIX locally set `regions` parameter to `local` at the config [file](../master/ProtocolsConfigurations/Config_GMW.json)
+To deploy MATRIX locally in `CloudProviders` let the name of the provider be `local`.  
+An example of a local deployment configuration can be found in [here](ProtocolsConfigurations/Config_GMW.json)
 
 
 #### AWS Deployment
@@ -81,6 +72,9 @@ Detailed explanation can be found [here](https://docs.aws.amazon.com/AWSEC2/late
 After you created your key, change this line at [fabfile.py](../master/ExperimentExecute/fabfile.py):
 
 - set the correct location and name of your AWS key `env.key_filename = ['%s/Keys/matrix.pem' % Path.home()]`
+
+#### Azure Deployment
+
 
 ### Execution
 
@@ -139,7 +133,7 @@ Sample configuration file can be found [here](../master/GlobalConfigurations/reg
 MATRIX uses configuration file to set it execution. The configuration file is written in [json](https://en.wikipedia.org/wiki/JSON) format.  
 Each configuration file has the following fields:
 * protocol - Name of protocol
-* CloudProviders - for eac cloud provider we need to create a unique entry. each entry contains these fields:
+* CloudProviders - for each cloud provider we need to create a unique entry. each entry contains these fields:
     * numOfParties - number of instances to create. 
     * instanceType
     * spotPrice - relevant only to AWS. For detailed explanation about spot instances, use this [link](https://aws.amazon.com/ec2/spot/) 
@@ -171,4 +165,4 @@ The configuration need to be in the same format of 'configurations' field
 
 In order to receive easy access to the MATRIX system, MATRIX uses basic CLI. To run the CLI run: `python3 main.py`
 
-For bugs/features requests open an issue or send mail to liork.cryptobiu@gmail.com
+For bugs/features requests open an issue or send an email to liork.cryptobiu@gmail.com
