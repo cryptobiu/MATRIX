@@ -18,8 +18,8 @@
   "executableName": ["HyperMPC"],
   "configurations":
   [
-    ["partiesNumber", "10", "inputFile", "inputs100.txt", "outputFile", "output.txt", "circuitFile",
-      "10000G_10000MG_100In_50Out_20D_OutputOne10P.txt", "fieldType", "ZpMersenne61", "partiesFile",
+    ["partiesNumber", "3", "inputFile", "inputs333.txt", "outputFile", "output.txt", "circuitFile",
+      "10000G_10000MG_333In_50Out_20D_OutputOne3P.txt", "fieldType", "ZpMersenne61", "partiesFile",
       "parties.conf", "internalIterationsNumber", "3"]
   ],
   "numOfRepetitions":1,
