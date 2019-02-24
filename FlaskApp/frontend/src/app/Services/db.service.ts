@@ -8,7 +8,7 @@ import {ICompetition, IProtocol} from "../interfaces";
 })
 export class DbService {
 
-  private _urlApi: string = 'http://localhost:5000/';
+  private _urlApi: string = 'http://localhost:5000/api/';
 
   constructor(private _http:HttpClient) { }
 
@@ -35,6 +35,11 @@ export class DbService {
 
   executeExecutionOperation(protocolName: string, operation:string) {
     let url = this._urlApi + 'execute/' + protocolName + '/' + operation;
+    return this._http.get(url);
+  }
+
+  executeReportingOperation(protocolName: string, operation:string) {
+    let url = this._urlApi + 'reporting/' + protocolName + '/' + operation;
     return this._http.get(url);
   }
 

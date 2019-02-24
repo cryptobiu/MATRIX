@@ -33,3 +33,9 @@ export interface IExecutionData {
   message: string;
   timestamp: Date;
 }
+
+export interface IReportingData {
+  protocolName: string;
+  message: string;
+  timestamp: Date;
+}

@@ -3,6 +3,7 @@ import {DataSource} from "@angular/cdk//collections";
 import {DbService} from "../../Services/db.service";
 import {Observable} from "rxjs";
 import {IProtocol} from "../../interfaces";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-reporting',
@@ -13,13 +14,14 @@ export class ReportingComponent implements OnInit {
   dataSource = new ReportingDataSource(this.dbService);
   displayedColumns = ['name', 'action'];
   actions = ['Analyze Results using Excel', 'Analyze Results using Elasticsearch'];
-  constructor(private dbService:DbService) { }
+
+  constructor(private dbService:DbService, private router:Router) { }
 
   ngOnInit() {
   }
 
-  onChange(value, protocol){
-        //TODO: Implement the requested reporting action.
+  onChange(operation, protocol){
+    this.router.navigate(['/reporting/' + protocol + '/' + operation])
   }
 
 }

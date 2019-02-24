@@ -6,12 +6,14 @@ import bson
 import json
 
 from pymongo import MongoClient
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 
 from Deployment.deploy import DeployCP
 from Deployment.aws_deploy import AmazonCP
-from Execution.end_to_end import E2E
+from Execution.new_execution import E2E
+from Reporting.analyze_results import Analyze
+from Reporting.upload_elastic import Elastic
 
 with open('GlobalConfigurations/tokens.json', 'r') as tokens:
     data = json.load(tokens)
@@ -47,7 +49,12 @@ def get_competitions():
     return json.dumps(competitions_list)
 
 
-@app.route('/protocols')
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/api/protocols')
 def get_protocols():
     client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
     db = client['BIU']
@@ -62,7 +69,7 @@ def get_protocols():
     return json.dumps(protocols_list)
 
 
-@app.route('/protocols/registerProtocol', methods=['POST'])
+@app.route('/api/protocols/registerProtocol', methods=['POST'])
 def register_new_protocol():
     form = request.data
     form_data = json.loads(form.decode('utf-8'))
@@ -86,7 +93,7 @@ def register_new_protocol():
     return jsonify('form submitted')
 
 
-@app.route('/competitions/registerCompetition/<string:competition_name>', methods=['POST'])
+@app.route('/api/competitions/registerCompetition/<string:competition_name>', methods=['POST'])
 def register_to_competition(competition_name):
     form = request.data
     form_data = json.loads(form.decode('utf-8'))
@@ -109,7 +116,7 @@ def register_to_competition(competition_name):
     return jsonify('form submitted')
 
 
-@app.route('/competitions/<string:competition_name>')
+@app.route('/api/competitions/<string:competition_name>')
 def get_competition_data(competition_name):
     client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
     db = client['BIU']
@@ -121,7 +128,7 @@ def get_competition_data(competition_name):
     return jsonify('Error retrieve competition')
 
 
-@app.route('/deploy/<string:protocol_name>/<string:operation>')
+@app.route('/api/deploy/<string:protocol_name>/<string:operation>')
 def execute_deploy_operation(protocol_name, operation):
 
     config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
@@ -160,7 +167,7 @@ def execute_deploy_operation(protocol_name, operation):
     return jsonify('deployment operation %s succeeded' % operation)
 
 
-@app.route('/execute/<string:protocol_name>/<string:operation>')
+@app.route('/api/execute/<string:protocol_name>/<string:operation>')
 def execute_execution_operation(protocol_name, operation):
     config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
                   % protocol_name
@@ -191,6 +198,30 @@ def execute_execution_operation(protocol_name, operation):
         ee.update_libscapi()
 
     return jsonify('execution operation %s succeeded' % operation)
+
+
+@app.route('/api/reporting/<string:protocol_name>/<string:operation>')
+def execute_reporting_operation(protocol_name, operation):
+    config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
+                  % protocol_name
+    raw_data = requests.get(config_file)
+    try:
+        raw_data.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print('Error while fetching configuration file: %s' % e.response.reason)
+        return jsonify('Error!!!')
+
+    data = json.loads(raw_data.content)
+
+    if operation == 'Analyze Results using Excel':
+        reporting = Analyze(data)
+        reporting.download_data()
+        reporting.analyze_results()
+    elif operation == 'Analyze Results using Elasticsearch':
+        e = Elastic(data)
+        e.upload_all_data()
+
+    return jsonify('reporting operation %s succeeded' % operation)
 
 
 if __name__ == '__main__':

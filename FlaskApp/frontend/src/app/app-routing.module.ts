@@ -14,6 +14,7 @@ import {DeploymentResultComponent} from "./Components/deployment-result/deployme
 import {ReportingComponent} from "./Components/reporting/reporting.component";
 import {ExecutionResultComponent} from "./Components/execution-result/execution-result.component";
 import {CompetitionsRegistrationComponent} from "./Components/competitions-registration/competitions-registration.component";
+import {ReportingResultComponent} from "./Components/reporting-result/reporting-result.component";
 
 const routes: Routes = [
   {path: '', component:HomeComponent, pathMatch:'full'},
@@ -27,6 +28,7 @@ const routes: Routes = [
   { path: 'execution', component: ExecutionComponent, pathMatch: 'full'},
   { path: 'execution/:protocolName/:action', component: ExecutionResultComponent, pathMatch: 'full'},
   { path: 'reporting', component: ReportingComponent, pathMatch: 'full'},
+  { path: 'reporting/:protocolName/:action', component: ReportingResultComponent, pathMatch: 'full'},
   { path: 'circuits', component:CircuitsComponent, pathMatch:'full'},
   { path: 'login', component:LoginComponent, pathMatch:'full'},
   { path: '**', component:PageNotFoundComponent, pathMatch:'full'},
