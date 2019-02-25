@@ -34,7 +34,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/competitions')
+@app.route('/api/competitions')
 def get_competitions():
     client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
     db = client['BIU']
@@ -47,11 +47,6 @@ def get_competitions():
         competitions_list.append(competition)
 
     return json.dumps(competitions_list)
-
-
-@app.route('/')
-def index():
-    return render_template('index.html')
 
 
 @app.route('/api/protocols')
