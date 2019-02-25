@@ -12,7 +12,7 @@ export class FormSubmissionService {
   constructor(private _http: HttpClient) { }
 
   submitUploadProtocolForm(protocol: Protocol){
-    let _url = 'http://localhost:5000/protocols/registerProtocol';
+    let _url = 'http://localhost:5000/api/protocols/registerProtocol';
     return this._http.post<any>(_url, protocol).
     pipe(catchError(this.errorHandler))
   }
@@ -23,7 +23,7 @@ export class FormSubmissionService {
 
   submitCompetitionRegistrationForm(cr: CompetitionRegistration, competitionName: string)
   {
-    let _url = 'http://localhost:5000/competitions/registerCompetition/' + competitionName;
+    let _url = 'http://localhost:5000/api/competitions/registerCompetition/' + competitionName;
     return this._http.post<any>(_url, cr).
     pipe(catchError(this.errorHandler))
   }
