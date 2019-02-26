@@ -8,7 +8,7 @@
 <div>
   <mat-table [dataSource]="dataSource">
     <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef> Protocol Name </mat-header-cell>
       <mat-cell *matCellDef="let protocol">  {{protocol.name}} </mat-cell>
     </ng-container>
     <ng-container matColumnDef="action">
