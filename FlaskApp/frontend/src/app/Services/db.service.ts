@@ -15,13 +15,13 @@ export class DbService {
 
   getCompetitions(): Observable<ICompetition[]> {
     let url = this._urlApi + 'competitions';
-    return this._http.get<ICompetition[]>(url);
+    return this._http.get<ICompetition[]>(url).pipe(catchError(this.handleError));
   }
 
   getCompetition(competitionName: string)
   {
     let url = this._urlApi + 'competitions/' + competitionName;
-    return this._http.get<ICompetition>(url);
+    return this._http.get<ICompetition>(url).pipe(catchError(this.handleError));
   }
 
   getProtocols(): Observable<IProtocol[]> {
@@ -31,17 +31,17 @@ export class DbService {
 
   executeDeployOperation(protocolName: string, operation:string) {
     let url = this._urlApi + 'deploy/' + protocolName + '/' + operation;
-    return this._http.get(url);
+    return this._http.get(url).pipe(catchError(this.handleError));
   }
 
   executeExecutionOperation(protocolName: string, operation:string) {
     let url = this._urlApi + 'execute/' + protocolName + '/' + operation;
-    return this._http.get(url);
+    return this._http.get(url).pipe(catchError(this.handleError));
   }
 
   executeReportingOperation(protocolName: string, operation:string) {
     let url = this._urlApi + 'reporting/' + protocolName + '/' + operation;
-    return this._http.get(url);
+    return this._http.get(url).pipe(catchError(this.handleError));
   }
 
   private handleError(error: HttpErrorResponse) {
@@ -58,6 +58,6 @@ export class DbService {
   // return an observable with a user-facing error message
   return throwError(
     'Something bad happened; please try again later.' + error.message);
-};
+  }
 
 }
