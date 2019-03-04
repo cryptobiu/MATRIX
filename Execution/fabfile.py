@@ -70,7 +70,7 @@ def run_protocol(config_file, args, executable_name, working_directory):
         elif len(data['CloudProviders']) > 1:
             regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['scaleway']['regions']
         elif 'servers' in data['CloudProviders']:
-            regions = data['CloudProviders']['servers']['servers']['regions']
+            regions = data['CloudProviders']['servers']['regions']
         else:
             regions = []
 
