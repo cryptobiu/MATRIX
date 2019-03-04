@@ -95,24 +95,25 @@ def run_protocol(config_file, args, executable_name, working_directory):
                     local('cd %s && ./%s partyID %s %s &' % (working_directory, executable_name, idx, values_str))
 
         else:
+            if env.user == 'root':
+                party_id = env.hosts.index('root@%s' % env.host)
+            else:
+                party_id = env.hosts.index(env.host)
+
+            with warn_only():
+                sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
+
+            if 'inputs0' in values_str:
+                values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
+
+            # # apply delay if needed
+            #
+            # if 'delay' in data:
+            #     sudo('tc qdisc del dev ens5 root netem')
+            #     sudo('tc qdisc add dev ens5 root netem delay %sms' % data['delay'])
+            #     time.sleep(10)
+
             with cd(working_directory):
-                if env.user == 'root':
-                    party_id = env.hosts.index('root@%s' % env.host)
-                else:
-                    party_id = env.hosts.index(env.host)
-
-                with warn_only():
-                    sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
-
-                if 'inputs0' in values_str:
-                    values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
-
-                # # apply delay if needed
-                #
-                # if 'delay' in data:
-                #     sudo('tc qdisc del dev ens5 root netem')
-                #     sudo('tc qdisc add dev ens5 root netem delay %sms' % data['delay'])
-                #     time.sleep(10)
 
                 if not external_protocol:
                     if len(regions) > 1:
