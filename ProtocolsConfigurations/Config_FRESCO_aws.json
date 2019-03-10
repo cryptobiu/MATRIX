@@ -1,0 +1,32 @@
+{
+  "protocol":"FRESCO-SPDZ",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":2,
+      "instanceType": "c5.large",
+      "regions":["eu-west-1a"],
+      "git":
+      {
+        "gitBranch": ["master"],
+        "gitAddress": ["https://github.com/aicis/fresco-matrix.git"]
+      }
+    }
+  },
+  "executableName": ["run.sh"],
+  "configurations":
+  [
+    "matrix-distance.jar@-s@spdz@-Dspdz.preprocessingStrategy%DUMMY@-e@SEQUENTIAL_BATCHED",
+    "matrix-distance.jar@-s@spdz@-Dspdz.preprocessingStrategy%DUMMY@-e@SEQUENTIAL"
+  ],
+  "preProcessTask": 8,
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":10,
+  "IsPublished": "true",
+  "isExternal": "true",
+  "workingDirectory": ["~/Projects/test-matrix"],
+  "resultsDirectory": "/Users/psn/Projects/MATRIX-EXP/MATRIX/results",
+  "emails": ["peter.s.nordholt@alexandra.dk"],
+  "institute":"The Alexandra Institute"
+}

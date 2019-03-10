@@ -8,27 +8,17 @@ The system requires a management computer (Manager) - a computer that centralize
 The Manager executes all the experiment phases, starting from install the experiment up to analyse it's results.
 The Manager is a stand alone workstation and it's not part of the workstations that participate in the experiment.
 
-In order to use all MATRIX capabilities, a cloud account is required.
+In order to use all MATRIX capabilities, a cloud account is required.  
 MATRIX uses two cloud providers(CP):
 1. AWS
-2. Scaleway - for ARM computing resources
+2. Azure
 
 To create account at AWS: 
 * Sign up for [AWS](https://portal.aws.amazon.com/billing/signup#/start).   
 * Define your [credentials](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html) at the Manager computer.
 
 To create account at Scaleway:
-* Sign up for [Scaleway](https://www.scaleway.com/)
-
-MATRIX uses two services of AWS:
-1. Spot instances - The execution of the protocols is done by deploy spot instances. All the instances have the same AMI(Amazon Machine Image).
-In most cases we are using a custom AMI that contains [libscapi](https://github.com/cryptobiu/libscapi). AMI are defined per region.
-If you are executing an experiment on two different regions(locations), you will need to copy the AMI to the requested regions.
-More on AMI can be found [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html).
-2. Elasticsearch service - The analysis done by Elasticsearch (ES). All the results are uploaded and stored at ES.
-Information on ES can be found [here](https://www.elastic.co/). We are also using the built in [Kibana](https://www.elastic.co/products/kibana)
-plugin to visualize our results.
-  
+* Sign up for [Azure](https://azure.microsoft.com/en-us/)
 
 ## Installation
 MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [openpyxl](https://openpyxl.readthedocs.io/en/stable/).  
@@ -71,16 +61,19 @@ After config file was created, You will need to deploy your images(instances). M
 
 #### Local Deployment
 
-To deploy MATRIX locally set `regions` parameter to `local` at the config [file](../master/ProtocolsConfigurations/Config_GMW.json)
-
+To deploy MATRIX locally in `CloudProviders` let the name of the provider be `local`.  
+An example of a local deployment configuration can be found in [here](ProtocolsConfigurations/Config_GMW.json)
 
 #### AWS Deployment
 
-After you created your AWS account and set your credentials, you will need a key to deploy your instances.
-Detailed explanation can be found [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html).  
-After you created your key, change this line at [fabfile.py](../master/ExperimentExecute/fabfile.py):
+After you created your AWS account and set your credentials (**NOTE**: MATRIX will fail if credentials are not set, see how above), you will need a key to deploy your instances.
+Detailed explanation can be found [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html). 
+After you created your key, change this line at [fabfile.py](Execution/fabfile.py):
 
-- set the correct location and name of your AWS key `env.key_filename = ['%s/Keys/matrix.pem' % Path.home()]`
+- set the correct location and name of your AWS key `env.key_filename = ['YOUR KEY HERE']`
+
+#### Azure Deployment
+
 
 ### Execution
 
@@ -107,9 +100,9 @@ MATRIX analyse four parameters:
 The report module analyse the results files that was taken from the images by number of parties parameter.
 If you want to analyse by different parameter use the Elasticsearch option.
 
-MATRIX uses a header class logger [API](../master/Reporting/MatrixMeasurement.h).  
-The logging is done at the protocol code. The logger generate logs files that uploaded to [Elasticsearch](https://www.elastic.co/) server.  
-To use MATRIX logger class, just include `MatrixMeasurement.h` to your main class.  
+MATRIX uses a header class logger [API](Reporting/MatrixMeasurement.h).
+The logging is done at the protocol code. The logger generate logs files that uploaded to [Elasticsearch](https://www.elastic.co/) server.
+To use MATRIX logger class, just include `MatrixMeasurement.h` to your main class.
 
 To measure task:
 ```
@@ -133,42 +126,42 @@ int main(int argc, char* argv[])
 
 In order to connect to the instances MATRIX uses a file that contains the AWS keys and security groups.
 For each region in AWS you need to create an entry in the global configuration file.
-Sample configuration file can be found [here](../master/GlobalConfigurations/regions.json)
+Sample configuration file can be found [here](GlobalConfigurations/regions.json)
 
 ### ProtocolsConfigurations
-MATRIX uses configuration file to set it execution. The configuration file is written in [json](https://en.wikipedia.org/wiki/JSON) format.  
+MATRIX uses configuration file to set it execution. The configuration file is written in [json](https://en.wikipedia.org/wiki/JSON) format.
 Each configuration file has the following fields:
-* protocol - Name of protocol
-* CloudProviders - for eac cloud provider we need to create a unique entry. each entry contains these fields:
-    * numOfParties - number of instances to create. 
-    * instanceType
-    * spotPrice - relevant only to AWS. For detailed explanation about spot instances, use this [link](https://aws.amazon.com/ec2/spot/) 
-    * git:
-        * gitAddress - Git  repository path. MATRIX will clone the repository into all target servers, configure, make and install. 
+* `protocol` - Name of protocol
+* `CloudProviders` - for each cloud provider we need to create a unique entry. each entry contains these fields:
+    * `numOfParties` - number of instances to create. 
+    * `instanceType`
+    * `spotPrice` - relevant only to AWS. For detailed explanation about spot instances, use this [link](https://aws.amazon.com/ec2/spot/) 
+    * `git`:
+        * `gitAddress` - Git  repository path. MATRIX will clone the repository into all target servers, configure, make and install.  
         If installation of other libraries is needed to be done, see pre-process section of MATRIX for details.
-        * gitBranch - The branch the protocol uses.
+        * `gitBranch` - The branch the protocol uses.
         
-* executableName - The name of the executable to execute
-* preProcessTask - ID of the pre process task that required. Not relevant to all of the protocols.
-The available pre process tasks that defines in MATRIX can be found in this [script](../master/ExperimentExecute/pre_process.py)
-* Configurations - List of configurations to run. Each configuration is a set of CLI arguments to the executable.
+* `executableName` - The name of the executable to execute
+* `preProcessTask` - ID of the pre process task that required. Not relevant to all of the protocols.
+The available pre process tasks that defines in MATRIX can be found in this [script](Execution/pre_process.py)
+* `Configurations` - List of configurations to run. Each configuration is a set of CLI arguments to the executable.
 The arguments are separated between them by '@'. Party ID is added automatically
-* numOfRepetitions - How Many times MATRIX will execute the protocol
-* numOfInternalRepetitions - How many times the protocol will be executed on single run.
-* isPublished - Indicate if the protocol was published.
-* isExternal - Indicate if the protocol external to libscapi library
-* regions - AWS regions to execute the protocol.
-* workingDirectory - The directory of the protocol and the data related to the protocol.
-* resultsDirectory - Directory to copy to the results files from the servers. The directory is local directory at the MATRIX system computer.
-* emails - MATRIX will send notifications to this email addresses. Multiple email addresses are supported
-* institute - Research Group identifier
-* coordinatorConfig - If coordinator exists in the protocol, the configuration for him will described here.
+* `numOfRepetitions` - How Many times MATRIX will execute the protocol
+* `numOfInternalRepetitions` - How many times the protocol will be executed on single run.
+* `isPublished` - Indicate if the protocol was published.
+* `isExternal` - Indicate if the protocol external to libscapi library.
+* `regions` - AWS regions to execute the protocol.
+* `workingDirectory` - The directory of the protocol and the data related to the protocol.
+* `resultsDirectory` - Directory to copy to the results files from the servers. The directory is local directory at the MATRIX system computer.
+* `emails` - MATRIX will send notifications to this email addresses. Multiple email addresses are supported
+* `institute` - Research Group identifier
+* `coordinatorConfig` - If coordinator exists in the protocol, the configuration for him will described here.
 The configuration need to be in the same format of 'configurations' field
-* coordinatorExecutable - The name of the coordinator executable
+* `coordinatorExecutable` - The name of the coordinator executable
 
 
 ### MATRIX Usage
 
 In order to receive easy access to the MATRIX system, MATRIX uses basic CLI. To run the CLI run: `python3 main.py`
 
-For bugs/features requests open an issue or send mail to liork.cryptobiu@gmail.com
+For bugs/features requests open an issue or send an email to liork.cryptobiu@gmail.com

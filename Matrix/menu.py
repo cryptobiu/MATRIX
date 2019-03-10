@@ -18,7 +18,7 @@ class MatrixMenu:
     method to start the menu.
     """
 
-    d = {'blue': colorama.Fore.BLUE,
+    d = {'blue': colorama.Fore.CYAN,
          'green': colorama.Fore.GREEN,
          'yellow': colorama.Fore.YELLOW,
          'red': colorama.Fore.RED,
@@ -136,28 +136,29 @@ class MatrixMenu:
             choice = num_items
         return choice
 
-    def run(self):
+    def run(self, config_path=None):
         """
         Start the client.
         """
         try:
             while self.protocol_config is None:
-                self.load_protocol_config()
+                self.load_protocol_config(config_path)
             self.main_menu()
         except KeyboardInterrupt:
             print('\nReceived KeyboardInterrupt, quitting ...')
 
-    def load_protocol_config(self):
+    def load_protocol_config(self, protocol_config_path=None):
         """
         Read relative path of a protocol configuration file.
         """
-        self.color_print('Enter configuration file(s):', 'blue')
-        cwd = os.getcwd()
-        prompt = 'Protocol configuration file path (current path is: {}): '.format(cwd)
-        try:
-            protocol_config_path = self.color_input(prompt,  'blue')
-        except EOFError:
-            return
+        if (protocol_config_path == None):
+            self.color_print('Enter configuration file(s):', 'blue')
+            cwd = os.getcwd()
+            prompt = 'Protocol configuration file path (current path is: {}): '.format(cwd)
+            try:
+                protocol_config_path = self.color_input(prompt,  'blue')
+            except EOFError:
+                return
         try:
             with open(protocol_config_path, 'r') as f:
                 self.protocol_config = json.load(f, object_pairs_hook=OrderedDict)
@@ -207,27 +208,33 @@ class MatrixMenu:
         elif 'local' in cp or 'servers' in cp:
             deploy = de.DeployCP(self.protocol_config)
             menu_color = 'blue'
+        else:
+            return
 
         selection = self.print_menu(*self.deploy_menu_desc, menu_color)
 
-        if selection == 1:
-            deploy.deploy_instances()
-        elif selection == 2:
-            deploy.create_key_pair()
-        elif selection == 3:
-            deploy.create_security_group()
-        elif selection == 4:
-            deploy.get_network_details()
-        elif selection == 5:
-            deploy.terminate_instances()
-        elif selection == 6:
-            deploy.change_instance_types()
-        elif selection == 7:
-            deploy.start_instances()
-        elif selection == 8:
-            deploy.stop_instances()
-        elif selection == 9:
-            deploy.copy_ami()
+        try:
+            if selection == 1:
+                deploy.deploy_instances()
+            elif selection == 2:
+                deploy.create_key_pair()
+            elif selection == 3:
+                deploy.create_security_group()
+            elif selection == 4:
+                deploy.get_network_details()
+            elif selection == 5:
+                deploy.terminate_instances()
+            elif selection == 6:
+                deploy.change_instance_types()
+            elif selection == 7:
+                deploy.start_instances()
+            elif selection == 8:
+                deploy.stop_instances()
+            elif selection == 9:
+                deploy.copy_ami()
+        except NotImplementedError:
+            MatrixMenu.color_print("Selected action '{}' is not implemented for the chosen deployment '{}'".format(self.deploy_menu_desc[1][selection - 1], self.cloud_provider_menu_desc[1][cp - 1]), menu_color)
+            self.instances_management_menu()
 
     def execution_menu(self):
         """

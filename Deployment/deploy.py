@@ -129,7 +129,7 @@ class DeployCP:
             # read servers configuration
         elif 'servers' in cp:
             server_file = input('Enter your server file configuration: ')
-            os.system('mv %s %s/InstancesConfigurations/public_ips' % (os.getcwd(), server_file))
+            os.system('cp %s %s/InstancesConfigurations/public_ips' % (server_file, os.getcwd()))
 
             server_ips = []
             with open('%s/InstancesConfigurations/public_ips' % os.getcwd(), 'r+') as server_ips_file:
