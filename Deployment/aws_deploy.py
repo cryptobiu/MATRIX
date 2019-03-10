@@ -14,10 +14,22 @@ from Deployment.deploy import DeployCP
 
 
 class AmazonCP(DeployCP):
+    """
+    The class enables deployment to AWS. All the methods are valid only to AWS
+    Sub class of Deployment.DeployCP
+    """
     def __init__(self, protocol_config):
+        """
+        :type protocol_config str
+        :param protocol_config: the configuration of the protocol we want to deploy
+        """
         super(AmazonCP, self).__init__(protocol_config)
 
     def create_key_pair(self):
+        """
+        Creates private key file
+        :return:
+        """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
 
         for regions_idx in range(len(regions)):
@@ -26,10 +38,10 @@ class AmazonCP(DeployCP):
             number_of_current_keys = len(keys['KeyPairs'])
             try:
                 key_idx = number_of_current_keys + 1
-                key_pair = client.create_key_pair(KeyName='Matrix%s-%s'
-                                                          % (regions[regions_idx].replace('-', '')[:-1], key_idx))
+                key_pair = client.create_key_pair(KeyName=f"Matrix{regions[regions_idx].replace('-', '')[:-1]}"
+                                                          f"-{key_idx}")
                 key_name = key_pair['KeyName']
-                with open('%s/Keys/%s' % (Path.home(), key_name), 'w+') as key_file:
+                with open(f'{Path.home()}/Keys/{key_name}', 'w+') as key_file:
                     key_file.write(key_pair['KeyMaterial'])
             except botocore.exceptions.EndpointConnectionError as e:
                 print(e.response['Error']['Message'].upper())
@@ -37,6 +49,10 @@ class AmazonCP(DeployCP):
                 print(e.response['Error']['Message'].upper())
 
     def create_security_group(self):
+        """
+        Creates firewall rules
+        :return:
+        """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
 
         for idx in range(len(regions)):
@@ -45,7 +61,7 @@ class AmazonCP(DeployCP):
             try:
                 response = client.create_security_group(
                     Description='Matrix system security group',
-                    GroupName='MatrixSG%s' % regions[idx].replace('-', '')[:-1],
+                    GroupName=f"MatrixSG{regions[idx].replace('-', '')[:-1]}",
                     DryRun=False
                 )
 
@@ -53,7 +69,7 @@ class AmazonCP(DeployCP):
                 sg_id = response['GroupId']
                 ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
                 security_group = ec2.SecurityGroup(sg_id)
-                security_group.authorize_ingress(IpProtocol="tcp", CidrIp="0.0.0.0/0", FromPort=0, ToPort=65535)
+                security_group.authorize_ingress(IpProtocol='tcp', CidrIp='0.0.0.0/0', FromPort=0, ToPort=65535)
             except botocore.exceptions.EndpointConnectionError as e:
                 print(e.response['Error']['Message'].upper())
             except botocore.exceptions.ClientError as e:
@@ -61,6 +77,14 @@ class AmazonCP(DeployCP):
 
     @staticmethod
     def check_latest_price(instance_type, region):
+        """
+        Check what is the latest winning price for spot requests
+        :type instance_type str
+        :param instance_type: the type of the machines the protocol uses
+        :type region str
+        :param region: the regions that the instances are located
+        :return: the last wining price
+        """
         client = boto3.client('ec2', region_name=region[:-1])
         prices = client.describe_spot_price_history(InstanceTypes=[instance_type], MaxResults=1,
                                                     ProductDescriptions=['Linux/UNIX (Amazon VPC)'],
@@ -69,16 +93,25 @@ class AmazonCP(DeployCP):
 
     @staticmethod
     def get_ami_disk_size(region_name):
+        """
+        :type region_name str
+        :param region_name: the region that the instances are located
+        :return: the size of the AMI disk
+        """
         client = boto3.client('ec2', region_name)
 
-        with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
+        with open(f'{os.getcwd()}/GlobalConfigurations/regions.json') as gc_file:
             global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
 
-        ami_id = global_config[region_name]["ami"]
+        ami_id = global_config[region_name]['ami']
         response = client.describe_images(ImageIds=[ami_id])
         return response['Images'][0]['BlockDeviceMappings'][0]['Ebs']['VolumeSize']
 
     def deploy_instances(self):
+        """
+        Deploy instances at the requested cloud provider (CP) as configured by self.protocol_config
+        :return:
+        """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         machine_type = self.protocol_config['CloudProviders']['aws']['instanceType']
         if 'spotPrice' in self.protocol_config['CloudProviders']['aws']:
@@ -89,7 +122,7 @@ class AmazonCP(DeployCP):
         number_of_parties = self.protocol_config['CloudProviders']['aws']['numOfParties']
         number_duplicated_servers = 0
         protocol_name = self.protocol_config['protocol']
-        with open('%s/GlobalConfigurations/regions.json' % os.getcwd()) as gc_file:
+        with open(f'{os.getcwd()}/GlobalConfigurations/regions.json') as gc_file:
             global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
 
         if len(regions) > 1:
@@ -114,10 +147,9 @@ class AmazonCP(DeployCP):
 
             doc = {}
             doc['protocolName'] = protocol_name
-            doc['message'] = 'Deploying instances :\nregion : %s\nnumber of instances : %s\nami_id : ' \
-                             '%s\ninstance_type : %s\n valid until : %s' \
-                             % (regions[idx], number_of_instances_to_deploy,
-                                global_config[regions[idx][:-1]]["ami"], machine_type, str(new_date))
+            doc['message'] = f"Deploying instances :\nregion : {regions[idx]}\nnumber of instances : " \
+                             f"{number_of_instances_to_deploy}\nami_id : {global_config[regions[idx][:-1]]['ami']}" \
+                             f"\ninstance_type : {machine_type}\n valid until : {str(new_date)}"
             doc['timestamp'] = datetime.utcnow()
             self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
 
@@ -136,9 +168,9 @@ class AmazonCP(DeployCP):
                                 ValidUntil=new_date,
                                 LaunchSpecification=
                                 {
-                                    'ImageId': global_config[regions[idx][:-1]]["ami"],
-                                    'KeyName': global_config[regions[idx][:-1]]["key"],
-                                    'SecurityGroups': [global_config[regions[idx][:-1]]["securityGroup"]],
+                                    'ImageId': global_config[regions[idx][:-1]]['ami'],
+                                    'KeyName': global_config[regions[idx][:-1]]['key'],
+                                    'SecurityGroups': [global_config[regions[idx][:-1]]['securityGroup']],
                                     'InstanceType': machine_type,
                                     'Placement':
                                         {
@@ -185,7 +217,7 @@ class AmazonCP(DeployCP):
                         MaxCount=int(number_of_instances_to_deploy),
                         SecurityGroups=[global_config[regions[idx][:-1]]["securityGroup"]],
                         # Use the below if you have an old AWS account and get errors about a VPC
-                        #SubnetId=[global_config[regions[idx][:-1]]["subnetid"]],
+                        # SubnetId=[global_config[regions[idx][:-1]]["subnetid"]],
                         InstanceType=machine_type,
                         Placement=
                         {
@@ -217,6 +249,15 @@ class AmazonCP(DeployCP):
         self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
 
     def get_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
+        """
+        Creates party file for all the parties when using localhost or pre defined servers (on-premise)
+        :type port_number int
+        :param port_number: base port number
+        :type file_name str
+        :param file_name: the name of the file
+        :type new_format bool
+        :param new_format: using the new format or not
+        """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         is_spot_request = 'spotPrice' in self.protocol_config['CloudProviders']['aws']
         coordinator_exists = 'coordinatorConfig' in self.protocol_config
@@ -257,8 +298,8 @@ class AmazonCP(DeployCP):
                                                  ['Instances'][reserve_idx]['PublicIpAddress'])
 
             # check if InstancesConfigurations dir exists
-            if not os.path.isdir('%s/InstancesConfigurations' % os.getcwd()):
-                os.makedirs('%s/InstancesConfigurations' % os.getcwd())
+            if not os.path.isdir(f'{os.getcwd()}/InstancesConfigurations'):
+                os.makedirs(f'{os.getcwd()}/InstancesConfigurations')
 
         if coordinator_exists == 'True':
             del private_ip_address[0]
@@ -282,6 +323,14 @@ class AmazonCP(DeployCP):
                 public_ip_file.write('%s\n' % public_ip_address[public_idx])
 
     def describe_instances(self, region_name, machines_name):
+        """
+        Retrieve all the machines associated to the protocol
+        :type region_name str
+        :param region_name: the regions that the instances are located
+        :type machines_name str
+        :param machines_name: the protocol name
+        :return list of instances
+        """
         client = boto3.client('ec2', region_name=region_name)
         is_spot_request = 'spotPrice' in self.protocol_config['CloudProviders']['aws']
         if is_spot_request:
@@ -299,6 +348,14 @@ class AmazonCP(DeployCP):
         return instances
 
     def check_running_instances(self, region, machine_type):
+        """
+        Check how many instances are online
+        :type region str
+        :param region: the regions that the instances are located
+        :type machine_type str
+        :param machine_type: the type of the machines the protocol uses
+        :return: number of online instances that associated to the protocol
+        """
         protocol_name = self.protocol_config['protocol']
         ready_instances = 0
 
@@ -317,6 +374,9 @@ class AmazonCP(DeployCP):
         return ready_instances
 
     def start_instances(self):
+        """
+        Turn on the instances
+        """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         machines_name = self.protocol_config['protocol']
 
@@ -336,6 +396,9 @@ class AmazonCP(DeployCP):
         self.get_network_details()
 
     def stop_instances(self):
+        """
+        Shut down the instances
+        """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         machines_name = self.protocol_config['protocol']
 
@@ -353,6 +416,10 @@ class AmazonCP(DeployCP):
             client.stop_instances(InstanceIds=instances)
 
     def reboot_instances(self):
+        """
+        Reboots the instances. Use this method if you want to reboot the instances.
+        It will save you money instead of stop->start
+        """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         machines_name = self.protocol_config['protocol']
 
@@ -370,6 +437,10 @@ class AmazonCP(DeployCP):
             client.reboot_instances(InstancesIds=instances)
 
     def change_instance_types(self):
+        """
+        Change the type of the instance the protocol uses.
+        The new type should be specified at the protocol configuration file.
+        """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         protocol_name = self.protocol_config['protocol']
         instance_type = self.protocol_config['CloudProviders']['aws']['instanceType']
@@ -401,6 +472,9 @@ class AmazonCP(DeployCP):
         self.get_network_details()
 
     def terminate_instances(self):
+        """
+        Deletes the instances
+        """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         machines_name = self.protocol_config['protocol']
 
@@ -420,6 +494,10 @@ class AmazonCP(DeployCP):
 
     @staticmethod
     def copy_ami():
+        """
+        Copy the libscapi AMI to all other regions from the source region
+        :return:
+        """
         with open('GlobalConfigurations/regions.json', 'r') as regions_file:
             data = json.load(regions_file, object_pairs_hook=OrderedDict)
 

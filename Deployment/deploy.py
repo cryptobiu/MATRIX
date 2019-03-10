@@ -1,33 +1,32 @@
 import os
 import copy
-import subprocess
-import shutil
 import certifi
 from elasticsearch import Elasticsearch
 
 
 class DeployCP:
     """
-    The class represent deployment object. the class is abstract
+    The class represents deployment object. the class is abstract
     """
     def __init__(self, protocol_config):
         """
-        :type protocol_config basestring
+        :type protocol_config str
         :param protocol_config: the configuration of the protocol we want to deploy
         """
         self.protocol_config = protocol_config
+        # TODO Fix security
         self.es = Elasticsearch('3.81.191.221:9200', ca_certs=certifi.where())
 
     def create_key_pair(self):
         """
-        Creates ssh keys
+        Creates private key file
         :return:
         """
         raise NotImplementedError
 
     def create_security_group(self):
         """
-        Creates security groups
+        Creates firewall rules
         :return:
         """
         raise NotImplementedError
@@ -36,9 +35,9 @@ class DeployCP:
     def check_latest_price(instance_type, region):
         """
         Check what is the latest winning price for spot requests
-        :type instance_type basestring
+        :type instance_type str
         :param instance_type: the type of the machines the protocol uses
-        :type region basestring
+        :type region str
         :param region: the regions that the instances are located
         :return: the last wining price
         """
@@ -54,9 +53,9 @@ class DeployCP:
     def check_running_instances(self, region, machine_type):
         """
         Check how many instances are online
-        :type region basestring
+        :type region str
         :param region: the regions that the instances are located
-        :type machine_type basestring
+        :type machine_type str
         :param machine_type: the type of the machines the protocol uses
         :return: number of online instances that associated to the protocol
         """
@@ -65,9 +64,9 @@ class DeployCP:
     def describe_instances(self, region_name, machines_name):
         """
         Retrieve all the machines associated to the protocol
-        :type region_name basestring
+        :type region_name str
         :param region_name: the regions that the instances are located
-        :type machines_name basestring
+        :type machines_name str
         :param machines_name: the protocol name
         :return list of instances
         """
@@ -81,13 +80,20 @@ class DeployCP:
 
     def stop_instances(self):
         """
-        Turn off the instances
+        Shut down the instances
+        """
+        raise NotImplementedError
+
+    def reboot_instances(self):
+        """
+        Reboots the instances. Use this method if you want to reboot the instances.
+        It will save you money instead of stop->start
         """
         raise NotImplementedError
 
     def terminate_instances(self):
         """
-        delete the instances
+        Deletes the instances
         """
         raise NotImplementedError
 
@@ -102,10 +108,10 @@ class DeployCP:
     def create_parties_files_multi_regions(file_name):
         """
         Creates network topology file for each party
-        :type file_name basestring
+        :type file_name str
         :param file_name: the name of the file
         """
-        with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'r') as origin_file:
+        with open(f'{os.getcwd()}/InstancesConfigurations/{file_name}', 'r') as origin_file:
             parties = origin_file.readlines()
 
         number_of_parties = len(parties) // 2
@@ -118,14 +124,14 @@ class DeployCP:
             with open('%s/InstancesConfigurations/parties%s.conf' % (os.getcwd(), idx), 'w+') as new_file:
                 new_file.writelines(new_parties)
 
-    def create_parties_file(self, ip_addresses, port_number, file_name, new_format=True, number_of_regions=1):
+    def create_parties_file(self, ip_addresses, port_number, file_name, new_format=False, number_of_regions=1):
         """
         Creates party file for all the parties
         :type ip_addresses list
         :param ip_addresses: IP addresses of the instances
         :type port_number int
         :param port_number: base port number
-        :type file_name basestring
+        :type file_name str
         :param file_name: the name of the file
         :type new_format bool
         :param new_format: using the new format or not
@@ -138,31 +144,31 @@ class DeployCP:
         else:
             mode = 'w+'
 
-        if 'aws' in self.protocol_config['CloudProviders'] and 'scaleway' in self.protocol_config['CloudProviders']:
-            regions = self.protocol_config['CloudProviders']['aws']['regions'] + \
-                      self.protocol_config['CloudProviders']['scaleway']['regions']
-        elif 'aws' in self.protocol_config['CloudProviders']:
-            regions = self.protocol_config['CloudProviders']['aws']['regions']
-        elif 'scaleway' in self.protocol_config['CloudProviders']:
-            regions = self.protocol_config['CloudProviders']['scaleway']['regions']
+        if 'aws' in self.protocol_config['CloudProviders']:
+            regions += self.protocol_config['CloudProviders']['aws']['regions']
+        if 'azure' in self.protocol_config['CloudProviders']:
+            regions += self.protocol_config['CloudProviders']['azure']['regions']
 
-        with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), mode) as private_ip_file:
+        # TODO: Log info msg: expected provider not found
+
+        with open(f'{os.getcwd()}/InstancesConfigurations/{file_name}', mode) as private_ip_file:
+            # for backward compatibility
             if not new_format:
-                for party_idx in range(len(ip_addresses)):
-                    private_ip_file.write('party_%s_ip=%s\n' % (party_idx, ip_addresses[party_idx]))
+                for party_idx, ip_addr in enumerate(ip_addresses):
+                    private_ip_file.write(f'party_{party_idx}_ip={ip_addr}\n')
 
                 for port_idx in range(len(ip_addresses)):
                     if len(regions) == 0:
-                        private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_number + (port_idx * 20)))
+                        private_ip_file.write(f'party_{port_idx}_port={port_number + (port_idx * 20)}\n')
                     else:
-                        private_ip_file.write('party_%s_port=%s\n' % (port_idx, port_number))
+                        private_ip_file.write(f'party_{port_idx}_port={port_number}\n')
 
             else:
-                for party_idx in range(len(ip_addresses)):
+                for party_idx, ip_addr in enumerate(ip_addresses):
                     if len(regions) == 0:
-                        private_ip_file.write('%s:%s\n' % (ip_addresses[party_idx], port_number + (party_idx * 20)))
+                        private_ip_file.write(f'{ip_addr}:{port_number + (party_idx * 20)}\n')
                     else:
-                        private_ip_file.write('%s:8000\n' % ip_addresses[party_idx])
+                        private_ip_file.write(f'{ip_addr}:8000\n')
 
         # create party file for each instance
         if number_of_regions > 1:
@@ -173,7 +179,7 @@ class DeployCP:
         Creates party file for all the parties when using localhost or pre defined servers (on-premise)
         :type port_number int
         :param port_number: base port number
-        :type file_name basestring
+        :type file_name str
         :param file_name: the name of the file
         :type new_format bool
         :param new_format: using the new format or not
@@ -184,18 +190,18 @@ class DeployCP:
             public_ip_address = []
             for ip_idx in range(number_of_parties):
                 public_ip_address.append('127.0.0.1')
-            with open('%s/InstancesConfigurations/public_ips' % os.getcwd(), 'w+') as local_ips:
+            with open(f'{os.getcwd()}/InstancesConfigurations/public_ips', 'w+') as local_ips:
                 for line in public_ip_address:
-                    local_ips.write('%s\n' % line)
+                    local_ips.write(f'{line}\n')
             self.create_parties_file(public_ip_address, port_number, file_name, False)
 
-            # read servers configuration
+        # read servers configuration
         elif 'servers' in cp:
             server_file = input('Enter your server file configuration: ')
-            os.system('cp %s %s/InstancesConfigurations/public_ips' % (server_file, os.getcwd()))
+            os.system(f'cp {server_file} {os.getcwd()}/InstancesConfigurations/public_ips')
 
             server_ips = []
-            with open('%s/InstancesConfigurations/public_ips' % os.getcwd(), 'r+') as server_ips_file:
+            with open(f'{os.getcwd()}/InstancesConfigurations/public_ips', 'r') as server_ips_file:
                 for line in server_ips_file:
                     server_ips.append(line)
             self.create_parties_file(server_ips, port_number, file_name, False)
