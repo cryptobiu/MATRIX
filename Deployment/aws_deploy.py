@@ -331,7 +331,8 @@ class AmazonCP(DeployCP):
 
             client = boto3.client('ec2', region_name=region_name)
             client.start_instances(InstanceIds=instances)
-            self.get_network_details()
+        time.sleep(20)
+        self.get_network_details()
 
     def stop_instances(self):
         regions = self.protocol_config['CloudProviders']['aws']['regions']
