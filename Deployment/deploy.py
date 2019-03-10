@@ -7,63 +7,104 @@ from elasticsearch import Elasticsearch
 
 
 class DeployCP:
+    """
+    The class represent deployment object. the class is abstract
+    """
     def __init__(self, protocol_config):
+        """
+        :type protocol_config basestring
+        :param protocol_config: the configuration of the protocol we want to deploy
+        """
         self.protocol_config = protocol_config
         self.es = Elasticsearch('3.81.191.221:9200', ca_certs=certifi.where())
 
-    @staticmethod
-    def generate_circuits():
-        # Synthetic circuits generation
-        parties = [2, 3, 4, 8, 16, 32, 64, 128]
-        depth = [10, 100, 1000, 10000, 100000, 1000000]
-        mult_gates = [10000, 100000, 1000000, 10000000, 100000000, 1000000000]
-        gates = [g * 4 for g in mult_gates]
-        inputs = [[int(i * 0.01) for i in mult_gates], [int(i * 0.05) for i in mult_gates],
-                  [int(i * 0.1) for i in mult_gates], [int(i * 0.5) for i in mult_gates]]
-
-        for idx in range(len(parties)):
-            for idx2 in range(len(inputs)):
-                for idx3 in range(len(inputs[idx2])):
-                    subprocess.call(['java', '-jar', 'Circuits/GenerateArythmeticCircuitForDepthAndGates.jar',
-                                     str(gates[idx3]), str(mult_gates[idx3]), str(depth[idx3]),
-                                     str(parties[idx]), str(inputs[idx2][idx3]), '50', 'true'], shell=False,
-                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        shutil.move('*.txt', 'Circuits')
-
     def create_key_pair(self):
+        """
+        Creates ssh keys
+        :return:
+        """
         raise NotImplementedError
 
     def create_security_group(self):
+        """
+        Creates security groups
+        :return:
+        """
         raise NotImplementedError
 
     @staticmethod
     def check_latest_price(instance_type, region):
+        """
+        Check what is the latest winning price for spot requests
+        :type instance_type basestring
+        :param instance_type: the type of the machines the protocol uses
+        :type region basestring
+        :param region: the regions that the instances are located
+        :return: the last wining price
+        """
         raise NotImplementedError
 
     def deploy_instances(self):
+        """
+        Deploy instances at the requested cloud provider (CP) as configured by self.protocol_config
+        :return:
+        """
         raise NotImplementedError
 
     def check_running_instances(self, region, machine_type):
+        """
+        Check how many instances are online
+        :type region basestring
+        :param region: the regions that the instances are located
+        :type machine_type basestring
+        :param machine_type: the type of the machines the protocol uses
+        :return: number of online instances that associated to the protocol
+        """
         raise NotImplementedError
 
     def describe_instances(self, region_name, machines_name):
+        """
+        Retrieve all the machines associated to the protocol
+        :type region_name basestring
+        :param region_name: the regions that the instances are located
+        :type machines_name basestring
+        :param machines_name: the protocol name
+        :return list of instances
+        """
         raise NotImplementedError
 
     def start_instances(self):
+        """
+        Turn on the instances
+        """
         raise NotImplementedError
 
     def stop_instances(self):
+        """
+        Turn off the instances
+        """
         raise NotImplementedError
 
     def terminate_instances(self):
+        """
+        delete the instances
+        """
         raise NotImplementedError
 
     def change_instance_types(self):
+        """
+        Change the type of the instance the protocol uses.
+        The new type should be specified at the protocol configuration file.
+        """
         raise NotImplementedError
 
     @staticmethod
     def create_parties_files_multi_regions(file_name):
+        """
+        Creates network topology file for each party
+        :type file_name basestring
+        :param file_name: the name of the file
+        """
         with open('%s/InstancesConfigurations/%s' % (os.getcwd(), file_name), 'r') as origin_file:
             parties = origin_file.readlines()
 
@@ -78,6 +119,19 @@ class DeployCP:
                 new_file.writelines(new_parties)
 
     def create_parties_file(self, ip_addresses, port_number, file_name, new_format=True, number_of_regions=1):
+        """
+        Creates party file for all the parties
+        :type ip_addresses list
+        :param ip_addresses: IP addresses of the instances
+        :type port_number int
+        :param port_number: base port number
+        :type file_name basestring
+        :param file_name: the name of the file
+        :type new_format bool
+        :param new_format: using the new format or not
+        :type number_of_regions int
+        :param number_of_regions: number of regions the protocol executed
+        """
         regions = []
         if len(self.protocol_config['CloudProviders']) > 1:
             mode = 'a+'
@@ -115,6 +169,15 @@ class DeployCP:
             self.create_parties_files_multi_regions(file_name)
 
     def get_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
+        """
+        Creates party file for all the parties when using localhost or pre defined servers (on-premise)
+        :type port_number int
+        :param port_number: base port number
+        :type file_name basestring
+        :param file_name: the name of the file
+        :type new_format bool
+        :param new_format: using the new format or not
+        """
         cp = self.protocol_config['CloudProviders']
         if 'local' in cp:
             number_of_parties = cp['local']['numOfParties']
