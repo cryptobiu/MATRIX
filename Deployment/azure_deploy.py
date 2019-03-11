@@ -7,12 +7,17 @@ from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.network import NetworkManagementClient
 from azure.mgmt.resource import ResourceManagementClient
 from azure.common.credentials import ServicePrincipalCredentials
+from azure.mgmt.network.models import NetworkSecurityGroup, SecurityRule
 from msrestazure.azure_exceptions import CloudError
 
 from Deployment.deploy import DeployCP
 
 
 class AzureCP(DeployCP):
+    """
+    The class enables deployment to Azure. All the methods are valid only to Azure
+    Sub class of Deployment.DeployCP
+    """
     def __init__(self, protocol_config):
         super(AzureCP, self).__init__(protocol_config)
         self.resource_group = 'MatrixRG'
@@ -37,21 +42,49 @@ class AzureCP(DeployCP):
         self.private_ips = []
 
     def create_key_pair(self):
+        """
+        Creates private key file. Azure does not support it.
+        :return:
+        """
         raise NotImplementedError
 
     def create_security_group(self):
-        raise NotImplementedError
+        """
+        Creates firewall rules
+        :return:
+        """
+        parameters = NetworkSecurityGroup()
+        parameters.location = 'useast1'
+
+        parameters.security_rules = [SecurityRule(description='AllIn', protocol='Tcp',
+                                                  source_port_range='*', destination_port_range='*', access='Allow',
+                                                  direction='Inbound',  priority=100, name='AllIn'),
+                                     SecurityRule(description='AllIn', protocol='Tcp',
+                                                  source_port_range='*', destination_port_range='*', access='Allow',
+                                                  direction='Outbound',  priority=100, name='AllIn')]
+        self.network_client.network_security_groups.create_or_update(self.resource_group, "test-nsg", parameters)
 
     @staticmethod
     def check_latest_price(instance_type, region):
+        """
+        NOT supported on Azure
+        Check what is the latest winning price for spot requests.
+        :type instance_type str
+        :param instance_type: the type of the machines the protocol uses
+        :type region str
+        :param region: the regions that the instances are located
+        :return: the last wining price
+        """
         raise NotImplementedError
 
     def create_availability_set(self, location, protocol_name):
         """
-        Creates availability set for the instances
-        :param location:
-        :param protocol_name:
-        :return:
+        Creates availability set for the instances. availability set creates instances close to each other
+        :type location str
+        :param location: the region that the instances are located
+        :type protocol_name str
+        :param protocol_name: the machines names
+        :return: availability set instance
         """
         avset_params = {
             'location': location,
@@ -69,8 +102,10 @@ class AzureCP(DeployCP):
     def create_public_ip_address(self, location, protocol_name):
         """
         Creates public ip for each instance
-        :param location:
-        :param protocol_name:
+        :type location str
+        :param location: the region that the instances are located
+        :type protocol_name str
+        :param protocol_name: the machines names
         :return: success of the request
         """
         public_ip_addess_params = {
@@ -87,6 +122,14 @@ class AzureCP(DeployCP):
             print('Error while creating availability_set', e.message)
 
     def create_vnet(self, location, protocol_name):
+        """
+        Creates virtual network at te requested location. The Virtual network will host a subnet
+        :type location str
+        :param location: the region that the instances are located
+        :type protocol_name str
+        :param protocol_name: the machines names
+        :return:
+        """
         vnet_params = {
             'location': location,
             'address_space': {
@@ -105,6 +148,12 @@ class AzureCP(DeployCP):
             print('Error while creating availability_set', e.message)
 
     def create_subnet(self, protocol_name):
+        """
+        Creates subnet for the instances.
+        :type protocol_name str
+        :param protocol_name: the machines names
+        :return:
+        """
         subnet_params = {
             'address_prefix': '10.0.0.0/24'
         }
@@ -121,6 +170,16 @@ class AzureCP(DeployCP):
             print('Error while creating availability_set', e.message)
 
     def create_nic(self, location, protocol_name, ip_name):
+        """
+        Creates NIC for each instance
+        :type location str
+        :param location: the region that the instances are located
+        :type protocol_name str
+        :param protocol_name: the machines names
+        :type ip_name str
+        :param ip_name: the public IP address name
+        :return:
+        """
         try:
             subnet_info = self.network_client.subnets.get(
                 self.resource_group,
@@ -153,7 +212,10 @@ class AzureCP(DeployCP):
             print('Error while creating availability_set', e.message)
 
     def deploy_instances(self):
-
+        """
+        Deploy instances at the requested cloud provider (CP) as configured by self.protocol_config
+        :return:
+        """
         regions = self.protocol_config['CloudProviders']['azure']['regions']
         machine_type = self.protocol_config['CloudProviders']['azure']['instanceType']
         protocol_name = self.protocol_config['protocol']
@@ -249,11 +311,13 @@ class AzureCP(DeployCP):
 
     def get_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
         """
-        Creates network topology file for the parties that participates in the protocol
-        :param port_number:
-        :param file_name:
-        :param new_format:
-        :return:
+        Creates party file for all the parties when using localhost or pre defined servers (on-premise)
+        :type port_number int
+        :param port_number: base port number
+        :type file_name str
+        :param file_name: the name of the file
+        :type new_format bool
+        :param new_format: using the new format or not
         """
         protocol_name = self.protocol_config['protocol']
         regions = self.protocol_config['CloudProviders']['azure']['regions']
@@ -294,10 +358,12 @@ class AzureCP(DeployCP):
 
     def describe_instances(self, region_name, machines_name):
         """
-        Return the machines objects according to region name and machine name
-        :param region_name:
-        :param machines_name:
-        :return: list of machines objects
+        Retrieve all the machines associated to the protocol
+        :type region_name str
+        :param region_name: the regions that the instances are located
+        :type machines_name str
+        :param machines_name: the protocol name
+        :return list of instances
         """
         response = self.compute_client.virtual_machines.list(self.resource_group)
         machines = []
@@ -307,6 +373,14 @@ class AzureCP(DeployCP):
         return machines
 
     def check_running_instances(self, region, machine_type):
+        """
+        Check how many instances are online
+        :type region str
+        :param region: the regions that the instances are located
+        :type machine_type str
+        :param machine_type: the type of the machines the protocol uses
+        :return: number of online instances that associated to the protocol
+        """
         protocol_name = self.protocol_config['protocol']
         ready_instances = 0
         response = self.describe_instances(region, protocol_name)
@@ -320,6 +394,9 @@ class AzureCP(DeployCP):
         return ready_instances
 
     def start_instances(self):
+        """
+        Turn on the instances
+        """
         protocol_name = self.protocol_config['protocol']
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         for region in regions:
@@ -335,6 +412,9 @@ class AzureCP(DeployCP):
                 self.compute_client.virtual_machines.start(self.resource_group, machine.name)
 
     def stop_instances(self):
+        """
+        Shut down the instances
+        """
         protocol_name = self.protocol_config['protocol']
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         for region in regions:
@@ -350,6 +430,10 @@ class AzureCP(DeployCP):
                 self.compute_client.virtual_machines.deallocate(self.resource_group, machine.name)
 
     def terminate_instances(self):
+        """
+        Reboots the instances. Use this method if you want to reboot the instances.
+        It will save you money instead of stop->start
+        """
         protocol_name = self.protocol_config['protocol']
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         for region in regions:
@@ -392,4 +476,9 @@ class AzureCP(DeployCP):
             self.compute_client.availability_sets.delete(self.resource_group, '%sAVSet' % protocol_name)
 
     def change_instance_types(self):
+        """
+        NOT supported on Azure
+        Change the type of the instance the protocol uses.
+        The new type should be specified at the protocol configuration file.
+        """
         raise NotImplementedError
