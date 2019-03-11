@@ -71,7 +71,7 @@ def run_protocol(config_file, args, executable_name, working_directory):
         elif 'azure' in data['CloudProviders']:
             regions = data['CloudProviders']['azure']['regions']
         elif len(data['CloudProviders']) > 1:
-            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['scaleway']['regions']
+            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
         elif 'servers' in data['CloudProviders']:
             regions = data['CloudProviders']['servers']['regions']
         else:
@@ -179,10 +179,10 @@ def run_protocol_profiler(config_file, args, executable_name, working_directory)
         external_protocol = json.loads(data['isExternal'].lower())
         if 'aws' in data['CloudProviders']:
             regions = data['CloudProviders']['aws']['regions']
-        elif 'scaleway' in data['CloudProviders']:
-            regions = data['CloudProviders']['scaleway']['regions']
+        elif 'azure' in data['CloudProviders']:
+            regions = data['CloudProviders']['azure']['regions']
         else:
-            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['scaleway']['regions']
+            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
         vals = args.split('@')
         values_str = ''
 
@@ -228,10 +228,10 @@ def run_protocol_with_latency(config_file, args, executable_name, working_direct
         external_protocol = json.loads(data['isExternal'].lower())
         if 'aws' in data['CloudProviders']:
             regions = data['CloudProviders']['aws']['regions']
-        elif 'scaleway' in data['CloudProviders']:
-            regions = data['CloudProviders']['scaleway']['regions']
+        elif 'azure' in data['CloudProviders']:
+            regions = data['CloudProviders']['azure']['regions']
         else:
-            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['scaleway']['regions']
+            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
         vals = args.split('@')
         values_str = ''
 

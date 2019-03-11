@@ -311,7 +311,7 @@ class AzureCP(DeployCP):
 
     def get_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
         """
-        Creates party file for all the parties when using localhost or pre defined servers (on-premise)
+        Creates party file for all the parties
         :type port_number int
         :param port_number: base port number
         :type file_name str

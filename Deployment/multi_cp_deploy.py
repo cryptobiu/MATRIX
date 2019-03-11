@@ -2,29 +2,52 @@ import os
 import glob
 
 from Deployment import aws_deploy as awsde
-from Deployment import scaleway_deploy as sde
+from Deployment import azure_deploy as ade
 
 
 class MultiCP:
+    """
+    The class enables deployment to two cloud providers at the same time:
+        1. AWS
+        2. Azure
+    """
     def __init__(self, protocol_config):
+        """
+        Init  instances of Deployment.AmazonCP and Deployment.AzureCP
+        :type protocol_config str
+        :param protocol_config: the configuration of the protocol we want to deploy
+        """
         self.aws = awsde.AmazonCP(protocol_config)
-        self.scaleway = sde.ScalewayCP(protocol_config)
+        self.azure = ade.AzureCP(protocol_config)
 
     def deploy_instances(self):
+        """
+        Deploy instances at AWS and Azure
+        :return:
+        """
         self.aws.deploy_instances()
-        self.scaleway.deploy_instances()
+        self.azure.deploy_instances()
 
     def start_instances(self):
+        """
+        Turn on the instances
+        """
         self.aws.start_instances()
-        self.scaleway.start_instances()
+        self.azure.start_instances()
 
     def stop_instances(self):
+        """
+        Shut down the instances
+        """
         self.aws.stop_instances()
-        self.scaleway.stop_instances()
+        self.azure.stop_instances()
 
     def terminate_instances(self):
+        """
+        Deletes the instances
+        """
         self.aws.terminate_instances()
-        self.scaleway.terminate_instances()
+        self.azure.terminate_instances()
 
         try:
             cwd = os.getcwd()
@@ -36,8 +59,11 @@ class MultiCP:
             print("Error: %s - %s." % (e.filename, e.strerror))
 
     def get_network_details(self):
+        """
+        Creates party file for all the parties
+        """
         self.aws.get_network_details()
-        self.scaleway.get_network_details()
+        self.azure.get_network_details()
 
         with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'r+') as parties_file:
             parties = []

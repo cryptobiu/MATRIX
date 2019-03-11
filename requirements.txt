@@ -27,7 +27,6 @@ pyOpenSSL==18.0.0
 python-dateutil==2.7.5
 requests==2.20.0
 s3transfer==0.1.13
-scaleway-sdk==1.6.0
 six==1.11.0
 slumber==0.7.1
 urllib3==1.24.1
