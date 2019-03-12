@@ -1,6 +1,6 @@
 import os
 import json
-import time
+from pathlib import Path
 from collections import OrderedDict
 from fabric.api import *
 from fabric.contrib.files import exists
@@ -16,36 +16,35 @@ env.key_filename = ['YOUR-KEY']
 path_to_matrix = 'YOU PATH TO MATRIX'
 
 
-
 @task
-def pre_process(working_directory, task_idx):
-    if not exists('%s' % working_directory):
-        print('Seems you are trying to install dependencies before you install your experiment. '
-              'That totally makes sense, but that is not how MATRIX works. You need to install the experiment first. '
-              'Please go do that now and come back.')
-    else:
-        sudo('apt-get update')
-        sudo('apt-get install python3 -y')
-        sudo('apt-get install python3-pip -y')
-        run('pip3 install boto3')
-        with cd(working_directory):
-            put('%s/Execution/pre_process.py' % path_to_matrix, working_directory)
-            run('python3 pre_process.py %s' % task_idx)
-
-@task
-def install_git_project(username, password, git_branch, working_directory, git_address, external):
-    if not exists('%s' % working_directory):
-        run('git clone %s %s' % (git_address.format(username, password), working_directory))
+def install_git_project(username, password, git_branch, git_address, working_directory, external):
+    """
+    Install the protocol at the working directory with the GitHub credentials
+    :type username str
+    :param username: GitHub username
+    :type password str
+    :param password: GitHub password
+    :type git_branch str
+    :param git_branch: GitHub project branch
+    :type git_address str
+    :param git_address: GitHub project address
+    :type working_directory str
+    :param working_directory: directory to clone the GutHub repository to
+    :type external str
+    :param external: indicate if libscapi protocol or not
+    """
+    if not exists(working_directory):
+        run(f'git clone {git_address.format(username, password)} {working_directory}')
 
     external = eval(external)
-    with cd('%s' % working_directory):
+    with cd(working_directory):
         run('git pull')
-        run('git checkout %s ' % git_branch)
+        run(f'git checkout {git_branch}')
         if external:
-            with cd('%s/MATRIX' % working_directory):
+            with cd(f'{working_directory}/MATRIX'):
                 run('. ./build.sh')
         else:
-            if exists('%s/CMakeLists.txt' % working_directory):
+            if exists(f'{working_directory}/CMakeLists.txt'):
                 sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
                 run('cmake .')
             run('make')
@@ -54,15 +53,29 @@ def install_git_project(username, password, git_branch, working_directory, git_a
 
 
 @task
-def update_libscapi(branch):
+def update_libscapi():
+    """
+    Update libscapi library on the remote servers from dev branch
+    """
     with cd('libscapi/'):
-        run('git checkout %s' % branch)
+        run('git checkout dev')
         run('git pull')
         run('make')
 
 
 @task
 def run_protocol(config_file, args, executable_name, working_directory):
+    """
+    Execute the protocol on remote servers
+    :type config_file str
+    :param config_file: configuration file directory
+    :type args str
+    :param args: the arguments for the protocol, separated by `@`
+    :type executable_name str
+    :param executable_name: the executable file name
+    :type working_directory str
+    :param working_directory: the executable file dir
+    """
     with open(config_file) as data_file:
         data = json.load(data_file, object_pairs_hook=OrderedDict)
         external_protocol = json.loads(data['isExternal'].lower())
@@ -83,50 +96,40 @@ def run_protocol(config_file, args, executable_name, working_directory):
         for val in vals:
             # for external protocols
             if val == 'partyid':
-                values_str += '%s ' % str(env.hosts.index(env.host) - 1)
+                values_str += f'{str(env.hosts.index(env.host) - 1)} '
             else:
-                values_str += '%s ' % val
+                values_str += f'{val} '
 
         # local execution
         if len(regions) == 0:
             number_of_parties = len(env.hosts)
-            local('cp InstancesConfigurations/parties.conf %s/MATRIX' % working_directory)
+            local(f'cp InstancesConfigurations/parties.conf {working_directory}/MATRIX')
             for idx in range(number_of_parties):
                 if external_protocol:
-                    local('cd %s/MATRIX && ./%s %s %s &' % (working_directory, executable_name, idx, values_str))
+                    local(f'cd {working_directory}/MATRIX && ./{executable_name} {idx} {values_str} &')
                 else:
-                    local('cd %s && ./%s partyID %s %s &' % (working_directory, executable_name, idx, values_str))
+                    local(f'cd {working_directory} && ./{executable_name} partyID {idx} {values_str} &')
 
         else:
-            if env.user == 'root':
-                party_id = env.hosts.index('root@%s' % env.host)
-            else:
-                party_id = env.hosts.index(env.host)
+            party_id = env.hosts.index(env.host)
 
             with warn_only():
                 sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
 
             if 'inputs0' in values_str:
-                values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
-
-            # # apply delay if needed
-            #
-            # if 'delay' in data:
-            #     sudo('tc qdisc del dev ens5 root netem')
-            #     sudo('tc qdisc add dev ens5 root netem delay %sms' % data['delay'])
-            #     time.sleep(10)
+                values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
 
             with cd(working_directory):
                 if not external_protocol:
                     if len(regions) > 1:
-                        put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                        run('mv parties%s.conf parties.conf' % party_id)
+                        put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
+                        run(f'mv parties{party_id}.conf parties.conf')
                     else:
                         put('InstancesConfigurations/parties.conf', run('pwd'))
-                    sudo('chmod +x %s' % executable_name)
-                    run('./%s partyID %s %s' % (executable_name, party_id, values_str))
+                    sudo(f'chmod +x {executable_name}')
+                    run(f'./{executable_name} partyID {party_id} {values_str}')
                     with open('Execution/execution_log.log', 'a+') as log_file:
-                        log_file.write('%s\n' % values_str)
+                        log_file.write(f'{values_str}\n')
                 else:
                     # run external protocols
                     with cd('MATRIX'):
@@ -142,38 +145,51 @@ def run_protocol(config_file, args, executable_name, working_directory):
                                 coordinator_values_str = ''
 
                                 for coordinator_val in coordinator_args:
-                                    coordinator_values_str += '%s ' % coordinator_val
+                                    coordinator_values_str += f'{coordinator_val} '
 
                                 with warn_only():
-                                    sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % coordinator_executable)
+                                    sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
                                     # required for SCALE-MAMBA to rsync between AWS instances
                                     put(env.key_filename[0], run('pwd'))
 
-                                run('./%s %s' % (coordinator_executable, coordinator_values_str))
+                                run(f'{coordinator_executable} {coordinator_values_str}')
                                 with open('Execution/execution_log.log', 'a+') as log_file:
-                                    log_file.write('%s\n' % values_str)
+                                    log_file.write(f'{values_str}\n' % values_str)
                             else:
                                 if len(regions) > 1:
-                                    put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                                    run('mv parties%s.conf parties.conf' % party_id)
+                                    put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
+                                    run(f'mv parties{party_id}.conf parties.conf')
 
-                                run('. ./%s %s %s' % (executable_name, party_id - 1, values_str))
+                                run(f'. ./{executable_name} {party_id - 1} {values_str}')
                                 with open('Execution/execution_log.log', 'a+') as log_file:
-                                    log_file.write('%s\n' % values_str)
+                                    log_file.write(f'{values_str}\n')
                         else:
                             # run external protocols with no coordinator
                             if len(regions) > 1:
-                                put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                                run('mv parties%s.conf parties.conf' % party_id)
+                                put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
+                                run(f'mv parties{party_id}.conf parties.conf')
                             else:
                                 put('InstancesConfigurations/parties.conf', run('pwd'))
                             run('mkdir -p logs')
-                            run('. ./%s %s %s' % (executable_name, party_id, values_str))
+                            run(f'. ./{executable_name} {party_id} {values_str}')
                             with open('Execution/execution_log.log', 'a+') as log_file:
-                                log_file.write('%s\n' % values_str)
+                                log_file.write(f'{values_str}\n')
+
 
 @task
 def run_protocol_profiler(config_file, args, executable_name, working_directory):
+    """
+    Execute the protocol on remote servers with profiler.
+    The first party is executed with profiler, the other executed normally
+    :type config_file str
+    :param config_file: configuration file directory
+    :type args str
+    :param args: the arguments for the protocol, separated by `@`
+    :type executable_name str
+    :param executable_name: the executable file name
+    :type working_directory str
+    :param working_directory: the executable file dir
+    """
     with open(config_file) as data_file:
         data = json.load(data_file, object_pairs_hook=OrderedDict)
         external_protocol = json.loads(data['isExternal'].lower())
@@ -189,40 +205,47 @@ def run_protocol_profiler(config_file, args, executable_name, working_directory)
         for val in vals:
             # for external protocols
             if val == 'partyid':
-                values_str += '%s ' % str(env.hosts.index(env.host) - 1)
+                values_str += f'{str(env.hosts.index(env.host) - 1)} '
             else:
-                values_str += '%s ' % val
+                values_str += f'{val} '
 
         with cd(working_directory):
-            if env.user == 'root':
-                party_id = env.hosts.index('root@%s' % env.host)
-            else:
-                party_id = env.hosts.index(env.host)
+            party_id = env.hosts.index(env.host)
 
             with warn_only():
                 sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
 
             if 'inputs0' in values_str:
-                values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
+                values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
 
             if not external_protocol:
                 if len(regions) > 1:
-                    put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                    run('mv parties%s.conf parties.conf' % party_id)
+                    put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
+                    run(f'mv parties{party_id}s.conf parties.conf')
                 else:
                     put('InstancesConfigurations/parties.conf', run('pwd'))
                 if party_id == 0:
-                    run('valgrind --tool=callgrind ./%s partyID %s %s'
-                        % (executable_name, party_id, values_str))
+                    run(f'valgrind --tool=callgrind ./{executable_name} partyID {party_id} {values_str}')
                     get('callgrind.out.*', os.getcwd())
                 else:
-                    run('./%s partyID %s %s' % (executable_name, party_id, values_str))
+                    run(f'./{executable_name} partyID {party_id} {values_str}')
                     with open('Execution/execution_log.log', 'a+') as log_file:
-                        log_file.write('%s\n' % values_str)
+                        log_file.write(f'{values_str}\n')
 
 
 @task
 def run_protocol_with_latency(config_file, args, executable_name, working_directory):
+    """
+    Execute the protocol on remote servers with network latency
+    :type config_file str
+    :param config_file: configuration file directory
+    :type args str
+    :param args: the arguments for the protocol, separated by `@`
+    :type executable_name str
+    :param executable_name: the executable file name
+    :type working_directory str
+    :param working_directory: the executable file dir
+    """
     with open(config_file) as data_file:
         data = json.load(data_file, object_pairs_hook=OrderedDict)
         external_protocol = json.loads(data['isExternal'].lower())
@@ -238,78 +261,60 @@ def run_protocol_with_latency(config_file, args, executable_name, working_direct
         for val in vals:
             # for external protocols
             if val == 'partyid':
-                values_str += '%s ' % str(env.hosts.index(env.host) - 1)
+                values_str += f'{str(env.hosts.index(env.host) - 1)} '
             else:
-                values_str += '%s ' % val
+                values_str += f'{val} '
 
         with cd(working_directory):
             # the warning required for multi executions.
             # If you delete this line it will failed if you don't reboot the servers
             with warn_only():
                 sudo('tc qdisc add dev ens5 root netem delay 300ms')
-            if env.user == 'root':
-                party_id = env.hosts.index('root@%s' % env.host)
-            else:
-                party_id = env.hosts.index(env.host)
+
+            party_id = env.hosts.index(env.host)
 
             with warn_only():
                 sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
 
             if 'inputs0' in values_str:
-                values_str = values_str.replace('input_0.txt', 'input_%s.txt' % str(party_id))
+                values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
 
             if not external_protocol:
                 if len(regions) > 1:
-                    put('InstancesConfigurations/parties%s.conf' % party_id, run('pwd'))
-                    run('mv parties%s.conf parties.conf' % party_id)
+                    put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
+                    run(f'mv parties{party_id}.conf parties.conf')
                 else:
                     put('InstancesConfigurations/parties.conf', run('pwd'))
-                if party_id == 0:
-                    run('valgrind --tool=callgrind ./%s partyID %s %s'
-                        % (executable_name, party_id, values_str))
-                    get('callgrind.out.*', os.getcwd())
-                else:
-                    run('./%s partyID %s %s' % (executable_name, party_id, values_str))
-                    with open('Execution/execution_log.log', 'a+') as log_file:
-                        log_file.write('%s\n' % values_str)
+
+                run(f'./{executable_name} partyID {party_id} {values_str}')
+                with open('Execution/execution_log.log', 'a+') as log_file:
+                    log_file.write(f'{values_str}\n')
 
 
 @task
 def collect_results(results_server_directory, results_local_directory, is_external):
-    local('mkdir -p %s' % results_local_directory)
+    """
+    :type results_server_directory str
+    :param results_server_directory: the remote directory of the JSON results files
+    :type results_local_directory str
+    :param results_local_directory: the directory that the results are copied too
+    :type is_external str
+    :param is_external: indicate if libscapi protocol or not
+    """
+    local(f'mkdir -p {results_local_directory}' % results_local_directory)
     is_external = eval(is_external)
     if not is_external:
-        get('%s/*.json' % results_server_directory, results_local_directory)
+        get(f'{results_server_directory}/*.json', results_local_directory)
     else:
-        get('%s/MATRIX/logs/*.log' % results_server_directory, results_local_directory)
+        get(f'{results_server_directory}/MATRIX/logs/*.log', results_local_directory)
 
 
 @task
 def get_logs(logs_directory):
+    """
+    Collect logs from the specified working directory
+    :type logs_directory str
+    :param logs_directory: logs files directory
+    """
     local('mkdir -p logs')
-    get('%s/*.log' % logs_directory, '%s/MATRIX/logs' % Path.home())
-
-@task
-def update_acp_protocol():
-    with cd('ACP'):
-        run('git pull https://github.com/cryptobiu/ACP')
-        with cd('comm_client'):
-            run('cmake .')
-            run('make')
-
-
-@task
-def deploy_proxy(number_of_proxies):
-    # set hosts to be proxy server
-    env.host = ['34.239.19.87']
-
-    # kill all existing proxies
-    with warn_only():
-        sudo("kill -9 `ps aux | grep cct_proxy | awk '{print $2}'`")
-
-    with cd('ACP/cct_proxy'):
-        put('NodeApp/public/assets/parties.conf', run('pwd'))
-        with open('NodeApp/public/assets/parties.conf') as parties_file:
-            number_of_peers = len(parties_file.readlines())
-            run('./run_multiple_proxies %s %s' % ((int(number_of_proxies) - 1), number_of_peers))
-
+    get(f'{logs_directory}/*.log', f'{Path.home()}/MATRIX/logs')

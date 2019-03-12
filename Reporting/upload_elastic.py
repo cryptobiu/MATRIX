@@ -1,4 +1,3 @@
-import os
 import json
 import certifi
 from glob import glob
@@ -9,71 +8,27 @@ from elasticsearch import Elasticsearch
 
 
 class Elastic:
-    def __init__(self, conf_file):
-        self.config_file = conf_file
-        self.es = Elasticsearch('https://search-escryptobiu-fyopgg3zepk6dtda4zerc53apy.us-east-1.es.amazonaws.com',
-                                use_ssl=True, ca_certs=certifi.where())
-
-    def delete_index(self, index_name):
-        self.es.indices.delete(index_name)
-
-    def create_index(self):
-        request_body = \
-            {
-                'mappings':
-                {
-                    'commSentresults':
-                    {
-                        'properties':
-                            {
-                                'partiesNumber': {'type': 'integer'},
-                                'partyId': {'type': 'integer'},
-                                'protocolName': {'type': 'text'},
-                                'executionTime': {'type': 'date'}
-                            }
-                    }
-                }
-            }
-        self.es.indices.create(index='commsentresults', body=request_body)
-        request_body = \
-            {
-                'mappings':
-                {
-                    'commReceivedresults':
-                    {
-                        'properties':
-                            {
-                                'partiesNumber': {'type': 'integer'},
-                                'partyId': {'type': 'integer'},
-                                'protocolName': {'type': 'text'},
-                                'executionTime': {'type': 'date'}
-                            }
-                    }
-                }
-            }
-        self.es.indices.create(index='commreceivedresults', body=request_body)
-        request_body = \
-            {
-                'mappings':
-                {
-                    'cpuresults':
-                    {
-                        'properties':
-                            {
-                                'partiesNumber': {'type': 'integer'},
-                                'partyId': {'type': 'integer'},
-                                'protocolName': {'type': 'text'},
-                                'executionTime': {'type': 'date'}
-                            }
-                    }
-                }
-            }
-        self.es.indices.create(index='cpuresults', body=request_body)
+    """
+    The class enables to upload results files in JSON/log format to Elasticsearch server
+    """
+    def __init__(self, protocol_config):
+        """
+        :type protocol_config str
+        :param protocol_config: the configuration of the protocol we want to execute
+        """
+        self.config_file = protocol_config
+        self.es = Elasticsearch('3.81.191.221:9200', ca_certs=certifi.where())
 
     def upload_json_data(self, analysis_type, results_path):
-
+        """
+        Upload results file in JSON format to Elasticsearch
+        :type analysis_type str
+        :param analysis_type: currently the analysis supports only CPU
+        :type results_path list
+        :param results_path: list of results files location
+        :return:
+        """
         raw_configurations = self.config_file['configurations'][0].split('@')
-        protocol_name = self.config_file['protocol']
         # delete values, only the parameters are left
         del raw_configurations[1::2]
         raw_configurations = [rc[1:] for rc in raw_configurations]
@@ -108,6 +63,12 @@ class Elastic:
                               body=doc)
 
     def upload_log_data(self, results_path):
+        """
+        Upload results file in log format to Elasticsearch
+        :type results_path: list
+        :param results_path: list of results files location
+        :return:
+        """
         raw_configurations = self.config_file['configurations'][0].split('@')
         del raw_configurations[1::2]
         # raw_configurations = [rc[1:] for rc in raw_configurations]
@@ -136,9 +97,11 @@ class Elastic:
 
                 self.es.index(index='cpuresults', doc_type='cpuresults', body=doc)
 
-
-
     def upload_all_data(self):
+        """
+        Activate the relevant function according to the results files format
+        :return:
+        """
         is_external = json.loads(self.config_file['isExternal'].lower())
         results_path = self.config_file['resultsDirectory']
         if not is_external:

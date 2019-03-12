@@ -17,12 +17,24 @@ from email.mime.application import MIMEApplication
 
 
 class Analyze:
+    """
+    The class enables to create reports for multi party protocols when we want to
+    separate the experiments by different number of parties.
+    If you want different separation, use the Elastic class
+    """
     def __init__(self, protocol_config):
+        """
+        :type protocol_config str
+        :param protocol_config: the configuration of the protocol we want to analyze
+        """
         self.protocol_config = protocol_config
         self.protocol_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         self.style1 = NamedStyle(number_format='#.##')
 
     def download_data(self):
+        """
+        Download data from the remote servers
+        """
         remote_directory = self.protocol_config['workingDirectory']
         is_external = json.loads(self.protocol_config['isExternal'].lower())
 
@@ -34,6 +46,9 @@ class Analyze:
             time.sleep(10)
 
     def send_email(self):
+        """
+        Sends email with the results file to the users specified in the configuration
+        """
         protocol_name = self.protocol_config['protocol']
         users = list(self.protocol_config['emails'].values())
         configurations = list(self.protocol_config['configurations'].values())
@@ -84,6 +99,11 @@ class Analyze:
         server.quit()
 
     def analyze_json(self, files_list):
+        """
+        Analyze results files that written in JSON format
+        :type files_list list
+        :param files_list: list of results files location
+        """
         protocol_name = self.protocol_config['protocol']
         results_path = self.protocol_config['resultsDirectory']
 
@@ -151,6 +171,12 @@ class Analyze:
         wb.save(results_file_name)
 
     def analyze_logs(self, files_list):
+        """
+        Analyze results files that written in log format.
+        For log example file, see https://github.com/cryptobiu/MATRIX/blob/master/Assets/
+        :type files_list list
+        :param files_list: list of results files location
+        """
         protocol_name = self.protocol_config['protocol']
         results_path = self.protocol_config['resultsDirectory']
         parties = set()
@@ -215,6 +241,9 @@ class Analyze:
         wb.save(results_file_name)
 
     def analyze_results(self):
+        """
+        List all the results files and activate the relevant function
+        """
         results_path = self.protocol_config['resultsDirectory']
 
         external_protocol = json.loads(self.protocol_config['isExternal'].lower())
