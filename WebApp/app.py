@@ -6,12 +6,12 @@ import bson
 import json
 
 from pymongo import MongoClient
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 from Deployment.deploy import DeployCP
 from Deployment.aws_deploy import AmazonCP
-from Execution.new_execution import E2E
+from Execution.end_to_end import E2E
 from Reporting.analyze_results import Analyze
 from Reporting.upload_elastic import Elastic
 
