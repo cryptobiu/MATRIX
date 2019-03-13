@@ -18,9 +18,9 @@ from email.mime.application import MIMEApplication
 
 class Analyze:
     """
-    The class enables to create reports for multi party protocols when we want to
-    separate the experiments by different number of parties.
-    If you want different separation, use the Elastic class
+    The class creates reports for multi party protocols when we want to
+    split the results by number of parties.
+    If you want to split by different parameter, use the Elastic class
     """
     def __init__(self, protocol_config):
         """
