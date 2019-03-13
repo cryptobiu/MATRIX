@@ -1,8 +1,9 @@
 # MATRIX
 
-MATRIX is an MPC Test Automation Framework developed by [Bar Ilan University Cryptography Research Group](http://crypto.biu.ac.il/).
+MATRIX is an MPC Automation Framework developed by [Bar Ilan University Cryptography Research Group](http://crypto.biu.ac.il/).
 It automates the tedious process of deploying, running, monitoring and summarizing results.
-It uses AWS or Scaleway to provision servers(instances), and can be used internally on a local host or in a container deployment. A [paper](https://eprint.iacr.org/2018/751) featuring MATRIX was prensented in ACM-CCS18 
+It uses AWS or Azure to provision servers(instances), and can be used internally on a local host or in a container deployment.  
+A [paper](https://eprint.iacr.org/2018/751) featuring MATRIX was prensented in ACM-CCS18 
 
 The system requires a management computer (Manager) - a computer that centralized all the execution.
 The Manager executes all the experiment phases, starting from install the experiment up to analyse it's results.
@@ -21,7 +22,7 @@ To create account at Azure:
 * Sign up for [Azure](https://azure.microsoft.com/en-us/)
 
 ## Installation
-MATRIX runs under python 3.5 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [openpyxl](https://openpyxl.readthedocs.io/en/stable/).  
+MATRIX runs under python 3.6 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [openpyxl](https://openpyxl.readthedocs.io/en/stable/).  
 Matrix tested on these OSs:
 * Ubuntu 16.04.3/18.04.1 LTS
 * CentOS 7.3
@@ -39,14 +40,17 @@ To install under Arch Linux:
 
 `pacman -S python python-pip`
 
-After You installed Python 3 and pip3 you will need to install the modules MATRIX uses. To install this three modules use pip3
+After You installed Python 3 and pip3 you will need to install the modules MATRIX uses. To install this modules use pip3
 
 `pip3 install --user -r requirements.txt`
 
-**NOTE**: on some computers the following error may appear: `locale.Error: unsupported locale setting`
+**NOTE[1]**: on some computers the following error may appear: `locale.Error: unsupported locale setting`
 To fix it, run:
 1. `sudo apt-get clean && sudo apt-get update && sudo apt-get install -y locales`
 2. `locale-gen en_US.UTF-8`
+
+**NOTE[2]**: If you want to deploy your experiment at Azure, you will need to install the [Azure-CLI](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest).  
+To install it, run: `curl -L https://aka.ms/InstallAzureCli | bash`
 
 After the modules installed, clone this repository to install MATRIX on your system.
 
@@ -73,6 +77,8 @@ After you created your key, change this line at [fabfile.py](Execution/fabfile.p
 - set the correct location and name of your AWS key `env.key_filename = ['YOUR KEY HERE']`
 
 #### Azure Deployment
+
+To set your credentials at Azure run `az login` and follow the instructions.
 
 
 ### Execution
@@ -162,6 +168,26 @@ The configuration need to be in the same format of 'configurations' field
 
 ### MATRIX Usage
 
-In order to receive easy access to the MATRIX system, MATRIX uses basic CLI. To run the CLI run: `python3 main.py`
+After the installation you have two options to use MATRIX. CLI and Angular web UI.  
+There is no difference between the two of them in manner of functionality.
+
+#### CLI
+
+The CLI allows access to the MATRIX system. To run the CLI run: `python3 main.py`
+
+#### Angular
+
+MATRIX UI developed under Angular 7 and enables simple UI.  
+
+To install Angular 7:
+1. Download Node and npm from [here](https://nodejs.org/en/)
+2. Install Nginx: `sudo apt install nginx`
+2. Install the Angular CLI: `npm install -g @angular/cli`
+3. Install the required JS packages: `cd WebApp/frontend && npm install`
+
+To use the UI, you will need to deploy two web services.  
+To deploy the Angular service use the `WebApp/matrix` file and cp it to `/etc/nginx/sites-available/`
+To deploy the backend service use `gunicorn`. To install it run: `pip3 install gunicorn --user`.
+After the installation finished run: `gunicorn  -m 007 app:app --chdir WebApp -b 0.0.0.0:5000`
 
 For bugs/features requests open an issue or send an email to liork.cryptobiu@gmail.com
