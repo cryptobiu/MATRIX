@@ -160,7 +160,7 @@ def run_protocol(config_file, args, executable_name, working_directory):
                                     put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
                                     run(f'mv parties{party_id}.conf parties.conf')
 
-                                run(f'. ./{executable_name} {party_id - 1} {values_str}')
+                                run(f'./{executable_name} {party_id - 1} {values_str}')
                                 with open('Execution/execution_log.log', 'a+') as log_file:
                                     log_file.write(f'{values_str}\n')
                         else:
@@ -171,7 +171,7 @@ def run_protocol(config_file, args, executable_name, working_directory):
                             else:
                                 put('InstancesConfigurations/parties.conf', run('pwd'))
                             run('mkdir -p logs')
-                            run(f'. ./{executable_name} {party_id} {values_str}')
+                            run(f'./{executable_name} {party_id} {values_str}')
                             with open('Execution/execution_log.log', 'a+') as log_file:
                                 log_file.write(f'{values_str}\n')
 
