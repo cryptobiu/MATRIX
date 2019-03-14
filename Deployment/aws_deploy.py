@@ -195,43 +195,83 @@ class AmazonCP(DeployCP):
                     except botocore.exceptions.ClientError as e:
                         print(e.response['Error']['Message'].upper())
                 else:
-                    client.run_instances(
-                        BlockDeviceMappings=
-                        [
-                            {
-                                'DeviceName': '/dev/sda1',
-                                'Ebs':
+                    # check if vpc exists. use subnet id instead of security group if not exists
+                    account = client.describe_account_attributes()
+                    if 'VPC' in account['AccountAttributes'][0]['AttributeValues'][0]['AttributeValue']:
+                        client.run_instances(
+                            BlockDeviceMappings=
+                            [
                                 {
-                                    'DeleteOnTermination': True,
-                                    'VolumeSize': disk_size
+                                    'DeviceName': '/dev/sda1',
+                                    'Ebs':
+                                    {
+                                        'DeleteOnTermination': True,
+                                        'VolumeSize': disk_size
+                                    }
+                                },
+                                {
+                                    'DeviceName': '/dev/sdf',
+                                    'NoDevice': ''
                                 }
-                            },
+                            ],
+                            ImageId=global_config[regions[idx][:-1]]["ami"],
+                            KeyName=global_config[regions[idx][:-1]]["key"],
+                            MinCount=int(number_of_instances_to_deploy),
+                            MaxCount=int(number_of_instances_to_deploy),
+                            SecurityGroups=[global_config[regions[idx][:-1]]["securityGroup"]],
+                            # Use the below if you have an old AWS account and get errors about a VPC
+                            # SubnetId=[global_config[regions[idx][:-1]]["subnetid"]],
+                            InstanceType=machine_type,
+                            Placement=
                             {
-                                'DeviceName': '/dev/sdf',
-                                'NoDevice': ''
-                            }
-                        ],
-                        ImageId=global_config[regions[idx][:-1]]["ami"],
-                        KeyName=global_config[regions[idx][:-1]]["key"],
-                        MinCount=int(number_of_instances_to_deploy),
-                        MaxCount=int(number_of_instances_to_deploy),
-                        SecurityGroups=[global_config[regions[idx][:-1]]["securityGroup"]],
-                        # Use the below if you have an old AWS account and get errors about a VPC
-                        # SubnetId=[global_config[regions[idx][:-1]]["subnetid"]],
-                        InstanceType=machine_type,
-                        Placement=
-                        {
-                            'AvailabilityZone': regions[idx],
-                        },
-                        TagSpecifications=[{
-                                            'ResourceType': 'instance',
-                                            'Tags':
-                                            [{
-                                                    'Key': 'Name',
-                                                    'Value': protocol_name
+                                'AvailabilityZone': regions[idx],
+                            },
+                            TagSpecifications=[{
+                                                'ResourceType': 'instance',
+                                                'Tags':
+                                                [{
+                                                        'Key': 'Name',
+                                                        'Value': protocol_name
+                                                }]
                                             }]
-                                        }]
-                    )
+                        )
+                    else:
+                        client.run_instances(
+                            BlockDeviceMappings=
+                            [
+                                {
+                                    'DeviceName': '/dev/sda1',
+                                    'Ebs':
+                                        {
+                                            'DeleteOnTermination': True,
+                                            'VolumeSize': disk_size
+                                        }
+                                },
+                                {
+                                    'DeviceName': '/dev/sdf',
+                                    'NoDevice': ''
+                                }
+                            ],
+                            ImageId=global_config[regions[idx][:-1]]["ami"],
+                            KeyName=global_config[regions[idx][:-1]]["key"],
+                            MinCount=int(number_of_instances_to_deploy),
+                            MaxCount=int(number_of_instances_to_deploy),
+                            SubnetId=[global_config[regions[idx][:-1]]["subnetid"]],
+                            InstanceType=machine_type,
+                            Placement=
+                            {
+                                'AvailabilityZone': regions[idx],
+                            },
+                            TagSpecifications=[{
+                                'ResourceType': 'instance',
+                                'Tags':
+                                    [{
+                                        'Key': 'Name',
+                                        'Value': protocol_name
+                                    }]
+                            }]
+                        )
+
 
         doc = {}
         doc['protocolName'] = protocol_name
