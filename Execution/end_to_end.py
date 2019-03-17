@@ -21,7 +21,7 @@ class E2E:
         self.protocol_config = protocol_config
         self.protocol_config_path = protocol_config_path
         try:
-            with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
+            with open(f'{os.getcwd()}/GlobalConfigurations/tokens.json') as gc_file:
                 global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
         except EnvironmentError:
             print('Cannot open Global Configurations')
