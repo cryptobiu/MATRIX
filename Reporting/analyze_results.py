@@ -82,15 +82,22 @@ class Analyze:
         message.attach(MIMEText(message_body))
 
         # attach to mail all the reports file
-        with open(results_file_name, 'rb') as fli:
-            part = MIMEApplication(fli.read(), Name=basename(results_file_name))
-            part['Content-Disposition'] = 'attachment; filename="%s"' % basename(results_file_name)
-            message.attach(part)
+        try:
+            with open(results_file_name, 'rb') as fli:
+                part = MIMEApplication(fli.read(), Name=basename(results_file_name))
+                part['Content-Disposition'] = 'attachment; filename="%s"' % basename(results_file_name)
+                message.attach(part)
+        except EnvironmentError:
+            print('Cannot attach files to mail')
+            return
 
-        with open('../GlobalConfigurations/tokens.json', 'r') as tokens:
-            data = json.load(tokens)
-            mail_username = data['mail']['user']
-            mail_password = data['mail']['password']
+        try:
+            with open('GlobalConfigurations/tokens.json', 'r') as tokens:
+                data = json.load(tokens)
+                mail_username = data['mail']['user']
+                mail_password = data['mail']['password']
+        except EnvironmentError:
+            print('Cannot open tokens file')
 
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.starttls()
@@ -128,9 +135,13 @@ class Analyze:
         tasks_names = dict()
 
         # load one of the data files to receive the headers to the xlsx file
+        try:
+            with open(files_list[0], 'r') as f:
+                data = json.load(f)
 
-        with open(files_list[0], 'r') as f:
-            data = json.load(f)
+        except EnvironmentError:
+            print(f'Cannot read {files_list[0]} for determine results files headers')
+            return
 
         # init list values
         for i in range(len(data)):
@@ -151,12 +162,16 @@ class Analyze:
             ws.cell(row=1, column=party_idx + 2, value=parties[party_idx])
             party_size = parties[party_idx]
             for data_file in parties_files[str(party_size)]:
-                with open(data_file, 'r') as df:
-                    json_data = json.load(df, object_pairs_hook=OrderedDict)
-                    for json_size_idx in range(len(json_data)):
-                        for rep_idx in range(num_of_repetitions):
-                            tasks_names[json_data[json_size_idx]['name']].append(
-                                json_data[json_size_idx]['iteration_%s' % str(rep_idx)])
+                try:
+                    with open(data_file, 'r') as df:
+                        json_data = json.load(df, object_pairs_hook=OrderedDict)
+                        for json_size_idx in range(len(json_data)):
+                            for rep_idx in range(num_of_repetitions):
+                                tasks_names[json_data[json_size_idx]['name']].append(
+                                    json_data[json_size_idx]['iteration_%s' % str(rep_idx)])
+                except EnvironmentError:
+                    print('Cannot read results files')
+                    return
             # write data to excel
             counter = 1
             for key in tasks_names.keys():
@@ -184,12 +199,15 @@ class Analyze:
 
         # map between number of parties and file names
         for idx in range(len(files_list)):
-            with open(files_list[idx]) as f:
-                data = [l.rstrip('\n') for l in f.readlines()]
-                if idx == 0:
-                    # read tasks names
-                    tasks_names = [l.split(':')[0] for l in data[1:]]
-                    tasks_names = {t: [] for t in tasks_names}
+            try:
+                with open(files_list[idx]) as f:
+                    data = [l.rstrip('\n') for l in f.readlines()]
+                    if idx == 0:
+                        # read tasks names
+                        tasks_names = [l.split(':')[0] for l in data[1:]]
+                        tasks_names = {t: [] for t in tasks_names}
+            except EnvironmentError:
+                print('Cannot read results files')
 
                 number_of_parties = data[0]
                 parties.add(number_of_parties)
@@ -218,13 +236,16 @@ class Analyze:
             party_size = parties[party_idx]
             ws.cell(row=1, column=party_idx + 2, value=party_size)
             for idx in range(len(parties_files[str(party_size)])):
-                with open(parties_files[str(party_size)][idx]) as data_file:
-                    # get only the values for each task
-                    data = [l.rstrip('\n').split(':')[1].split(',')[:-1] for l in data_file.readlines()[1:]]
-                    counter = 0
-                    for key in tasks_names.keys():
-                        tasks_names[key].append(data[counter])
-                        counter += 1
+                try:
+                    with open(parties_files[str(party_size)][idx]) as data_file:
+                        # get only the values for each task
+                        data = [l.rstrip('\n').split(':')[1].split(',')[:-1] for l in data_file.readlines()[1:]]
+                        counter = 0
+                        for key in tasks_names.keys():
+                            tasks_names[key].append(data[counter])
+                            counter += 1
+                except EnvironmentError:
+                    print('Cannot read results files')
 
             # write the values to file for the current party_number
             data_counter = 1  # use for write the data to the correct location at the file

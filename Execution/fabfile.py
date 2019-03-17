@@ -76,19 +76,22 @@ def run_protocol(config_file, args, executable_name, working_directory):
     :type working_directory str
     :param working_directory: the executable file dir
     """
-    with open(config_file) as data_file:
-        data = json.load(data_file, object_pairs_hook=OrderedDict)
-        external_protocol = json.loads(data['isExternal'].lower())
-        if 'aws' in data['CloudProviders']:
-            regions = data['CloudProviders']['aws']['regions']
-        elif 'azure' in data['CloudProviders']:
-            regions = data['CloudProviders']['azure']['regions']
-        elif len(data['CloudProviders']) > 1:
-            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
-        elif 'servers' in data['CloudProviders']:
-            regions = data['CloudProviders']['servers']['regions']
-        else:
-            regions = []
+    try:
+        with open(config_file) as data_file:
+            data = json.load(data_file, object_pairs_hook=OrderedDict)
+            external_protocol = json.loads(data['isExternal'].lower())
+            if 'aws' in data['CloudProviders']:
+                regions = data['CloudProviders']['aws']['regions']
+            elif 'azure' in data['CloudProviders']:
+                regions = data['CloudProviders']['azure']['regions']
+            elif len(data['CloudProviders']) > 1:
+                regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
+            elif 'servers' in data['CloudProviders']:
+                regions = data['CloudProviders']['servers']['regions']
+            else:
+                regions = []
+    except EnvironmentError:
+        print(f'Cannot open config at: {config_file}')
 
         vals = args.split('@')
         values_str = ''
@@ -128,8 +131,11 @@ def run_protocol(config_file, args, executable_name, working_directory):
                         put('InstancesConfigurations/parties.conf', run('pwd'))
                     sudo(f'chmod +x {executable_name}')
                     run(f'./{executable_name} partyID {party_id} {values_str}')
-                    with open('Execution/execution_log.log', 'a+') as log_file:
-                        log_file.write(f'{values_str}\n')
+                    try:
+                        with open('Execution/execution_log.log', 'a+') as log_file:
+                            log_file.write(f'{values_str}\n')
+                    except EnvironmentError:
+                        print('Cannot write data to execution log file')
                 else:
                     # run external protocols
                     with cd('MATRIX'):
@@ -153,16 +159,22 @@ def run_protocol(config_file, args, executable_name, working_directory):
                                     put(env.key_filename[0], run('pwd'))
 
                                 run(f'{coordinator_executable} {coordinator_values_str}')
-                                with open('Execution/execution_log.log', 'a+') as log_file:
-                                    log_file.write(f'{values_str}\n' % values_str)
+                                try:
+                                    with open('Execution/execution_log.log', 'a+') as log_file:
+                                        log_file.write(f'{values_str}\n' % values_str)
+                                except EnvironmentError:
+                                    print('Cannot write data to execution log file')
                             else:
                                 if len(regions) > 1:
                                     put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
                                     run(f'mv parties{party_id}.conf parties.conf')
 
                                 run(f'./{executable_name} {party_id - 1} {values_str}')
-                                with open('Execution/execution_log.log', 'a+') as log_file:
-                                    log_file.write(f'{values_str}\n')
+                                try:
+                                    with open('Execution/execution_log.log', 'a+') as log_file:
+                                        log_file.write(f'{values_str}\n')
+                                except EnvironmentError:
+                                    print('Cannot write data to execution log file')
                         else:
                             # run external protocols with no coordinator
                             if len(regions) > 1:
@@ -172,8 +184,11 @@ def run_protocol(config_file, args, executable_name, working_directory):
                                 put('InstancesConfigurations/parties.conf', run('pwd'))
                             run('mkdir -p logs')
                             run(f'./{executable_name} {party_id} {values_str}')
-                            with open('Execution/execution_log.log', 'a+') as log_file:
-                                log_file.write(f'{values_str}\n')
+                            try:
+                                with open('Execution/execution_log.log', 'a+') as log_file:
+                                    log_file.write(f'{values_str}\n')
+                            except EnvironmentError:
+                                print('Cannot write data to execution log file')
 
 
 @task
@@ -190,47 +205,54 @@ def run_protocol_profiler(config_file, args, executable_name, working_directory)
     :type working_directory str
     :param working_directory: the executable file dir
     """
-    with open(config_file) as data_file:
-        data = json.load(data_file, object_pairs_hook=OrderedDict)
-        external_protocol = json.loads(data['isExternal'].lower())
-        if 'aws' in data['CloudProviders']:
-            regions = data['CloudProviders']['aws']['regions']
-        elif 'azure' in data['CloudProviders']:
-            regions = data['CloudProviders']['azure']['regions']
-        else:
-            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
-        vals = args.split('@')
-        values_str = ''
-
-        for val in vals:
-            # for external protocols
-            if val == 'partyid':
-                values_str += f'{str(env.hosts.index(env.host) - 1)} '
+    try:
+        with open(config_file) as data_file:
+            data = json.load(data_file, object_pairs_hook=OrderedDict)
+            external_protocol = json.loads(data['isExternal'].lower())
+            if 'aws' in data['CloudProviders']:
+                regions = data['CloudProviders']['aws']['regions']
+            elif 'azure' in data['CloudProviders']:
+                regions = data['CloudProviders']['azure']['regions']
             else:
-                values_str += f'{val} '
+                regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
+    except EnvironmentError:
+        print(f'Cannot open config at: {config_file}')
 
-        with cd(working_directory):
-            party_id = env.hosts.index(env.host)
+    vals = args.split('@')
+    values_str = ''
 
-            with warn_only():
-                sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
+    for val in vals:
+        # for external protocols
+        if val == 'partyid':
+            values_str += f'{str(env.hosts.index(env.host) - 1)} '
+        else:
+            values_str += f'{val} '
 
-            if 'inputs0' in values_str:
-                values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
+    with cd(working_directory):
+        party_id = env.hosts.index(env.host)
 
-            if not external_protocol:
-                if len(regions) > 1:
-                    put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
-                    run(f'mv parties{party_id}s.conf parties.conf')
-                else:
-                    put('InstancesConfigurations/parties.conf', run('pwd'))
-                if party_id == 0:
-                    run(f'valgrind --tool=callgrind ./{executable_name} partyID {party_id} {values_str}')
-                    get('callgrind.out.*', os.getcwd())
-                else:
-                    run(f'./{executable_name} partyID {party_id} {values_str}')
+        with warn_only():
+            sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
+
+        if 'inputs0' in values_str:
+            values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
+
+        if not external_protocol:
+            if len(regions) > 1:
+                put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
+                run(f'mv parties{party_id}s.conf parties.conf')
+            else:
+                put('InstancesConfigurations/parties.conf', run('pwd'))
+            if party_id == 0:
+                run(f'valgrind --tool=callgrind ./{executable_name} partyID {party_id} {values_str}')
+                get('callgrind.out.*', os.getcwd())
+            else:
+                run(f'./{executable_name} partyID {party_id} {values_str}')
+                try:
                     with open('Execution/execution_log.log', 'a+') as log_file:
                         log_file.write(f'{values_str}\n')
+                except EnvironmentError:
+                    print('Cannot write data to execution log file')
 
 
 @task
@@ -246,49 +268,56 @@ def run_protocol_with_latency(config_file, args, executable_name, working_direct
     :type working_directory str
     :param working_directory: the executable file dir
     """
-    with open(config_file) as data_file:
-        data = json.load(data_file, object_pairs_hook=OrderedDict)
-        external_protocol = json.loads(data['isExternal'].lower())
-        if 'aws' in data['CloudProviders']:
-            regions = data['CloudProviders']['aws']['regions']
-        elif 'azure' in data['CloudProviders']:
-            regions = data['CloudProviders']['azure']['regions']
-        else:
-            regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
-        vals = args.split('@')
-        values_str = ''
-
-        for val in vals:
-            # for external protocols
-            if val == 'partyid':
-                values_str += f'{str(env.hosts.index(env.host) - 1)} '
+    try:
+        with open(config_file) as data_file:
+            data = json.load(data_file, object_pairs_hook=OrderedDict)
+            external_protocol = json.loads(data['isExternal'].lower())
+            if 'aws' in data['CloudProviders']:
+                regions = data['CloudProviders']['aws']['regions']
+            elif 'azure' in data['CloudProviders']:
+                regions = data['CloudProviders']['azure']['regions']
             else:
-                values_str += f'{val} '
+                regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
+    except EnvironmentError:
+        print(f'Cannot open config at: {config_file}')
 
-        with cd(working_directory):
-            # the warning required for multi executions.
-            # If you delete this line it will failed if you don't reboot the servers
-            with warn_only():
-                sudo('tc qdisc add dev ens5 root netem delay 300ms')
+    vals = args.split('@')
+    values_str = ''
 
-            party_id = env.hosts.index(env.host)
+    for val in vals:
+        # for external protocols
+        if val == 'partyid':
+            values_str += f'{str(env.hosts.index(env.host) - 1)} '
+        else:
+            values_str += f'{val} '
 
-            with warn_only():
-                sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
+    with cd(working_directory):
+        # the warning required for multi executions.
+        # If you delete this line it will failed if you don't reboot the servers
+        with warn_only():
+            sudo('tc qdisc add dev ens5 root netem delay 300ms')
 
-            if 'inputs0' in values_str:
-                values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
+        party_id = env.hosts.index(env.host)
 
-            if not external_protocol:
-                if len(regions) > 1:
-                    put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
-                    run(f'mv parties{party_id}.conf parties.conf')
-                else:
-                    put('InstancesConfigurations/parties.conf', run('pwd'))
+        with warn_only():
+            sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
 
-                run(f'./{executable_name} partyID {party_id} {values_str}')
+        if 'inputs0' in values_str:
+            values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
+
+        if not external_protocol:
+            if len(regions) > 1:
+                put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
+                run(f'mv parties{party_id}.conf parties.conf')
+            else:
+                put('InstancesConfigurations/parties.conf', run('pwd'))
+
+            run(f'./{executable_name} partyID {party_id} {values_str}')
+            try:
                 with open('Execution/execution_log.log', 'a+') as log_file:
                     log_file.write(f'{values_str}\n')
+            except EnvironmentError:
+                print('Cannot write data to execution log file')
 
 
 @task

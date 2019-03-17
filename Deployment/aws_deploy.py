@@ -41,8 +41,11 @@ class AmazonCP(DeployCP):
                 key_pair = client.create_key_pair(KeyName=f"Matrix{regions[regions_idx].replace('-', '')[:-1]}"
                                                           f"-{key_idx}")
                 key_name = key_pair['KeyName']
-                with open(f'{Path.home()}/Keys/{key_name}', 'w+') as key_file:
-                    key_file.write(key_pair['KeyMaterial'])
+                try:
+                    with open(f'{Path.home()}/Keys/{key_name}', 'w+') as key_file:
+                        key_file.write(key_pair['KeyMaterial'])
+                except EnvironmentError:
+                    print('Cannot write the key to file')
             except botocore.exceptions.EndpointConnectionError as e:
                 print(e.response['Error']['Message'].upper())
             except botocore.exceptions.ClientError as e:
@@ -56,7 +59,8 @@ class AmazonCP(DeployCP):
         regions = self.protocol_config['CloudProviders']['aws']['regions']
 
         for idx in range(len(regions)):
-            client = boto3.client('ec2', region_name=regions[idx][:-1])
+            region_name = regions[idx][:-1]
+            client = boto3.client('ec2', region_name=region_name)
             # create security group
             try:
                 response = client.create_security_group(
@@ -67,7 +71,7 @@ class AmazonCP(DeployCP):
 
                 # Add FW rules
                 sg_id = response['GroupId']
-                ec2 = boto3.resource('ec2', region_name=regions[idx][:-1])
+                ec2 = boto3.resource('ec2', region_name=region_name)
                 security_group = ec2.SecurityGroup(sg_id)
                 security_group.authorize_ingress(IpProtocol='tcp', CidrIp='0.0.0.0/0', FromPort=0, ToPort=65535)
             except botocore.exceptions.EndpointConnectionError as e:
@@ -100,8 +104,11 @@ class AmazonCP(DeployCP):
         """
         client = boto3.client('ec2', region_name)
 
-        with open(f'{os.getcwd()}/GlobalConfigurations/regions.json') as gc_file:
-            global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+        try:
+            with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
+                global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+        except EnvironmentError:
+            print('Cannot open Global Configurations')
 
         ami_id = global_config[region_name]['ami']
         response = client.describe_images(ImageIds=[ami_id])
@@ -122,24 +129,27 @@ class AmazonCP(DeployCP):
         number_of_parties = self.protocol_config['CloudProviders']['aws']['numOfParties']
         number_duplicated_servers = 0
         protocol_name = self.protocol_config['protocol']
-        with open(f'{os.getcwd()}/GlobalConfigurations/regions.json') as gc_file:
-            global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+        try:
+            with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
+                global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+        except EnvironmentError:
+            print('Cannot open Global Configurations')
 
         if len(regions) > 1:
             number_of_instances = number_of_parties // len(regions)
-            if number_of_parties % len(regions):
-                number_duplicated_servers = number_of_parties % len(regions)
+            number_duplicated_servers = number_of_parties % len(regions)
         else:
             number_of_instances = number_of_parties
 
-        date = datetime.now() - timedelta(hours=3)
+        date = datetime.utcnow()
         new_date = date + timedelta(hours=6)
 
         for idx in range(len(regions)):
-            client = boto3.client('ec2', region_name=regions[idx][:-1])
-            disk_size = self.get_ami_disk_size(regions[idx][:-1])
+            region_name = regions[idx][:-1]
+            client = boto3.client('ec2', region_name=region_name)
+            disk_size = self.get_ami_disk_size(region_name)
 
-            number_of_instances_to_deploy = self.check_running_instances(regions[idx][:-1], machine_type)
+            number_of_instances_to_deploy = self.check_running_instances(region_name, machine_type)
             if idx < number_duplicated_servers:
                 number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
             else:
@@ -148,7 +158,7 @@ class AmazonCP(DeployCP):
             doc = {}
             doc['protocolName'] = protocol_name
             doc['message'] = f"Deploying instances :\nregion : {regions[idx]}\nnumber of instances : " \
-                             f"{number_of_instances_to_deploy}\nami_id : {global_config[regions[idx][:-1]]['ami']}" \
+                             f"{number_of_instances_to_deploy}\nami_id : {global_config[region_name]['ami']}" \
                              f"\ninstance_type : {machine_type}\n valid until : {str(new_date)}"
             doc['timestamp'] = datetime.utcnow()
             self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
@@ -198,79 +208,66 @@ class AmazonCP(DeployCP):
                     # check if vpc exists. use subnet id instead of security group if not exists
                     account = client.describe_account_attributes()
                     if 'VPC' in account['AccountAttributes'][0]['AttributeValues'][0]['AttributeValue']:
-                        client.run_instances(
-                            BlockDeviceMappings=
-                            [
-                                {
-                                    'DeviceName': '/dev/sda1',
-                                    'Ebs':
+                        kwargs = {
+                            'BlockDeviceMappings': [{
+                                'DeviceName': '/dev/sda1',
+                                'Ebs':
                                     {
                                         'DeleteOnTermination': True,
                                         'VolumeSize': disk_size
                                     }
-                                },
+                            },
                                 {
-                                    'DeviceName': '/dev/sdf',
-                                    'NoDevice': ''
+                                'DeviceName': '/dev/sdf',
+                                'NoDevice': ''
                                 }
                             ],
-                            ImageId=global_config[regions[idx][:-1]]["ami"],
-                            KeyName=global_config[regions[idx][:-1]]["key"],
-                            MinCount=int(number_of_instances_to_deploy),
-                            MaxCount=int(number_of_instances_to_deploy),
-                            SecurityGroups=[global_config[regions[idx][:-1]]["securityGroup"]],
-                            # Use the below if you have an old AWS account and get errors about a VPC
-                            # SubnetId=[global_config[regions[idx][:-1]]["subnetid"]],
-                            InstanceType=machine_type,
-                            Placement=
-                            {
-                                'AvailabilityZone': regions[idx],
-                            },
-                            TagSpecifications=[{
-                                                'ResourceType': 'instance',
-                                                'Tags':
-                                                [{
-                                                        'Key': 'Name',
-                                                        'Value': protocol_name
-                                                }]
-                                            }]
-                        )
-                    else:
-                        client.run_instances(
-                            BlockDeviceMappings=
-                            [
-                                {
-                                    'DeviceName': '/dev/sda1',
-                                    'Ebs':
-                                        {
-                                            'DeleteOnTermination': True,
-                                            'VolumeSize': disk_size
-                                        }
-                                },
-                                {
-                                    'DeviceName': '/dev/sdf',
-                                    'NoDevice': ''
-                                }
-                            ],
-                            ImageId=global_config[regions[idx][:-1]]["ami"],
-                            KeyName=global_config[regions[idx][:-1]]["key"],
-                            MinCount=int(number_of_instances_to_deploy),
-                            MaxCount=int(number_of_instances_to_deploy),
-                            SubnetId=[global_config[regions[idx][:-1]]["subnetid"]],
-                            InstanceType=machine_type,
-                            Placement=
-                            {
-                                'AvailabilityZone': regions[idx],
-                            },
-                            TagSpecifications=[{
+                            'ImageId': global_config[region_name]["ami"],
+                            'KeyName': global_config[region_name]["key"],
+                            'MinCount': int(number_of_instances_to_deploy),
+                            'MaxCount': int(number_of_instances_to_deploy),
+                            'SecurityGroups': [global_config[region_name]["securityGroup"]],
+                            'InstanceType': machine_type,
+                            'Placement': {'AvailabilityZone': regions[idx]},
+                            'TagSpecifications': [{
                                 'ResourceType': 'instance',
-                                'Tags':
-                                    [{
-                                        'Key': 'Name',
-                                        'Value': protocol_name
-                                    }]
+                                'Tags': [{
+                                    'Key': 'Name',
+                                    'Value': protocol_name
+                                }]
                             }]
-                        )
+                        }
+                    else:
+                        kwargs = {
+                            'BlockDeviceMappings': [{
+                                'DeviceName': '/dev/sda1',
+                                'Ebs':
+                                    {
+                                        'DeleteOnTermination': True,
+                                        'VolumeSize': disk_size
+                                    }
+                            },
+                                {
+                                    'DeviceName': '/dev/sdf',
+                                    'NoDevice': ''
+                                }
+                            ],
+                            'ImageId': global_config[region_name]["ami"],
+                            'KeyName': global_config[region_name]["key"],
+                            'MinCount': int(number_of_instances_to_deploy),
+                            'MaxCount': int(number_of_instances_to_deploy),
+                            'SubnetId': [global_config[region_name]["subnetid"]],
+                            'InstanceType': machine_type,
+                            'Placement': {'AvailabilityZone': regions[idx]},
+                            'TagSpecifications': [{
+                                'ResourceType': 'instance',
+                                'Tags': [{
+                                    'Key': 'Name',
+                                    'Value': protocol_name
+                                }]
+                            }]
+                        }
+                    client.run_instances(**kwargs)
 
 
         doc = {}
@@ -316,7 +313,8 @@ class AmazonCP(DeployCP):
 
         # get the spot instances ids
         for idx in range(len(regions)):
-            client = boto3.client('ec2', region_name=regions[idx][:-1])
+            region_name = regions[idx][:-1]
+            client = boto3.client('ec2', region_name=region_name)
             if is_spot_request:
                 response = client.describe_instances(Filters=[{'Name': 'instance-lifecycle', 'Values': ['spot']},
                                                               {'Name': 'instance-type', 'Values': [instance_type]},
@@ -358,9 +356,12 @@ class AmazonCP(DeployCP):
             mode = 'a+'
         else:
             mode = 'w+'
-        with open('InstancesConfigurations/public_ips', mode) as public_ip_file:
-            for public_idx in range(len(public_ip_address)):
-                public_ip_file.write('%s\n' % public_ip_address[public_idx])
+        try:
+            with open('InstancesConfigurations/public_ips', mode) as public_ip_file:
+                for public_idx in range(len(public_ip_address)):
+                    public_ip_file.write('%s\n' % public_ip_address[public_idx])
+        except EnvironmentError:
+            print('Cannot write public ips to file')
 
     def describe_instances(self, region_name, machines_name):
         """
@@ -538,8 +539,11 @@ class AmazonCP(DeployCP):
         Copy the libscapi AMI to all other regions from the source region
         :return:
         """
-        with open('GlobalConfigurations/regions.json', 'r') as regions_file:
-            data = json.load(regions_file, object_pairs_hook=OrderedDict)
+        try:
+            with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
+                data = json.load(gc_file, object_pairs_hook=OrderedDict)
+        except EnvironmentError:
+            print('Cannot open Global Configurations')
 
         source_region = input('enter source region:')
         regions_list = list(data.keys())
@@ -551,5 +555,8 @@ class AmazonCP(DeployCP):
                                          SourceImageId=data[source_region]['ami'], SourceRegion=source_region)
             data[region]['ami'] = response['ImageId']
 
-        with open('GlobalConfigurations/regions.json', 'w') as regions_file:
-            json.dump(data, regions_file)
+        try:
+            with open('GlobalConfigurations/awsRegions.json', 'w') as regions_file:
+                json.dump(data, regions_file)
+        except EnvironmentError:
+            print('Cannot write Global Configurations')

@@ -2,6 +2,7 @@ import os
 import json
 import certifi
 from datetime import datetime
+from collections import OrderedDict
 from elasticsearch import Elasticsearch
 
 
@@ -19,18 +20,28 @@ class E2E:
         """
         self.protocol_config = protocol_config
         self.protocol_config_path = protocol_config_path
-        self.es = Elasticsearch('3.81.191.221:9200', ca_certs=certifi.where())
+        try:
+            with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
+                global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+        except EnvironmentError:
+            print('Cannot open Global Configurations')
+            return
+        es_address = global_config['Elasticsearch']['address']
+        self.es = Elasticsearch(es_address, ca_certs=certifi.where())
 
     def install_experiment(self):
         """
         Install the protocol on remote servers
         """
         # read git credentials configuration
+        try:
+            with open('GlobalConfigurations/tokens.json', 'r') as tokens_file:
+                data = json.load(tokens_file)
+                username = data['GitHub']['user']
+                password = data['GitHub']['password']
 
-        with open('GlobalConfigurations/tokens.json', 'r') as tokens_file:
-            data = json.load(tokens_file)
-            username = data['GitHub']['user']
-            password = data['GitHub']['password']
+        except EnvironmentError:
+            print('Cannot open tokens file')
 
         protocol_name = self.protocol_config['protocol']
         working_directory = self.protocol_config['workingDirectory']

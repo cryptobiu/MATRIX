@@ -15,10 +15,13 @@ from Execution.end_to_end import E2E
 from Reporting.analyze_results import Analyze
 from Reporting.upload_elastic import Elastic
 
-with open('GlobalConfigurations/tokens.json', 'r') as tokens:
-    data = json.load(tokens)
-    db_username = data['mongo']['user']
-    db_password = data['mongo']['password']
+try:
+    with open('GlobalConfigurations/tokens.json', 'r') as tokens:
+        data = json.load(tokens)
+        db_username = data['mongo']['user']
+        db_password = data['mongo']['password']
+except EnvironmentError:
+    print('Cannot open tokens file')
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -29,8 +32,6 @@ class JSONEncoder(json.JSONEncoder):
 
 
 app = Flask(__name__)
-
-# TODO: Restrict access from domains
 CORS(app)
 
 
@@ -176,8 +177,12 @@ def execute_execution_operation(protocol_name, operation):
 
     config_file_path = '%s/%s.json' % (os.getcwd(), protocol_name)
 
-    with open(config_file_path, 'w') as fp:
-        json.dump(data, fp)
+    try:
+        with open(config_file_path, 'w') as fp:
+            json.dump(data, fp)
+    except EnvironmentError:
+        print(f'Cannot write {config_file_path}')
+        return
 
     ee = E2E(data, config_file_path)
 

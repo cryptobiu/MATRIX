@@ -65,22 +65,27 @@ class MultiCP:
         self.aws.get_network_details()
         self.azure.get_network_details()
 
-        with open('%s/InstancesConfigurations/parties.conf' % os.getcwd(), 'r+') as parties_file:
-            parties = []
-            origin_data = parties_file.readlines()
-            for d in origin_data:
-                if 'ip' in d:
-                    # get the ip address
-                    parties.append(d.split('=')[1])
+        file_path = f'{os.getcwd()}/InstancesConfigurations/parties.conf'
 
-            parties_file.seek(0)
-            for idx in range(len(parties)):
-                parties_file.write('party_%s_ip=%s' % (idx, parties[idx]))
+        try:
+            with open(file_path, 'r+') as parties_file:
+                parties = []
+                origin_data = parties_file.readlines()
+                for d in origin_data:
+                    if 'ip' in d:
+                        # get the ip address
+                        parties.append(d.split('=')[1])
 
-            for idx in range(len(parties)):
-                parties_file.write('party_%s_port=8000\n' % idx)
+                parties_file.seek(0)
+                for idx in range(len(parties)):
+                    parties_file.write('party_%s_ip=%s' % (idx, parties[idx]))
 
-            parties_file.truncate()
+                for idx in range(len(parties)):
+                    parties_file.write('party_%s_port=8000\n' % idx)
+
+                parties_file.truncate()
+        except EnvironmentError:
+            print(f'Cannot write to {file_path}')
 
         self.aws.create_parties_files_multi_regions('parties.conf')
 

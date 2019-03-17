@@ -1,6 +1,8 @@
 import os
 import copy
+import json
 import certifi
+from collections import OrderedDict
 from elasticsearch import Elasticsearch
 
 
@@ -14,8 +16,14 @@ class DeployCP:
         :param protocol_config: the configuration of the protocol we want to deploy
         """
         self.protocol_config = protocol_config
-        # TODO Fix security
-        self.es = Elasticsearch('3.81.191.221:9200', ca_certs=certifi.where())
+        try:
+            with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
+                global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+        except EnvironmentError:
+            print('Cannot open Global Configurations')
+            return
+        es_address = global_config['Elasticsearch']['address']
+        self.es = Elasticsearch(es_address, ca_certs=certifi.where())
 
     def create_key_pair(self):
         """
@@ -111,8 +119,12 @@ class DeployCP:
         :type file_name str
         :param file_name: the name of the file
         """
-        with open(f'{os.getcwd()}/InstancesConfigurations/{file_name}', 'r') as origin_file:
-            parties = origin_file.readlines()
+        try:
+            with open(f'{os.getcwd()}/InstancesConfigurations/{file_name}', 'r') as origin_file:
+                parties = origin_file.readlines()
+        except EnvironmentError:
+            print(f'Cannot open {file_name}')
+            return
 
         number_of_parties = len(parties) // 2
 
@@ -121,8 +133,11 @@ class DeployCP:
             new_parties[idx] = 'party_%s_ip=0.0.0.0\n' % idx
 
             # write data to file
-            with open('%s/InstancesConfigurations/parties%s.conf' % (os.getcwd(), idx), 'w+') as new_file:
-                new_file.writelines(new_parties)
+            try:
+                with open('%s/InstancesConfigurations/parties%s.conf' % (os.getcwd(), idx), 'w+') as new_file:
+                    new_file.writelines(new_parties)
+            except EnvironmentError:
+                print(f'Cannot write parties{idx}')
 
     def create_parties_file(self, ip_addresses, port_number, file_name, new_format=False, number_of_regions=1):
         """
@@ -148,27 +163,31 @@ class DeployCP:
             regions += self.protocol_config['CloudProviders']['aws']['regions']
         if 'azure' in self.protocol_config['CloudProviders']:
             regions += self.protocol_config['CloudProviders']['azure']['regions']
+        else:
+            print('Cloud provider did not found. Program will exit now')
+            return
+        try:
+            with open(f'{os.getcwd()}/InstancesConfigurations/{file_name}', mode) as private_ip_file:
+                # for backward compatibility
+                if not new_format:
+                    for party_idx, ip_addr in enumerate(ip_addresses):
+                        private_ip_file.write(f'party_{party_idx}_ip={ip_addr}\n')
 
-        # TODO: Log info msg: expected provider not found
+                    for port_idx in range(len(ip_addresses)):
+                        if len(regions) == 0:
+                            private_ip_file.write(f'party_{port_idx}_port={port_number + (port_idx * 20)}\n')
+                        else:
+                            private_ip_file.write(f'party_{port_idx}_port={port_number}\n')
 
-        with open(f'{os.getcwd()}/InstancesConfigurations/{file_name}', mode) as private_ip_file:
-            # for backward compatibility
-            if not new_format:
-                for party_idx, ip_addr in enumerate(ip_addresses):
-                    private_ip_file.write(f'party_{party_idx}_ip={ip_addr}\n')
+                else:
+                    for party_idx, ip_addr in enumerate(ip_addresses):
+                        if len(regions) == 0:
+                            private_ip_file.write(f'{ip_addr}:{port_number + (party_idx * 20)}\n')
+                        else:
+                            private_ip_file.write(f'{ip_addr}:8000\n')
 
-                for port_idx in range(len(ip_addresses)):
-                    if len(regions) == 0:
-                        private_ip_file.write(f'party_{port_idx}_port={port_number + (port_idx * 20)}\n')
-                    else:
-                        private_ip_file.write(f'party_{port_idx}_port={port_number}\n')
-
-            else:
-                for party_idx, ip_addr in enumerate(ip_addresses):
-                    if len(regions) == 0:
-                        private_ip_file.write(f'{ip_addr}:{port_number + (party_idx * 20)}\n')
-                    else:
-                        private_ip_file.write(f'{ip_addr}:8000\n')
+        except EnvironmentError:
+            print(f'Cannot write to {file_name}')
 
         # create party file for each instance
         if number_of_regions > 1:
@@ -190,9 +209,12 @@ class DeployCP:
             public_ip_address = []
             for ip_idx in range(number_of_parties):
                 public_ip_address.append('127.0.0.1')
-            with open(f'{os.getcwd()}/InstancesConfigurations/public_ips', 'w+') as local_ips:
-                for line in public_ip_address:
-                    local_ips.write(f'{line}\n')
+            try:
+                with open(f'{os.getcwd()}/InstancesConfigurations/public_ips', 'w+') as local_ips:
+                    for line in public_ip_address:
+                        local_ips.write(f'{line}\n')
+            except EnvironmentError:
+                print('Cannot write public IPs')
             self.create_parties_file(public_ip_address, port_number, file_name, False)
 
         # read servers configuration
@@ -201,8 +223,11 @@ class DeployCP:
             os.system(f'cp {server_file} {os.getcwd()}/InstancesConfigurations/public_ips')
 
             server_ips = []
-            with open(f'{os.getcwd()}/InstancesConfigurations/public_ips', 'r') as server_ips_file:
-                for line in server_ips_file:
-                    server_ips.append(line)
+            try:
+                with open(f'{os.getcwd()}/InstancesConfigurations/public_ips', 'r') as server_ips_file:
+                    for line in server_ips_file:
+                        server_ips.append(line)
+            except EnvironmentError:
+                print('Cannot read public IPs')
             self.create_parties_file(server_ips, port_number, file_name, False)
 

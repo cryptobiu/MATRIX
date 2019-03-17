@@ -1,10 +1,11 @@
+import os
 import json
 import certifi
 from glob import glob
-from os.path import basename, expanduser
 from datetime import datetime
 from collections import OrderedDict
 from elasticsearch import Elasticsearch
+from os.path import basename, expanduser
 
 
 class Elastic:
@@ -17,7 +18,14 @@ class Elastic:
         :param protocol_config: the configuration of the protocol we want to execute
         """
         self.config_file = protocol_config
-        self.es = Elasticsearch('3.81.191.221:9200', ca_certs=certifi.where())
+        try:
+            with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
+                global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
+        except EnvironmentError:
+            print('Cannot open Global Configurations')
+            return
+        es_address = global_config['Elasticsearch']['address']
+        self.es = Elasticsearch(es_address, ca_certs=certifi.where())
 
     def upload_json_data(self, analysis_type, results_path):
         """
@@ -45,22 +53,25 @@ class Elastic:
             analyzed_parameter = config_values[1].lower()
             del config_values[1]
 
-            with open(file) as results:
-                data = json.load(results, object_pairs_hook=OrderedDict)
-                doc = OrderedDict()
-                for idx in range(len(raw_configurations)):
-                    doc[raw_configurations[idx]] = config_values[idx]
-                number_of_tasks = len(data)
-                number_of_iterations = len(data[0]) - 1
-                for task_idx in range(number_of_tasks):
-                    val = 0
-                    for iteration_idx in range(number_of_iterations):
-                        val += data[task_idx]['iteration_%s' % iteration_idx]
-                    doc[data[task_idx]['name']] = val / float(number_of_iterations)
-                doc['executionTime'] = dts
+            try:
+                with open(file) as results:
+                    data = json.load(results, object_pairs_hook=OrderedDict)
+                    doc = OrderedDict()
+                    for idx in range(len(raw_configurations)):
+                        doc[raw_configurations[idx]] = config_values[idx]
+                    number_of_tasks = len(data)
+                    number_of_iterations = len(data[0]) - 1
+                    for task_idx in range(number_of_tasks):
+                        val = 0
+                        for iteration_idx in range(number_of_iterations):
+                            val += data[task_idx]['iteration_%s' % iteration_idx]
+                        doc[data[task_idx]['name']] = val / float(number_of_iterations)
+                    doc['executionTime'] = dts
 
-                self.es.index(index='%sresults' % analyzed_parameter, doc_type='%sresults' % analyzed_parameter,
-                              body=doc)
+                    self.es.index(index='%sresults' % analyzed_parameter, doc_type='%sresults' % analyzed_parameter,
+                                  body=doc)
+            except EnvironmentError:
+                print('Cannot read results files')
 
     def upload_log_data(self, results_path):
         """
@@ -78,24 +89,28 @@ class Elastic:
         dts = datetime.utcnow()
         results_files = glob('%s/*.log' % expanduser(results_path))
         protocol_name = self.config_file['protocol']
-        for file in results_files:
-            config_values = basename(file).split('*')
-            config_values[-1] = config_values[-1][:-4]
-            config_values.insert(0, protocol_name)
+        try:
+            for file in results_files:
+                config_values = basename(file).split('*')
+                config_values[-1] = config_values[-1][:-4]
+                config_values.insert(0, protocol_name)
 
-            with open(file) as results:
-                doc = OrderedDict()
-                for idx in range(len(raw_configurations)):
-                    doc[raw_configurations[idx]] = config_values[idx]
-                data = results.read().split('\n')
-                for d in data:
-                    if len(d) > 1:
-                        key = d.split(':')[0]
-                        values = list(map(int, d.split(':')[1].split(',')[:-1]))  # remove the last ',' to map
-                        doc[key] = sum(values) / len(values)
-                doc['executionTime'] = dts
+                with open(file) as results:
+                    doc = OrderedDict()
+                    for idx in range(len(raw_configurations)):
+                        doc[raw_configurations[idx]] = config_values[idx]
+                    data = results.read().split('\n')
+                    for d in data:
+                        if len(d) > 1:
+                            key = d.split(':')[0]
+                            values = list(map(int, d.split(':')[1].split(',')[:-1]))  # remove the last ',' to map
+                            doc[key] = sum(values) / len(values)
+                    doc['executionTime'] = dts
 
-                self.es.index(index='cpuresults', doc_type='cpuresults', body=doc)
+                    self.es.index(index='cpuresults', doc_type='cpuresults', body=doc)
+
+        except EnvironmentError:
+            print('Cannot read results files')
 
     def upload_all_data(self):
         """

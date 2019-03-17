@@ -23,12 +23,15 @@ class AzureCP(DeployCP):
         self.resource_group = 'MatrixRG'
 
         # init credentials
-        with open('GlobalConfigurations/tokens.json', 'r') as cred_files:
-            data = json.load(cred_files)
-            client_id = data['Azure']['client']
-            secret = data['Azure']['secret']
-            tenant = data['Azure']['tenant']
-            self.subscription_id = data['Azure']['subscription']
+        try:
+            with open('GlobalConfigurations/tokens.json', 'r') as cred_files:
+                data = json.load(cred_files)
+                client_id = data['Azure']['client']
+                secret = data['Azure']['secret']
+                tenant = data['Azure']['tenant']
+                self.subscription_id = data['Azure']['subscription']
+        except EnvironmentError:
+            print('Cannot open Global Configurations')
 
         self.credentials = ServicePrincipalCredentials(client_id=client_id, secret=secret, tenant=tenant)
         self.compute_client = ComputeManagementClient(self.credentials, self.subscription_id)
@@ -250,12 +253,21 @@ class AzureCP(DeployCP):
                 self.create_vnet(regions[idx], protocol_name)
                 self.create_subnet(protocol_name)
                 nsg = self.network_client.network_security_groups.get(self.resource_group, 'MatrixNSG').id
-                with open('GlobalConfigurations/azureTokens.json', 'r') as tokens:
-                    data = json.load(tokens)
-                    key_data = data[regions[idx]]['keyData']
-                with open('GlobalConfigurations/azureRegions.json', 'r') as regions_file:
-                    images = json.load(regions_file)
-                    image_name = images[regions[idx]]['imageName']
+                try:
+                    with open('GlobalConfigurations/azureTokens.json', 'r') as tokens:
+                        data = json.load(tokens)
+                        key_data = data[regions[idx]]['keyData']
+                except EnvironmentError:
+                    print('Cannot read Azure tokens')
+                    return
+
+                try:
+                    with open('GlobalConfigurations/azureRegions.json', 'r') as regions_file:
+                        images = json.load(regions_file)
+                        image_name = images[regions[idx]]['imageName']
+                except EnvironmentError:
+                    print('Cannot read Azure images data')
+                    return
 
                 for idx2 in range(number_of_instances_to_deploy):
 
@@ -269,8 +281,8 @@ class AzureCP(DeployCP):
                             },
                         'storage_profile': {
                                 'image_reference': {
-                                        'id': '/subscriptions/e500fb85-1759-463b-b828-0d4e0b38a305/resourceGroups/'
-                                              'MatrixRG/providers/Microsoft.Compute/images/%s' % image_name
+                                        'id': f'/subscriptions/{self.subscription_id}/resourceGroups/'
+                                              f'MatrixRG/providers/Microsoft.Compute/images/{image_name}'
                                     }
                             },
                         'network_profile': {
@@ -352,9 +364,13 @@ class AzureCP(DeployCP):
             mode = 'a+'
         else:
             mode = 'w+'
-        with open('InstancesConfigurations/public_ips', mode) as public_ip_file:
-            for public_idx in range(len(self.public_ips)):
-                public_ip_file.write('%s\n' % self.public_ips[public_idx])
+
+        try:
+            with open('InstancesConfigurations/public_ips', mode) as public_ip_file:
+                for public_idx in range(len(self.public_ips)):
+                    public_ip_file.write('%s\n' % self.public_ips[public_idx])
+        except EnvironmentError:
+            print('Cannot write public ips to file')
 
     def describe_instances(self, region_name, machines_name):
         """

@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
 
 In order to connect to the instances MATRIX uses a file that contains the AWS keys and security groups.
 For each region in AWS you need to create an entry in the global configuration file.
-Sample configuration file can be found [here](GlobalConfigurations/regions.json)
+Sample configuration file can be found [here](GlobalConfigurations/awsRegions.json)
 
 ### ProtocolsConfigurations
 MATRIX uses configuration file to set it execution. The configuration file is written in [json](https://en.wikipedia.org/wiki/JSON) format.
