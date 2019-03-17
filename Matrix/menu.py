@@ -59,7 +59,6 @@ class MatrixMenu:
     execution_menu_desc = (
         'Choose task to be executed:',
         [
-            'Preform pre process operations',
             'Install Experiment',
             'Execute Experiment',
             'Execute Experiment with profiler',
@@ -243,18 +242,15 @@ class MatrixMenu:
         selection = self.print_menu(*self.execution_menu_desc)
 
         ee = e2e.E2E(self.protocol_config, self.protocol_config_path)
-
         if selection == 1:
-            ee.pre_process()
-        elif selection == 2:
             ee.install_experiment()
-        elif selection == 3:
+        elif selection == 2:
             ee.execute_experiment()
-        elif selection == 4:
+        elif selection == 3:
             ee.execute_experiment_callgrind()
-        elif selection == 5:
+        elif selection == 4:
             ee.execute_experiment_with_latency()
-        elif selection == 6:
+        elif selection == 5:
             ee.update_libscapi()
 
     def analysis_menu(self):
