@@ -13,7 +13,8 @@ import { ProtocolsUploadComponent } from './Components/protocols-upload/protocol
 import {FormsModule} from "@angular/forms";
 import { MainNavComponent } from './Components/main-nav/main-nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
-import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTableModule, MatPaginatorModule, MatSortModule, MatSelectModule } from '@angular/material';
+import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTableModule,
+  MatPaginatorModule, MatSortModule, MatSelectModule, MatRadioModule, MatCheckboxModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DeploymentComponent } from './Components/deployment/deployment.component';
 import { ExecutionComponent } from './Components/execution/execution.component';
@@ -58,7 +59,9 @@ import { ReportingResultComponent } from './Components/reporting-result/reportin
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
-    MatSelectModule
+    MatSelectModule,
+    MatRadioModule,
+    MatCheckboxModule
   ],
   providers: [],
   bootstrap: [AppComponent]

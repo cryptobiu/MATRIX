@@ -70,22 +70,29 @@ def register_new_protocol():
     form = request.data
     form_data = json.loads(form.decode('utf-8'))
     protocol_name = form_data['protocolName']
-    address = form_data['repoAddress']
-    security_level = form_data['securityLevel']
-    security_threshold = form_data['thresholdLevel']
-    client = MongoClient('mongodb://%s:%s@127.0.0.1/BIU' % (db_username, db_password))
-    db = client['BIU']
-    collection = db['protocols']
-    protocol = {
-        'name': protocol_name,
-        'repoAddress': address,
-        'securityLevel': security_level,
-        'securityThreshold': security_threshold,
-    }
-    try:
-        collection.insert_one(protocol)
-    except bson.errors.InvalidDocument as e:
-        return jsonify(e.with_traceback()), 500
+    raw_configurations = form_data['configurations'].split(' ')
+
+    conf_dict = {}
+    for idx in range(0, len(raw_configurations), 2):
+        key = raw_configurations[idx]
+        value = raw_configurations[idx + 1]
+        if key not in conf_dict.keys():
+            conf_dict[key] = []
+        conf_dict[key].append(value)
+
+    # get the length of the values by retrieve the last key
+    numbers_of_configurations = len(conf_dict[raw_configurations[-2]])
+    configurations = []
+
+    for idx in range(numbers_of_configurations):
+        configuration = ''
+        for key, value in conf_dict.items():
+            configuration += f'{key}@{value[idx]}@'
+        configurations.append(configuration)
+
+    form_data['configurations'] = configurations
+    with open(f'{os.getcwd()}/{protocol_name}.json', 'w+') as fp:
+        json.dump(form_data, fp)
     return jsonify('form submitted')
 
 
@@ -127,7 +134,7 @@ def get_competition_data(competition_name):
 @app.route('/api/deploy/<string:protocol_name>/<string:operation>')
 def execute_deploy_operation(protocol_name, operation):
 
-    config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
+    config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/master/ProtocolsConfigurations/Config_%s.json' \
                   % protocol_name
     raw_data = requests.get(config_file)
     try:
@@ -165,7 +172,7 @@ def execute_deploy_operation(protocol_name, operation):
 
 @app.route('/api/execute/<string:protocol_name>/<string:operation>')
 def execute_execution_operation(protocol_name, operation):
-    config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
+    config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/master/ProtocolsConfigurations/Config_%s.json' \
                   % protocol_name
     raw_data = requests.get(config_file)
     try:
@@ -202,7 +209,7 @@ def execute_execution_operation(protocol_name, operation):
 
 @app.route('/api/reporting/<string:protocol_name>/<string:operation>')
 def execute_reporting_operation(protocol_name, operation):
-    config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/web/ProtocolsConfigurations/Config_%s.json' \
+    config_file = 'https://raw.githubusercontent.com/cryptobiu/MATRIX/master/ProtocolsConfigurations/Config_%s.json' \
                   % protocol_name
     raw_data = requests.get(config_file)
     try:

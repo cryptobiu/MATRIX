@@ -3,7 +3,13 @@ import {ICompetition} from "./interfaces";
 export class Protocol {
   constructor(
     public protocolName: string,
-    public repoAddress: string,
+    public cloudProviders : {},
+    public executableName : string,
+    public configurations: [],
+    public numOfIterations : number,
+    public workingDirectory : string,
+    public resultsDirectory: string,
+    public institute : string,
     public securityLevel: string,
     public thresholdLevel: string,
   ){}
