@@ -39,9 +39,11 @@ private:
     string m_arguments = "";
     vector<string> m_tasksNames;
     int m_partiesNumber = 0;
+    string m_logsPath;
 
 public:
-    MatrixMeasurement(size_t argc, char* argv[], int partiesNumber, vector<string> tasksNames, int numberOfIterations):
+    MatrixMeasurement(size_t argc, char* argv[], int partiesNumber, vector<string> tasksNames, int numberOfIterations,
+                      string logsPath=""):
             m_cpuStartTimes(vector<vector<long>>(tasksNames.size(), vector<long>(numberOfIterations))),
             m_cpuEndTimes(vector<vector<long>>(tasksNames.size(), vector<long>(numberOfIterations)))
     {
@@ -57,6 +59,7 @@ public:
 
         m_tasksNames = tasksNames;
         m_partiesNumber = partiesNumber;
+        m_logsPath=logsPath;
 
     }
 
@@ -82,7 +85,10 @@ public:
         // if this is the last task and last iteration write the data to file
         if (taskIdx == m_tasksNames.size() - 1 && currentIterationNumber == m_cpuEndTimes[0].size() - 1)
         {
-            string logFileName = getcwdStr() + path + m_arguments + ".log";
+            if(m_logsPath.length() == 0)
+                string logFileName = getcwdStr() + m_arguments + ".log";
+            else
+                string logFileName = m_logsPath + m_arguments + ".log";
 
             ofstream logFile(logFileName);
             if (logFile.is_open())
