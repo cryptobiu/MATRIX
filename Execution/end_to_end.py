@@ -45,7 +45,6 @@ class E2E:
 
         protocol_name = self.protocol_config['protocol']
         working_directory = self.protocol_config['workingDirectory']
-        external_protocol = json.loads(self.protocol_config['isExternal'])
         cp = list(self.protocol_config['CloudProviders'].keys())
         git_address = self.protocol_config['CloudProviders'][cp[0]]['git']['gitAddress']
         git_branch = self.protocol_config['CloudProviders'][cp[0]]['git']['gitBranch']
@@ -57,7 +56,7 @@ class E2E:
             doc['timestamp'] = datetime.utcnow()
             self.es.index(index='execution_matrix_ui', doc_type='execution_matrix_ui', body=doc)
             os.system(f'fab -f Execution/fabfile.py install_git_project:{username},{password},{git_branch[idx]},'
-                      f'{git_address[idx]},{working_directory[idx]},{external_protocol} --parallel')
+                      f'{git_address[idx]},{working_directory[idx]} --parallel')
 
     def execute_experiment(self):
         """

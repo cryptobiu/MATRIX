@@ -17,7 +17,7 @@ path_to_matrix = 'YOU PATH TO MATRIX'
 
 
 @task
-def install_git_project(username, password, git_branch, git_address, working_directory, external):
+def install_git_project(username, password, git_branch, git_address, working_directory):
     """
     Install the protocol at the working directory with the GitHub credentials
     :type username str
@@ -36,20 +36,11 @@ def install_git_project(username, password, git_branch, git_address, working_dir
     if not exists(working_directory):
         run(f'git clone {git_address.format(username, password)} {working_directory}')
 
-    external = eval(external)
     with cd(working_directory):
         run('git pull')
         run(f'git checkout {git_branch}')
-        if external:
-            with cd(f'{working_directory}/MATRIX'):
-                run('. ./build.sh')
-        else:
-            if exists(f'{working_directory}/CMakeLists.txt'):
-                sudo('rm -rf CMakeFiles CMakeCache.txt Makefile')
-                run('cmake .')
-            run('make')
-            with warn_only():
-                run('7za -y x \"*.7z\"')
+        with cd(f'{working_directory}/MATRIX'):
+            run('. ./build.sh')
 
 
 @task
