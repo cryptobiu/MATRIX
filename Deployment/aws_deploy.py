@@ -95,6 +95,19 @@ class AmazonCP(DeployCP):
                                                     AvailabilityZone=region)
         return float(prices['SpotPriceHistory'][0]['SpotPrice'])
 
+    def cancel_spot_requests(self):
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        protocol_name = self.protocol_config['protocol']
+        for region in regions:
+            instances = self.describe_instances(region[:-1], protocol_name)
+            client = boto3.client('ec2', region_name=region[:-1])
+            try:
+                client.cancel_spot_instance_requests(SpotInstanceRequestIds=instances)
+            except botocore.exceptions.ClientError as e:
+                print(e.response['Error']['Message'].upper())
+
+
+
     @staticmethod
     def get_ami_disk_size(region_name):
         """

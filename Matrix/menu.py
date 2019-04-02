@@ -52,6 +52,7 @@ class MatrixMenu:
             'Change machines types',
             'Start instances',
             'Stop instances',
+            'cancel spot requests',
             'Copy AMI',
             'Return',
         ])
@@ -150,7 +151,7 @@ class MatrixMenu:
         """
         Read relative path of a protocol configuration file.
         """
-        if (protocol_config_path == None):
+        if protocol_config_path is None:
             self.color_print('Enter configuration file(s):', 'blue')
             cwd = os.getcwd()
             prompt = 'Protocol configuration file path (current path is: {}): '.format(cwd)
@@ -230,6 +231,8 @@ class MatrixMenu:
             elif selection == 8:
                 deploy.stop_instances()
             elif selection == 9:
+                deploy.cancel_spot_requests()
+            elif selection == 10:
                 deploy.copy_ami()
         except NotImplementedError:
             MatrixMenu.color_print("Selected action '{}' is not implemented for the chosen deployment '{}'".format(self.deploy_menu_desc[1][selection - 1], self.cloud_provider_menu_desc[1][cp - 1]), menu_color)
