@@ -1,9 +1,5 @@
 import os
 import copy
-import json
-import certifi
-from collections import OrderedDict
-from elasticsearch import Elasticsearch
 
 
 class DeployCP:
@@ -16,14 +12,7 @@ class DeployCP:
         :param protocol_config: the configuration of the protocol we want to deploy
         """
         self.protocol_config = protocol_config
-        try:
-            with open(f'{os.getcwd()}/GlobalConfigurations/tokens.json') as gc_file:
-                global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
-        except EnvironmentError:
-            print('Cannot open Global Configurations')
-            return
-        es_address = global_config['Elasticsearch']['address']
-        self.es = Elasticsearch(es_address, ca_certs=certifi.where())
+        self.protocol_name = self.protocol_config['protocol']
 
     def create_key_pair(self):
         """
@@ -161,7 +150,7 @@ class DeployCP:
 
         if 'aws' in self.protocol_config['CloudProviders']:
             regions += self.protocol_config['CloudProviders']['aws']['regions']
-        if 'azure' in self.protocol_config['CloudProviders']:
+        elif 'azure' in self.protocol_config['CloudProviders']:
             regions += self.protocol_config['CloudProviders']['azure']['regions']
         else:
             print('Cloud provider did not found. Program will exit now')

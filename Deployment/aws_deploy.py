@@ -32,24 +32,28 @@ class AmazonCP(DeployCP):
         """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
 
-        for regions_idx in range(len(regions)):
-            client = boto3.client('ec2', region_name=regions[regions_idx][:-1])
-            keys = client.describe_key_pairs()
-            number_of_current_keys = len(keys['KeyPairs'])
-            try:
-                key_idx = number_of_current_keys + 1
-                key_pair = client.create_key_pair(KeyName=f"Matrix{regions[regions_idx].replace('-', '')[:-1]}"
-                                                          f"-{key_idx}")
-                key_name = key_pair['KeyName']
+        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
+            print('Creating key pairs', file=output_file)
+            for regions_idx in range(len(regions)):
+                client = boto3.client('ec2', region_name=regions[regions_idx][:-1])
+                keys = client.describe_key_pairs()
+                number_of_current_keys = len(keys['KeyPairs'])
                 try:
-                    with open(f'{Path.home()}/Keys/{key_name}', 'w+') as key_file:
-                        key_file.write(key_pair['KeyMaterial'])
-                except EnvironmentError:
-                    print('Cannot write the key to file')
-            except botocore.exceptions.EndpointConnectionError as e:
-                print(e.response['Error']['Message'].upper())
-            except botocore.exceptions.ClientError as e:
-                print(e.response['Error']['Message'].upper())
+                    key_idx = number_of_current_keys + 1
+                    key_pair = client.create_key_pair(KeyName=f"Matrix{regions[regions_idx].replace('-', '')[:-1]}"
+                                                              f"-{key_idx}")
+                    key_name = key_pair['KeyName']
+                    try:
+                        with open(f'{Path.home()}/Keys/{key_name}', 'w+') as key_file:
+                            key_file.write(key_pair['KeyMaterial'])
+                    except EnvironmentError:
+                        print('Cannot write the key to file', file=output_file)
+                except botocore.exceptions.EndpointConnectionError as e:
+                    print(e.response['Error']['Message'].upper(), file=output_file)
+                except botocore.exceptions.ClientError as e:
+                    print(e.response['Error']['Message'].upper(), file=output_file)
+            print('Done creating key pairs, you will redirect to the deployment in few seconds..', file=output_file)
+            time.sleep(5)
 
     def create_security_group(self):
         """
@@ -58,26 +62,30 @@ class AmazonCP(DeployCP):
         """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
 
-        for idx in range(len(regions)):
-            region_name = regions[idx][:-1]
-            client = boto3.client('ec2', region_name=region_name)
-            # create security group
-            try:
-                response = client.create_security_group(
-                    Description='Matrix system security group',
-                    GroupName=f"MatrixSG{regions[idx].replace('-', '')[:-1]}",
-                    DryRun=False
-                )
-
-                # Add FW rules
-                sg_id = response['GroupId']
-                ec2 = boto3.resource('ec2', region_name=region_name)
-                security_group = ec2.SecurityGroup(sg_id)
-                security_group.authorize_ingress(IpProtocol='tcp', CidrIp='0.0.0.0/0', FromPort=0, ToPort=65535)
-            except botocore.exceptions.EndpointConnectionError as e:
-                print(e.response['Error']['Message'].upper())
-            except botocore.exceptions.ClientError as e:
-                print(e.response['Error']['Message'].upper())
+        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
+            print('Creating security groups', file=output_file)
+            for idx in range(len(regions)):
+                region_name = regions[idx][:-1]
+                client = boto3.client('ec2', region_name=region_name)
+                # create security group
+                try:
+                    response = client.create_security_group(
+                        Description='Matrix system security group',
+                        GroupName=f"MatrixSG{regions[idx].replace('-', '')[:-1]}",
+                        DryRun=False
+                    )
+                    # Add FW rules
+                    sg_id = response['GroupId']
+                    ec2 = boto3.resource('ec2', region_name=region_name)
+                    security_group = ec2.SecurityGroup(sg_id)
+                    security_group.authorize_ingress(IpProtocol='tcp', CidrIp='0.0.0.0/0', FromPort=0, ToPort=65535)
+                except botocore.exceptions.EndpointConnectionError as e:
+                    print(e.response['Error']['Message'].upper(), file=output_file)
+                except botocore.exceptions.ClientError as e:
+                    print(e.response['Error']['Message'].upper(), file=output_file)
+            print('Done creating security groups, you will redirect to the deployment in few seconds..',
+                  file=output_file)
+            time.sleep(5)
 
     @staticmethod
     def check_latest_price(instance_type, region):
@@ -97,16 +105,13 @@ class AmazonCP(DeployCP):
 
     def cancel_spot_requests(self):
         regions = self.protocol_config['CloudProviders']['aws']['regions']
-        protocol_name = self.protocol_config['protocol']
         for region in regions:
-            instances = self.describe_instances(region[:-1], protocol_name)
+            instances = self.describe_instances(region[:-1], self.protocol_name)
             client = boto3.client('ec2', region_name=region[:-1])
             try:
                 client.cancel_spot_instance_requests(SpotInstanceRequestIds=instances)
             except botocore.exceptions.ClientError as e:
                 print(e.response['Error']['Message'].upper())
-
-
 
     @staticmethod
     def get_ami_disk_size(region_name):
@@ -141,162 +146,142 @@ class AmazonCP(DeployCP):
             spot_request = False
         number_of_parties = self.protocol_config['CloudProviders']['aws']['numOfParties']
         number_duplicated_servers = 0
-        protocol_name = self.protocol_config['protocol']
         try:
             with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
                 global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
         except EnvironmentError:
             print('Cannot open Global Configurations')
 
-        if len(regions) > 1:
-            number_of_instances = number_of_parties // len(regions)
-            number_duplicated_servers = number_of_parties % len(regions)
-        else:
-            number_of_instances = number_of_parties
-
-        date = datetime.utcnow()
-        new_date = date + timedelta(hours=6)
-
-        for idx in range(len(regions)):
-            region_name = regions[idx][:-1]
-            client = boto3.client('ec2', region_name=region_name)
-            disk_size = self.get_ami_disk_size(region_name)
-
-            number_of_instances_to_deploy = self.check_running_instances(region_name, machine_type)
-            if idx < number_duplicated_servers:
-                number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
+        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'a+') as output_file:
+            print(f'Starting deploy servers for {self.protocol_name} protocol', file=output_file)
+            if len(regions) > 1:
+                number_of_instances = number_of_parties // len(regions)
+                number_duplicated_servers = number_of_parties % len(regions)
             else:
-                number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
+                number_of_instances = number_of_parties
 
-            doc = {}
-            doc['protocolName'] = protocol_name
-            doc['message'] = f"Deploying instances :\nregion : {regions[idx]}\nnumber of instances : " \
-                             f"{number_of_instances_to_deploy}\nami_id : {global_config[region_name]['ami']}" \
-                             f"\ninstance_type : {machine_type}\n valid until : {str(new_date)}"
-            doc['timestamp'] = datetime.utcnow()
-            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+            date = datetime.utcnow()
+            new_date = date + timedelta(hours=6)
 
-            doc = {}
+            for idx in range(len(regions)):
+                region_name = regions[idx][:-1]
+                client = boto3.client('ec2', region_name=region_name)
+                disk_size = self.get_ami_disk_size(region_name)
 
-            if number_of_instances_to_deploy > 0:
-                if spot_request:
-                    # check if price isn't too low
-                    winning_bid_price = self.check_latest_price(machine_type, regions[idx])
-                    request_bid = min(price_bids, winning_bid_price)
-                    try:
-                        response = client.request_spot_instances(
-                                DryRun=False,
-                                SpotPrice=str(request_bid),
-                                InstanceCount=number_of_instances_to_deploy,
-                                ValidUntil=new_date,
-                                LaunchSpecification=
-                                {
-                                    'ImageId': global_config[regions[idx][:-1]]['ami'],
-                                    'KeyName': global_config[regions[idx][:-1]]['key'],
-                                    'SecurityGroups': [global_config[regions[idx][:-1]]['securityGroup']],
-                                    'InstanceType': machine_type,
-                                    'Placement':
-                                        {
-                                            'AvailabilityZone': regions[idx],
-                                        },
-                                }
-                        )
-                        time.sleep(10)
-                        spot_requests_ids = []
-                        for request in response['SpotInstanceRequests']:
-                            spot_requests_ids.append(request['SpotInstanceRequestId'])
-                        instances_response = client.describe_spot_instance_requests(
-                            Filters=[{'Name': 'spot-instance-request-id', 'Values': spot_requests_ids}])
-                        instances_ids = []
-                        for instance_response in instances_response['SpotInstanceRequests']:
-                            instances_ids.append(instance_response['InstanceId'])
-                        client.create_tags(Resources=instances_ids, Tags=[{
-                            'Key': 'Name',
-                            'Value': protocol_name
-                        }])
-
-                    except botocore.exceptions.ClientError as e:
-                        print(e.response['Error']['Message'].upper())
+                number_of_instances_to_deploy = self.check_running_instances(region_name, machine_type)
+                if idx < number_duplicated_servers:
+                    number_of_instances_to_deploy = (number_of_instances - number_of_instances_to_deploy) + 1
                 else:
-                    # check if vpc exists. use subnet id instead of security group if not exists
-                    account = client.describe_account_attributes()
-                    if 'VPC' in account['AccountAttributes'][0]['AttributeValues'][0]['AttributeValue']:
-                        kwargs = {
-                            'BlockDeviceMappings': [{
-                                'DeviceName': '/dev/sda1',
-                                'Ebs':
+                    number_of_instances_to_deploy = number_of_instances - number_of_instances_to_deploy
+
+                if number_of_instances_to_deploy > 0:
+                    if spot_request:
+                        # check if price isn't too low
+                        winning_bid_price = self.check_latest_price(machine_type, regions[idx])
+                        request_bid = min(price_bids, winning_bid_price)
+                        try:
+                            response = client.request_spot_instances(
+                                    DryRun=False,
+                                    SpotPrice=str(request_bid),
+                                    InstanceCount=number_of_instances_to_deploy,
+                                    ValidUntil=new_date,
+                                    LaunchSpecification=
                                     {
-                                        'DeleteOnTermination': True,
-                                        'VolumeSize': disk_size
+                                        'ImageId': global_config[regions[idx][:-1]]['ami'],
+                                        'KeyName': global_config[regions[idx][:-1]]['key'],
+                                        'SecurityGroups': [global_config[regions[idx][:-1]]['securityGroup']],
+                                        'InstanceType': machine_type,
+                                        'Placement':
+                                            {
+                                                'AvailabilityZone': regions[idx],
+                                            },
                                     }
-                            },
-                                {
-                                'DeviceName': '/dev/sdf',
-                                'NoDevice': ''
-                                }
-                            ],
-                            'ImageId': global_config[region_name]["ami"],
-                            'KeyName': global_config[region_name]["key"],
-                            'MinCount': int(number_of_instances_to_deploy),
-                            'MaxCount': int(number_of_instances_to_deploy),
-                            'SecurityGroups': [global_config[region_name]["securityGroup"]],
-                            'InstanceType': machine_type,
-                            'Placement': {'AvailabilityZone': regions[idx]},
-                            'TagSpecifications': [{
-                                'ResourceType': 'instance',
-                                'Tags': [{
-                                    'Key': 'Name',
-                                    'Value': protocol_name
-                                }]
-                            }]
-                        }
+                            )
+                            time.sleep(10)
+                            spot_requests_ids = []
+                            for request in response['SpotInstanceRequests']:
+                                spot_requests_ids.append(request['SpotInstanceRequestId'])
+                            instances_response = client.describe_spot_instance_requests(
+                                Filters=[{'Name': 'spot-instance-request-id', 'Values': spot_requests_ids}])
+                            instances_ids = []
+                            for instance_response in instances_response['SpotInstanceRequests']:
+                                instances_ids.append(instance_response['InstanceId'])
+                            client.create_tags(Resources=instances_ids, Tags=[{
+                                'Key': 'Name',
+                                'Value': self.protocol_name
+                            }])
+
+                        except botocore.exceptions.ClientError as e:
+                            print(e.response['Error']['Message'].upper())
                     else:
-                        kwargs = {
-                            'BlockDeviceMappings': [{
-                                'DeviceName': '/dev/sda1',
-                                'Ebs':
+                        # check if vpc exists. use subnet id instead of security group if not exists
+                        account = client.describe_account_attributes()
+                        if 'VPC' in account['AccountAttributes'][0]['AttributeValues'][0]['AttributeValue']:
+                            kwargs = {
+                                'BlockDeviceMappings': [{
+                                    'DeviceName': '/dev/sda1',
+                                    'Ebs':
+                                        {
+                                            'DeleteOnTermination': True,
+                                            'VolumeSize': disk_size
+                                        }
+                                },
                                     {
-                                        'DeleteOnTermination': True,
-                                        'VolumeSize': disk_size
-                                    }
-                            },
-                                {
                                     'DeviceName': '/dev/sdf',
                                     'NoDevice': ''
-                                }
-                            ],
-                            'ImageId': global_config[region_name]["ami"],
-                            'KeyName': global_config[region_name]["key"],
-                            'MinCount': int(number_of_instances_to_deploy),
-                            'MaxCount': int(number_of_instances_to_deploy),
-                            'SubnetId': [global_config[region_name]["subnetid"]],
-                            'InstanceType': machine_type,
-                            'Placement': {'AvailabilityZone': regions[idx]},
-                            'TagSpecifications': [{
-                                'ResourceType': 'instance',
-                                'Tags': [{
-                                    'Key': 'Name',
-                                    'Value': protocol_name
+                                    }
+                                ],
+                                'ImageId': global_config[region_name]["ami"],
+                                'KeyName': global_config[region_name]["key"],
+                                'MinCount': int(number_of_instances_to_deploy),
+                                'MaxCount': int(number_of_instances_to_deploy),
+                                'SecurityGroups': [global_config[region_name]["securityGroup"]],
+                                'InstanceType': machine_type,
+                                'Placement': {'AvailabilityZone': regions[idx]},
+                                'TagSpecifications': [{
+                                    'ResourceType': 'instance',
+                                    'Tags': [{
+                                        'Key': 'Name',
+                                        'Value': self.protocol_name
+                                    }]
                                 }]
-                            }]
-                        }
-                    client.run_instances(**kwargs)
+                            }
+                        else:
+                            kwargs = {
+                                'BlockDeviceMappings': [{
+                                    'DeviceName': '/dev/sda1',
+                                    'Ebs':
+                                        {
+                                            'DeleteOnTermination': True,
+                                            'VolumeSize': disk_size
+                                        }
+                                },
+                                    {
+                                        'DeviceName': '/dev/sdf',
+                                        'NoDevice': ''
+                                    }
+                                ],
+                                'ImageId': global_config[region_name]["ami"],
+                                'KeyName': global_config[region_name]["key"],
+                                'MinCount': int(number_of_instances_to_deploy),
+                                'MaxCount': int(number_of_instances_to_deploy),
+                                'SubnetId': [global_config[region_name]["subnetid"]],
+                                'InstanceType': machine_type,
+                                'Placement': {'AvailabilityZone': regions[idx]},
+                                'TagSpecifications': [{
+                                    'ResourceType': 'instance',
+                                    'Tags': [{
+                                        'Key': 'Name',
+                                        'Value': self.protocol_name
+                                    }]
+                                }]
+                            }
+                        client.run_instances(**kwargs)
+            print(f'waiting for the deploy to be finished', file=output_file)
+            time.sleep(240)
 
-
-        doc = {}
-        doc['protocolName'] = protocol_name
-        doc['message'] = 'Waiting for the images to be deployed..'
-        doc['timestamp'] = datetime.utcnow()
-        self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
-        time.sleep(240)
-
-        self.get_network_details()
-
-        doc = {}
-        doc['protocolName'] = protocol_name
-        doc['message'] = 'Finished to deploy machines'
-        doc['timestamp'] = datetime.utcnow()
-        self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+            self.get_network_details()
+            print(f'Deploy finished', file=output_file)
 
     def get_network_details(self, port_number=8000, file_name='parties.conf', new_format=False):
         """
@@ -312,13 +297,9 @@ class AmazonCP(DeployCP):
         is_spot_request = 'spotPrice' in self.protocol_config['CloudProviders']['aws']
         coordinator_exists = 'coordinatorConfig' in self.protocol_config
         instance_type = self.protocol_config['CloudProviders']['aws']['instanceType']
-        protocol_name = self.protocol_config['protocol']
 
-        doc = {}
-        doc['protocolName'] = protocol_name
-        doc['message'] = 'Fetching network topology for protocol: %s' % protocol_name
-        doc['timestamp'] = datetime.utcnow()
-        self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'a+') as output_file:
+            print(f'Fetching network topology for {self.protocol_name}', file=output_file)
 
         instances_ids = []
         public_ip_address = []
@@ -331,10 +312,10 @@ class AmazonCP(DeployCP):
             if is_spot_request:
                 response = client.describe_instances(Filters=[{'Name': 'instance-lifecycle', 'Values': ['spot']},
                                                               {'Name': 'instance-type', 'Values': [instance_type]},
-                                                              {'Name': 'tag:Name', 'Values': [protocol_name]}])
+                                                              {'Name': 'tag:Name', 'Values': [self.protocol_name]}])
 
             else:
-                response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [protocol_name]}])
+                response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [self.protocol_name]}])
 
             # Extract instances ids
             for res_idx in range(len(response['Reservations'])):
@@ -372,9 +353,12 @@ class AmazonCP(DeployCP):
         try:
             with open('InstancesConfigurations/public_ips', mode) as public_ip_file:
                 for public_idx in range(len(public_ip_address)):
-                    public_ip_file.write('%s\n' % public_ip_address[public_idx])
+                    public_ip_file.write(f'{public_ip_address[public_idx]}\n')
         except EnvironmentError:
             print('Cannot write public ips to file')
+
+        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'a+') as output_file:
+            print(f'Network topology for {self.protocol_name} updated', file=output_file)
 
     def describe_instances(self, region_name, machines_name):
         """
@@ -410,7 +394,6 @@ class AmazonCP(DeployCP):
         :param machine_type: the type of the machines the protocol uses
         :return: number of online instances that associated to the protocol
         """
-        protocol_name = self.protocol_config['protocol']
         ready_instances = 0
 
         client = boto3.client('ec2', region_name=region)
@@ -421,7 +404,7 @@ class AmazonCP(DeployCP):
             for reserve_idx in range(reservations_len):
                 if response['Reservations'][res_idx]['Instances'][reserve_idx]['State']['Name'] == 'running' and \
                         response['Reservations'][res_idx]['Instances'][reserve_idx]['Tags'][0]['Value'] == \
-                        protocol_name and \
+                        self.protocol_name and \
                         response['Reservations'][res_idx]['Instances'][reserve_idx]['InstanceType'] == machine_type:
                     ready_instances += 1
 
@@ -431,18 +414,13 @@ class AmazonCP(DeployCP):
         """
         Turn on the instances
         """
+        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
+            print(f'Starting {self.protocol_name} instances', file=output_file)
         regions = self.protocol_config['CloudProviders']['aws']['regions']
-        machines_name = self.protocol_config['protocol']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
-            instances = self.describe_instances(region_name, machines_name)
-
-            doc = {}
-            doc['protocolName'] = machines_name
-            doc['message'] = 'starting protocol: %s instances ' % machines_name
-            doc['timestamp'] = datetime.utcnow()
-            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+            instances = self.describe_instances(region_name, self.protocol_name)
 
             client = boto3.client('ec2', region_name=region_name)
             client.start_instances(InstanceIds=instances)
@@ -453,19 +431,13 @@ class AmazonCP(DeployCP):
         """
         Shut down the instances
         """
+        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
+            print(f'Shut down {self.protocol_name} instances', file=output_file)
         regions = self.protocol_config['CloudProviders']['aws']['regions']
-        machines_name = self.protocol_config['protocol']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
-            instances = self.describe_instances(region_name, machines_name)
-
-            doc = {}
-            doc['protocolName'] = machines_name
-            doc['message'] = 'stopping protocol: %s instances ' % machines_name
-            doc['timestamp'] = datetime.utcnow()
-            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
-
+            instances = self.describe_instances(region_name, self.protocol_name)
             client = boto3.client('ec2', region_name=region_name)
             client.stop_instances(InstanceIds=instances)
 
@@ -474,19 +446,13 @@ class AmazonCP(DeployCP):
         Reboots the instances. Use this method if you want to reboot the instances.
         It will save you money instead of stop->start
         """
+        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
+            print(f'Rebooting {self.protocol_name} instances', file=output_file)
         regions = self.protocol_config['CloudProviders']['aws']['regions']
-        machines_name = self.protocol_config['protocol']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
-            instances = self.describe_instances(region_name, machines_name)
-
-            doc = {}
-            doc['protocolName'] = machines_name
-            doc['message'] = 'rebooting protocol: %s instances ' % machines_name
-            doc['timestamp'] = datetime.utcnow()
-            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
-
+            instances = self.describe_instances(region_name, self.protocol_name)
             client = boto3.client('ec2', region_name=region_name)
             client.reboot_instances(InstancesIds=instances)
 
@@ -496,20 +462,14 @@ class AmazonCP(DeployCP):
         The new type should be specified at the protocol configuration file.
         """
         regions = self.protocol_config['CloudProviders']['aws']['regions']
-        protocol_name = self.protocol_config['protocol']
         instance_type = self.protocol_config['CloudProviders']['aws']['instanceType']
+
+        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
+            print(f'Changing {self.protocol_name} instances to {instance_type}', file=output_file)
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
-            instances = self.describe_instances(region_name, protocol_name)
-
-            doc = {}
-            doc['protocolName'] = protocol_name
-            doc['message'] = 'changing protocol: %s machine types to %s instances at regions %s' \
-                             % (protocol_name, instance_type, region_name)
-            doc['timestamp'] = datetime.utcnow()
-            self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
-
+            instances = self.describe_instances(region_name, self.protocol_name)
             client = boto3.client('ec2', region_name=region_name)
             client.stop_instances(InstanceIds=instances)
             waiter = client.get_waiter('instance_stopped')
@@ -529,19 +489,15 @@ class AmazonCP(DeployCP):
         """
         Deletes the instances
         """
-        regions = self.protocol_config['CloudProviders']['aws']['regions']
-        machines_name = self.protocol_config['protocol']
 
-        doc = {}
-        doc['protocolName'] = machines_name
-        doc['message'] = 'Terminating %s ' % machines_name
-        doc['timestamp'] = datetime.utcnow()
-        self.es.index(index='deployment_matrix_ui', doc_type='deployment_matrix_ui', body=doc)
+        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
+            print(f'Terminate {self.protocol_name} instances ', file=output_file)
+        regions = self.protocol_config['CloudProviders']['aws']['regions']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
 
-            instances = self.describe_instances(region_name, machines_name)
+            instances = self.describe_instances(region_name, self.protocol_name)
 
             client = boto3.client('ec2', region_name=region_name)
             client.terminate_instances(InstanceIds=instances)
