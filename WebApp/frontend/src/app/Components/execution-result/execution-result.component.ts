@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {timer} from 'rxjs';
-import {IExecutionData} from "../../interfaces";
 import {DbService} from "../../Services/db.service";
-import {ElasticsearchService} from "../../Services/elasticsearch.service";
 
 @Component({
   selector: 'app-execution-result',
@@ -14,9 +12,9 @@ export class ExecutionResultComponent implements OnInit {
 
   public protocolName: string;
   public operation: string;
-  public executionData: Array<IExecutionData>;
+  public executionData: string[];
 
-  constructor(private ac_router: ActivatedRoute, private dbService: DbService, private es: ElasticsearchService) {
+  constructor(private ac_router: ActivatedRoute, private dbService: DbService) {
     this.protocolName = this.protocolName = this.ac_router.snapshot.paramMap.get('protocolName');
     this.operation = this.ac_router.snapshot.paramMap.get('action');
     this.executionData = [];
@@ -30,24 +28,13 @@ export class ExecutionResultComponent implements OnInit {
   }
 
   readData(){
-    let timerObservable = timer(1000, 10000);
-    timerObservable.subscribe(value => this.es.getDocuments('execution_matrix_ui',
-      'execution_matrix_ui', this.protocolName).then(
+    let timeObservable = timer(1000,10000);
+    timeObservable.subscribe(value => this.dbService.getExecutionData(this.protocolName).subscribe(
       response => {
-        this.executionData.length = 0; // clear the data before assign new data
-        for (let hit of response.hits.hits)
-        {
-          let data :IExecutionData =
-            {
-            protocolName: hit._source.protocolName,
-            message: hit._source.message,
-            timestamp: new Date(hit._source.timestamp)
-            };
-          this.executionData.push(data);
-        }
-      }, error => {
-        console.error(error); //error of es
-      }),
-      err => console.log(err)); //error of timer
+        this.executionData = response.toString().split(',');
+      },
+      error => console.log(error)
+      ),
+      err => console.log(err));
   }
 }

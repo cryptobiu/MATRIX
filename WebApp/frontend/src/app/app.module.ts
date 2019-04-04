@@ -23,6 +23,7 @@ import { ReportingComponent } from './Components/reporting/reporting.component';
 import { ExecutionResultComponent } from './Components/execution-result/execution-result.component';
 import { CompetitionsRegistrationComponent } from './Components/competitions-registration/competitions-registration.component';
 import { ReportingResultComponent } from './Components/reporting-result/reporting-result.component';
+import {AuthService} from "./Services/auth.service";
 
 @NgModule({
   declarations: [
@@ -42,7 +43,7 @@ import { ReportingResultComponent } from './Components/reporting-result/reportin
     ReportingComponent,
     ExecutionResultComponent,
     CompetitionsRegistrationComponent,
-    ReportingResultComponent,
+    ReportingResultComponent
   ],
   imports: [
     BrowserModule,
@@ -63,7 +64,7 @@ import { ReportingResultComponent } from './Components/reporting-result/reportin
     MatRadioModule,
     MatCheckboxModule
   ],
-  providers: [],
+  providers: [AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

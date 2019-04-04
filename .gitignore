@@ -17,3 +17,5 @@ FlaskApp/Uploads
 Execution/execution_log.log
 GlobalConfigurations/tokens.json
 GlobalConfigurations/azureTokens.json
+WebApp/DeploymentLogs
+WebApp/ExecutionLogs

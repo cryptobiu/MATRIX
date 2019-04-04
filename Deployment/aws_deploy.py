@@ -152,7 +152,7 @@ class AmazonCP(DeployCP):
         except EnvironmentError:
             print('Cannot open Global Configurations')
 
-        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'a+') as output_file:
+        with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
             print(f'Starting deploy servers for {self.protocol_name} protocol', file=output_file)
             if len(regions) > 1:
                 number_of_instances = number_of_parties // len(regions)

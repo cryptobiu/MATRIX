@@ -11,7 +11,7 @@ env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
 # Set this to point to where the AWS key is put by MATRIX (possibly ~/Keys/[KEYNAME])
-env.key_filename = ['YOUR-KEY']
+env.key_filename = [f'{Path.home()}/Keys/Matrixuseast1.pem']
 # Set this to point to where you put the MATRIX root
 path_to_matrix = 'YOU PATH TO MATRIX'
 
@@ -29,9 +29,7 @@ def install_git_project(username, password, git_branch, git_address, working_dir
     :type git_address str
     :param git_address: GitHub project address
     :type working_directory str
-    :param working_directory: directory to clone the GutHub repository to
-    :type external str
-    :param external: indicate if libscapi protocol or not
+    :param working_directory: directory to clone the GitHub repository to
     """
     if not exists(working_directory):
         run(f'git clone {git_address.format(username, password)} {working_directory}')
@@ -39,8 +37,8 @@ def install_git_project(username, password, git_branch, git_address, working_dir
     with cd(working_directory):
         run('git pull')
         run(f'git checkout {git_branch}')
-        with cd(f'{working_directory}/MATRIX'):
-            run('. ./build.sh')
+        with cd(f'{working_directory}'):
+            run('./MATRIX/build.sh')
 
 
 @task

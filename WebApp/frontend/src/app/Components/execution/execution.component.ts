@@ -4,6 +4,7 @@ import {DataSource} from '@angular/cdk/collections';
 import {DbService} from "../../Services/db.service";
 import {IProtocol} from "../../interfaces";
 import {Router} from "@angular/router";
+import {AuthService} from "../../Services/auth.service";
 
 @Component({
   selector: 'app-execution',
@@ -17,7 +18,11 @@ export class ExecutionComponent implements OnInit {
   actions = ['Install Experiment', 'Execute Experiment', 'Execute Experiment with profiler',
     'Get Logs', 'Update libscapi'];
 
-  constructor(private dbService:DbService, private router:Router) { }
+  constructor(private dbService:DbService, private auth: AuthService, private router : Router)
+  {
+    // if (!this.auth.isAuthenticated())
+    //   this.router.navigate([this.auth.login()]);
+  }
 
   ngOnInit() {
   }

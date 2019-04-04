@@ -1,12 +1,14 @@
 import datetime
 import os
 import requests
+import threading
 
 import bson
 import json
+import time
 
 from pymongo import MongoClient
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 
 from Deployment.deploy import DeployCP
@@ -14,6 +16,9 @@ from Deployment.aws_deploy import AmazonCP
 from Execution.end_to_end import E2E
 from Reporting.analyze_results import Analyze
 from Reporting.upload_elastic import Elastic
+
+# lock to serialize console output
+lock = threading.Lock()
 
 try:
     with open('GlobalConfigurations/tokens.json', 'r') as tokens:
@@ -131,6 +136,9 @@ def get_competition_data(competition_name):
     return jsonify('Error retrieve competition')
 
 
+# TODO: all the calls for MATRIX backend suppose to be done with threads:
+#  1. One thread for backend calls
+#  2. Sending tracking to the Angular UI
 @app.route('/api/deploy/<string:protocol_name>/<string:operation>')
 def execute_deploy_operation(protocol_name, operation):
 
@@ -231,6 +239,20 @@ def execute_reporting_operation(protocol_name, operation):
     return jsonify('reporting operation %s succeeded' % operation)
 
 
+@app.route('/api/deployment/getData/<string:protocol_name>')
+def get_deployment_data(protocol_name):
+    with open(f'WebApp/DeploymentLogs/{protocol_name}.log') as df:
+        data = [line.rstrip('\n') for line in df.readlines()]
+        return jsonify(str(data[:20]))
+
+
+@app.route('/api/execution/getData/<string:protocol_name>')
+def get_execution_data(protocol_name):
+    with open(f'WebApp/ExecutionLogs/{protocol_name}.log') as df:
+        data = [line.rstrip('\n') for line in df.readlines()]
+        return jsonify(str(data[-20:]))
+
+
 if __name__ == '__main__':
     app.secret_key = 'secret'
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)
