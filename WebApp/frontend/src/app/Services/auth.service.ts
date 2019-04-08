@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import * as auth0 from 'auth0-js';
+import auth0Tokens from './../../assets/auth0Tokens.json';
 
 (window as any).global = window;
 
@@ -23,10 +24,10 @@ export class AuthService {
     this._expiresAt = 0;
     this._auth0 = new auth0.WebAuth(
     {
-      clientID: 'my_client_id',
-      domain: 'my_domain',
+      clientID: auth0Tokens.clientID,
+      domain: auth0Tokens.domain,
       responseType: 'token id_token',
-      redirectUri: 'my_callback',
+      redirectUri: auth0Tokens.redirectUri,
       scope: 'openid'
     });
   }
