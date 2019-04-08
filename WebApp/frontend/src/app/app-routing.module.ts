@@ -15,9 +15,10 @@ import {ReportingComponent} from "./Components/reporting/reporting.component";
 import {ExecutionResultComponent} from "./Components/execution-result/execution-result.component";
 import {CompetitionsRegistrationComponent} from "./Components/competitions-registration/competitions-registration.component";
 import {ReportingResultComponent} from "./Components/reporting-result/reporting-result.component";
+import {CallbackComponent} from "./Components/callback/callback.component";
 
 const routes: Routes = [
-  {path: '', component:HomeComponent, pathMatch:'full'},
+  { path: '', component:HomeComponent, pathMatch:'full'},
   { path: 'competitions', component:CompetitionsComponent, pathMatch:'full'},
   { path: 'competitions/:name', component:CompetitionsDetailsComponent},
   { path: 'competitions/registration/:name', component:CompetitionsRegistrationComponent},
@@ -31,6 +32,7 @@ const routes: Routes = [
   { path: 'reporting/:protocolName/:action', component: ReportingResultComponent, pathMatch: 'full'},
   { path: 'circuits', component:CircuitsComponent, pathMatch:'full'},
   { path: 'login', component:LoginComponent, pathMatch:'full'},
+  { path: 'callback', component:CallbackComponent, pathMatch:'full'},
   { path: '**', component:PageNotFoundComponent, pathMatch:'full'},
 ];
 

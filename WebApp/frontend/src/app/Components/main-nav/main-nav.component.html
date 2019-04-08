@@ -5,29 +5,35 @@
       [opened]="!(isHandset$ | async)">
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item href="/">Home</a>
-      <a mat-list-item href="/competitions">Competitions</a>
-      <a mat-list-item href="/protocols">Protocols</a>
-      <a mat-list-item href="/circuits">Circuits</a>
-      <a mat-list-item href="/deployment">Deployment</a>
-      <a mat-list-item href="/execution">Execution</a>
-      <a mat-list-item href="/reporting">Reporting</a>
+      <a mat-list-item routerLink="/">Home</a>
+      <a mat-list-item routerLink="/competitions">Competitions</a>
+      <a mat-list-item routerLink="/protocols">Protocols</a>
+      <a mat-list-item routerLink="/circuits">Circuits</a>
+      <a mat-list-item routerLink="/deployment">Deployment</a>
+      <a mat-list-item routerLink="/execution">Execution</a>
+      <a mat-list-item routerLink="/reporting">Reporting</a>
     </mat-nav-list>
   </mat-sidenav>
   <!--For elements outside the navbar-->
   <mat-sidenav-content>
+    <ng-content></ng-content>
     <mat-toolbar color="primary">
-      <button mat-icon-button (click)="drawer.toggle()"
-        type="button"
-        aria-label="Toggle sidenav"
-        *ngIf="isHandset$ | async">
+      <button mat-icon-button (click)="drawer.toggle().catch()"
+              type="button"
+              aria-label="Toggle sidenav"
+              *ngIf="isHandset$ | async">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span>MATRIX</span>
       <span class="spacer"></span>
-      <a href="/login">Login</a>
-      <a href="">Sign Out</a>
+<!--      <ng-container *ngIf="isLoggedIn; else logout_div">-->
+        <a routerLink="/login">Login</a>
+<!--      </ng-container>-->
+
+<!--      <ng-template #logout_div>-->
+        <a (click)="logout();">Sign Out</a>
+<!--      </ng-template>-->
+
     </mat-toolbar>
-    <ng-content></ng-content>
   </mat-sidenav-content>
 </mat-sidenav-container>

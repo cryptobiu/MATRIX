@@ -9,12 +9,9 @@ import {AuthService} from "../../Services/auth.service";
 export class LoginComponent implements OnInit {
 
   constructor(public auth: AuthService) {
-    auth.handleAuthentication();
+    auth.login();
   }
 
-  ngOnInit() {
-    if (localStorage.getItem('isLoggedIn') === 'true')
-      this.auth.renewTokens();
-  }
+  ngOnInit() {}
 
 }

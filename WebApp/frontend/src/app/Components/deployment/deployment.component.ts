@@ -20,8 +20,8 @@ export class DeploymentComponent implements OnInit {
 
   constructor(private dbService:DbService, private auth: AuthService, private router : Router)
   {
-    // if (!this.auth.isAuthenticated())
-    //   this.router.navigate([this.auth.login()]);
+    if (!localStorage.getItem('isLoggedIn'))
+      this.router.navigate(['/login']);
   }
 
   ngOnInit() {

@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { filter } from 'rxjs/operators';
 import * as auth0 from 'auth0-js';
-import {Observable, Observer, Subject} from "rxjs";
 
+(window as any).global = window;
 
 @Injectable({
   providedIn: 'root'
@@ -13,21 +12,23 @@ export class AuthService {
   private _idToken: string;
   private _accessToken: string;
   private _expiresAt: number;
+  private _auth0 : auth0.WebAuth;
+  private _authenticated: boolean;
+  private _userProfile: any;
 
-  auth0 = new auth0.WebAuth(
-    {
-      clientID: 'YOUR_CLIENT_ID',
-      domain: 'YOUR_AUTH0_DOMAIN',
-      responseType: 'token id_token',
-      redirectUri: 'http://localhost:3000/callback',
-      scope: 'openid'
-    }
-  );
 
-  constructor(public router : Router) {
+  constructor(public router: Router) {
     this._idToken = '';
     this._accessToken = '';
     this._expiresAt = 0;
+    this._auth0 = new auth0.WebAuth(
+    {
+      clientID: 'my_client_id',
+      domain: 'my_domain',
+      responseType: 'token id_token',
+      redirectUri: 'my_callback',
+      scope: 'openid'
+    });
   }
 
   get accessToken(): string {
@@ -39,42 +40,41 @@ export class AuthService {
   }
 
   public login(): void {
-    this.auth0.authorize();
+    console.log(this._auth0.authorize());
+    this._authenticated = this._auth0.authenticated;
   }
 
-  public handleAuthentication(): void
-  {
-    this.auth0.parseHash((err, authResult) => {
-      if(authResult && authResult.accessToken && authResult.idtoken){
+   handleLoginCallback() {
+    // When Auth0 hash parsed, get profile
+    this._auth0.parseHash((err, authResult) => {
+      if (authResult && authResult.accessToken) {
         window.location.hash = '';
-        this.localLogin(authResult);
+        this.getUserInfo(authResult);
         this.router.navigate(['/']);
-      } else if (err)
-      {
-        this.router.navigate(['/']);
-        console.log(err);
+      } else if (err) {
+        console.error(`Error: ${err.error}`);
+      }
+      this.router.navigate(['/']);
+    });
+  }
+
+  getUserInfo(authResult) {
+    // Use access token to retrieve user's profile and set session
+    this._auth0.client.userInfo(authResult.accessToken, (err, profile) => {
+      if (profile) {
+        this._setSession(authResult, profile);
       }
     });
   }
 
-  private localLogin(authResult){
-    localStorage.setItem('isLoggedIn', 'true');
-    const expiresAt = (authResult.expiresIn * 3600) + new Date().getTime();
+   private _setSession(authResult, profile) {
+    // Save authentication data and update login status subject
+    this._expiresAt = authResult.expiresIn * 1000 + Date.now();
     this._accessToken = authResult.accessToken;
-    this._idToken = authResult.idToken;
-    this._expiresAt = expiresAt;
-  }
-
-  public renewTokens(): void {
-    this.auth0.checkSession({}, (err, authResult) => {
-      if(authResult && authResult.accessToken && authResult.idtoken)
-        this.localLogin(authResult);
-       else if (err)
-      {
-        console.log(err);
-        this.logout();
-      }
-    });
+    this._userProfile = profile;
+    this._authenticated = true;
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('clientToken', this._accessToken);
   }
 
   public logout(): void{
@@ -83,14 +83,19 @@ export class AuthService {
     this._expiresAt = 0;
     // Remove isLoggedIn flag from localStorage
     localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('clientToken');
     // Go back to the home route
-    this.router.navigate(['/']);
+    this._auth0.logout({
+      returnTo: 'http://localhost:4200',
+    });
   }
+
 
   public isAuthenticated(): boolean {
     // Check whether the current time is past the
     // access token's expiry time
-    return new Date().getTime() < this._expiresAt;
+    return this._authenticated;
   }
 
 }
+ //https://community.auth0.com/t/auth0-state-does-not-match-angular-7/23078

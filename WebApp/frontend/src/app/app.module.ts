@@ -24,6 +24,7 @@ import { ExecutionResultComponent } from './Components/execution-result/executio
 import { CompetitionsRegistrationComponent } from './Components/competitions-registration/competitions-registration.component';
 import { ReportingResultComponent } from './Components/reporting-result/reporting-result.component';
 import {AuthService} from "./Services/auth.service";
+import { CallbackComponent } from './Components/callback/callback.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import {AuthService} from "./Services/auth.service";
     ReportingComponent,
     ExecutionResultComponent,
     CompetitionsRegistrationComponent,
-    ReportingResultComponent
+    ReportingResultComponent,
+    CallbackComponent
   ],
   imports: [
     BrowserModule,

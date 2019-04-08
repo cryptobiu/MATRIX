@@ -15,7 +15,11 @@ export class ReportingComponent implements OnInit {
   displayedColumns = ['name', 'action'];
   actions = ['Analyze Results using Excel', 'Analyze Results using Elasticsearch'];
 
-  constructor(private dbService:DbService, private router:Router) { }
+  constructor(private dbService:DbService, private router:Router)
+  {
+    if (!localStorage.getItem('isLoggedIn'))
+      this.router.navigate(['/login']);
+  }
 
   ngOnInit() {
   }
