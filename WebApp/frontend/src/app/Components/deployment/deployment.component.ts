@@ -21,14 +21,20 @@ export class DeploymentComponent implements OnInit {
   constructor(private dbService:DbService, private auth: AuthService, private router : Router)
   {
     if (!localStorage.getItem('isLoggedIn'))
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login']).catch(function (err) {
+        if(err)
+          console.error(err);
+      });
   }
 
   ngOnInit() {
   }
 
   onChange(operation, protocol){
-    this.router.navigate(['/deployment/' + protocol + '/' + operation])
+    this.router.navigate(['/deployment/' + protocol + '/' + operation]).catch(function (err) {
+      if(err)
+        console.error(err);
+    });
   }
 
 }

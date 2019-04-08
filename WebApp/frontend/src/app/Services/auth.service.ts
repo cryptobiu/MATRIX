@@ -50,11 +50,17 @@ export class AuthService {
       if (authResult && authResult.accessToken) {
         window.location.hash = '';
         this.getUserInfo(authResult);
-        this.router.navigate(['/']);
+        this.router.navigate(['/']).catch(function (err) {
+          if(err)
+            console.error(err);
+        });
       } else if (err) {
         console.error(`Error: ${err.error}`);
       }
-      this.router.navigate(['/']);
+      this.router.navigate(['/']).catch(function (err) {
+        if(err)
+          console.error(err);
+      });
     });
   }
 
@@ -98,4 +104,3 @@ export class AuthService {
   }
 
 }
- //https://community.auth0.com/t/auth0-state-does-not-match-angular-7/23078
