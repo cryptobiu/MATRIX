@@ -27,6 +27,7 @@
     "core-js": "^2.5.4",
     "elasticsearch": "^15.3.0",
     "elasticsearch-browser": "^15.3.0",
+    "fstream": "^1.0.12",
     "hammerjs": "^2.0.8",
     "jquery": "^3.4.0",
     "mongoose": "^5.4.0",
