@@ -1,5 +1,6 @@
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" fixedInViewport="true"
+
+   <mat-sidenav #drawer class="sidenav" fixedInViewport="false"
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="!(isHandset$ | async)">
@@ -14,9 +15,8 @@
       <a mat-list-item routerLink="/reporting">Reporting</a>
     </mat-nav-list>
   </mat-sidenav>
-  <!--For elements outside the navbar-->
+    <!--For elements outside the navbar-->
   <mat-sidenav-content>
-    <ng-content></ng-content>
     <mat-toolbar color="primary">
       <button mat-icon-button (click)="drawer.toggle().catch()"
               type="button"
@@ -26,14 +26,15 @@
       </button>
       <span>MATRIX</span>
       <span class="spacer"></span>
-<!--      <ng-container *ngIf="isLoggedIn; else logout_div">-->
+      <ng-container *ngIf="isLoggedIn; else logout_div">
         <a routerLink="/login">Login</a>
-<!--      </ng-container>-->
+      </ng-container>
 
-<!--      <ng-template #logout_div>-->
+      <ng-template #logout_div>
         <a (click)="logout();">Sign Out</a>
-<!--      </ng-template>-->
+      </ng-template>
 
     </mat-toolbar>
+    <ng-content></ng-content>
   </mat-sidenav-content>
 </mat-sidenav-container>
