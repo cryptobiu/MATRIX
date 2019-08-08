@@ -1,9 +1,10 @@
 from Matrix import MatrixMenu
 import sys
 
+
 def main():
     menu = MatrixMenu()
-    if (len(sys.argv) == 2):
+    if len(sys.argv) == 2:
         menu.run(sys.argv[1])
     else:
         menu.run()
