@@ -1,5 +1,7 @@
 import os
 import json
+from json import JSONDecodeError
+
 import certifi
 from glob import glob
 from datetime import datetime
@@ -19,7 +21,7 @@ class Elastic:
         """
         self.config_file = protocol_config
         try:
-            with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
+            with open(f'{os.getcwd()}/GlobalConfigurations/tokens.json') as gc_file:
                 global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
         except EnvironmentError:
             print('Cannot open Global Configurations')
@@ -39,18 +41,18 @@ class Elastic:
         raw_configurations = self.config_file['configurations'][0].split('@')
         # delete values, only the parameters are left
         del raw_configurations[1::2]
-        raw_configurations = [rc[1:] for rc in raw_configurations]
+        raw_configurations = [rc[1:] for rc in raw_configurations if rc[0] == '-']
         raw_configurations.insert(0, 'partyId')
         raw_configurations.insert(0, 'protocolName')
 
         dts = datetime.utcnow()
-        # results_path += '/*%s*.json' % analysis_type
-        results_files = glob('%s/*%s*.json' % (expanduser(results_path), analysis_type))
+        cloud_provider = 'aws' if 'aws' in self.config_file['CloudProviders'] else 'azure'
+        network_type = self.config_file['CloudProviders'][cloud_provider]['networkType']
+        results_files = glob(expanduser(f'{results_path}/*.json'))
         for file in results_files:
             config_values = basename(file).split('*')
             # remove the json extension
             config_values[-1] = config_values[-1][:-5]
-            analyzed_parameter = config_values[1].lower()
             del config_values[1]
 
             try:
@@ -64,14 +66,17 @@ class Elastic:
                     for task_idx in range(number_of_tasks):
                         val = 0
                         for iteration_idx in range(number_of_iterations):
-                            val += data[task_idx]['iteration_%s' % iteration_idx]
+                            val += float(data[task_idx]['iteration_%s' % iteration_idx])
                         doc[data[task_idx]['name']] = val / float(number_of_iterations)
                     doc['executionTime'] = dts
+                    doc['networkType'] = network_type
 
-                    self.es.index(index='%sresults' % analyzed_parameter, doc_type='%sresults' % analyzed_parameter,
-                                  body=doc)
+                    self.es.index(index=f'{analysis_type}results', doc_type=f'{analysis_type}results', body=doc)
+
             except EnvironmentError:
-                print('Cannot read results files')
+                print(f'Cannot read results from {file}')
+            except JSONDecodeError:
+                print(f'Problem reading data from {file}')
 
     def upload_log_data(self, results_path):
         """
