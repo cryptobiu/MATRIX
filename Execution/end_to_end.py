@@ -106,4 +106,11 @@ class E2E:
         logs_directory = self.protocol_config['logs']
         protocol_name = self.protocol_config['protocol']
         os.system(f'fab -f Execution/fabfile.py get_logs:{logs_directory} --parallel | '
-                              f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+                  f'tee WebApp/ExecutionLogs/{protocol_name}.log')
+
+    def delete_old_experiment(self):
+        protocol_name = self.protocol_config['protocol']
+        working_directory = self.protocol_config['workingDirectory']
+        for idx in range(len(working_directory)):
+            os.system(f'fab -f Execution/fabfile.py delete_old_experiment:{working_directory[idx]} --parallel | '
+                      f'tee WebApp/ExecutionLogs/{protocol_name}.log')
