@@ -65,6 +65,8 @@ class MatrixMenu:
             'Execute Experiment with profiler',
             'Execute Experiment with latency',
             'Update libscapi',
+            'Get logs',
+            'Delete old experiment data',
             'Return',
         ],
         'yellow')
@@ -255,6 +257,10 @@ class MatrixMenu:
             ee.execute_experiment_with_latency()
         elif selection == 5:
             ee.update_libscapi()
+        elif selection == 6:
+            ee.get_logs()
+        elif selection == 7:
+            ee.delete_old_experiment()
 
     def analysis_menu(self):
         """
