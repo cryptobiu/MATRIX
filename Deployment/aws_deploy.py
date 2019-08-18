@@ -24,6 +24,8 @@ class AmazonCP(DeployCP):
         :param protocol_config: the configuration of the protocol we want to deploy
         """
         super(AmazonCP, self).__init__(protocol_config)
+        profile_name = self.protocol_config['profileName']
+        self.session = boto3.session.Session(profile_name=profile_name)
 
     def create_key_pair(self):
         """
@@ -35,7 +37,7 @@ class AmazonCP(DeployCP):
         with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
             print('Creating key pairs', file=output_file)
             for regions_idx in range(len(regions)):
-                client = boto3.client('ec2', region_name=regions[regions_idx][:-1])
+                client = self.session.client('ec2', region_name=regions[regions_idx][:-1])
                 keys = client.describe_key_pairs()
                 number_of_current_keys = len(keys['KeyPairs'])
                 try:
@@ -66,7 +68,7 @@ class AmazonCP(DeployCP):
             print('Creating security groups', file=output_file)
             for idx in range(len(regions)):
                 region_name = regions[idx][:-1]
-                client = boto3.client('ec2', region_name=region_name)
+                client = self.session.client('ec2', region_name=region_name)
                 # create security group
                 try:
                     response = client.create_security_group(
@@ -76,7 +78,7 @@ class AmazonCP(DeployCP):
                     )
                     # Add FW rules
                     sg_id = response['GroupId']
-                    ec2 = boto3.resource('ec2', region_name=region_name)
+                    ec2 = self.session.resource('ec2', region_name=region_name)
                     security_group = ec2.SecurityGroup(sg_id)
                     security_group.authorize_ingress(IpProtocol='tcp', CidrIp='0.0.0.0/0', FromPort=0, ToPort=65535)
                 except botocore.exceptions.EndpointConnectionError as e:
@@ -97,7 +99,7 @@ class AmazonCP(DeployCP):
         :param region: the regions that the instances are located
         :return: the last wining price
         """
-        client = boto3.client('ec2', region_name=region[:-1])
+        client = self.session.client('ec2', region_name=region[:-1])
         prices = client.describe_spot_price_history(InstanceTypes=[instance_type], MaxResults=1,
                                                     ProductDescriptions=['Linux/UNIX (Amazon VPC)'],
                                                     AvailabilityZone=region)
@@ -107,7 +109,7 @@ class AmazonCP(DeployCP):
         regions = self.protocol_config['CloudProviders']['aws']['regions']
         for region in regions:
             instances = self.describe_instances(region[:-1], self.protocol_name)
-            client = boto3.client('ec2', region_name=region[:-1])
+            client = self.session.client('ec2', region_name=region[:-1])
             try:
                 client.cancel_spot_instance_requests(SpotInstanceRequestIds=instances)
             except botocore.exceptions.ClientError as e:
@@ -120,7 +122,7 @@ class AmazonCP(DeployCP):
         :param region_name: the region that the instances are located
         :return: the size of the AMI disk
         """
-        client = boto3.client('ec2', region_name)
+        client = self.session.client('ec2', region_name)
 
         try:
             with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
@@ -165,8 +167,8 @@ class AmazonCP(DeployCP):
 
             for idx in range(len(regions)):
                 region_name = regions[idx][:-1]
-                client = boto3.client('ec2', region_name=region_name)
-                disk_size = self.get_ami_disk_size(region_name)
+                client = self.session.client('ec2', region_name=region_name)
+                # disk_size = self.get_ami_disk_size(region_name)
 
                 number_of_instances_to_deploy = self.check_running_instances(region_name, machine_type)
                 if idx < number_duplicated_servers:
@@ -223,7 +225,7 @@ class AmazonCP(DeployCP):
                                     'Ebs':
                                         {
                                             'DeleteOnTermination': True,
-                                            'VolumeSize': disk_size
+                                            'VolumeSize': 400
                                         }
                                 },
                                     {
@@ -253,7 +255,7 @@ class AmazonCP(DeployCP):
                                     'Ebs':
                                         {
                                             'DeleteOnTermination': True,
-                                            'VolumeSize': disk_size
+                                            'VolumeSize': 400
                                         }
                                 },
                                     {
@@ -308,7 +310,7 @@ class AmazonCP(DeployCP):
         # get the spot instances ids
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
-            client = boto3.client('ec2', region_name=region_name)
+            client = self.session.client('ec2', region_name=region_name)
             if is_spot_request:
                 response = client.describe_instances(Filters=[{'Name': 'instance-lifecycle', 'Values': ['spot']},
                                                               {'Name': 'instance-type', 'Values': [instance_type]},
@@ -369,7 +371,7 @@ class AmazonCP(DeployCP):
         :param machines_name: the protocol name
         :return list of instances
         """
-        client = boto3.client('ec2', region_name=region_name)
+        client = self.session.client('ec2', region_name=region_name)
         is_spot_request = 'spotPrice' in self.protocol_config['CloudProviders']['aws']
         if is_spot_request:
             response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [machines_name]},
@@ -396,7 +398,7 @@ class AmazonCP(DeployCP):
         """
         ready_instances = 0
 
-        client = boto3.client('ec2', region_name=region)
+        client = self.session.client('ec2', region_name=region)
         response = client.describe_instances()
 
         for res_idx in range(len(response['Reservations'])):
@@ -422,7 +424,7 @@ class AmazonCP(DeployCP):
             region_name = regions[idx][:-1]
             instances = self.describe_instances(region_name, self.protocol_name)
 
-            client = boto3.client('ec2', region_name=region_name)
+            client = self.session.client('ec2', region_name=region_name)
             client.start_instances(InstanceIds=instances)
         time.sleep(20)
         self.get_network_details()
@@ -438,7 +440,7 @@ class AmazonCP(DeployCP):
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
             instances = self.describe_instances(region_name, self.protocol_name)
-            client = boto3.client('ec2', region_name=region_name)
+            client = self.session.client('ec2', region_name=region_name)
             client.stop_instances(InstanceIds=instances)
 
     def reboot_instances(self):
@@ -453,7 +455,7 @@ class AmazonCP(DeployCP):
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
             instances = self.describe_instances(region_name, self.protocol_name)
-            client = boto3.client('ec2', region_name=region_name)
+            client = self.session.client('ec2', region_name=region_name)
             client.reboot_instances(InstancesIds=instances)
 
     def change_instance_types(self):
@@ -470,7 +472,7 @@ class AmazonCP(DeployCP):
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
             instances = self.describe_instances(region_name, self.protocol_name)
-            client = boto3.client('ec2', region_name=region_name)
+            client = self.session.client('ec2', region_name=region_name)
             client.stop_instances(InstanceIds=instances)
             waiter = client.get_waiter('instance_stopped')
             waiter.wait(InstanceIds=instances)
@@ -499,7 +501,7 @@ class AmazonCP(DeployCP):
 
             instances = self.describe_instances(region_name, self.protocol_name)
 
-            client = boto3.client('ec2', region_name=region_name)
+            client = self.session.client('ec2', region_name=region_name)
             client.terminate_instances(InstanceIds=instances)
 
     @staticmethod
@@ -519,7 +521,7 @@ class AmazonCP(DeployCP):
         regions_list.remove(source_region)
 
         for region in regions_list:
-            client = boto3.client('ec2', region_name=region)
+            client = self.session.client('ec2', region_name=region)
             response = client.copy_image(Description='libscapi image', Name='libscapi',
                                          SourceImageId=data[source_region]['ami'], SourceRegion=source_region)
             data[region]['ami'] = response['ImageId']
