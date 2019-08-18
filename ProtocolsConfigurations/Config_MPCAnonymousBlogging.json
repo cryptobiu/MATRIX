@@ -1,0 +1,35 @@
+{
+  "protocol":"MPCAnonymousBlogging",
+  "CloudProviders":
+  {
+    "aws":
+    {
+      "numOfParties":21,
+      "instanceType":"m5.12xlarge",
+      "regions": ["us-east-1c"],
+      "git":
+      {
+        "gitBranch": ["cpu"],
+        "gitAddress": ["https://{}:{}@github.com/cryptobiu/MPCAnonymousBloging.git"]
+      },
+      "networkType": "LAN",
+      "profileName": "vmware"
+    }
+  },
+  "executableName": ["run.sh"],
+  "configurations":
+  [
+    "3@10000@9@8",
+    "13@10000@9@1",
+    "21@10000@9@1"
+  ],
+  "numOfRepetitions":1,
+  "numOfInternalRepetitions":1,
+  "IsPublished": "true",
+  "isExternal": "false",
+  "workingDirectory": ["~/MPCAnonymousBloging"],
+  "logDirectory": [],
+  "resultsDirectory": "~/MATRIX/ResultsExp3LANDebugging",
+  "emails": ["liork.cryptobiu@gmail.com"],
+  "institute":"Bar Ilan Cyber Center"
+}
