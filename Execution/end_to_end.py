@@ -51,12 +51,23 @@ class E2E:
         configurations = self.protocol_config['configurations']
         working_directory = self.protocol_config['workingDirectory']
         executables = self.protocol_config['executableName']
+        number_of_regions = len(self.protocol_config['CloudProviders'])
+        if 'coordinatorExecutable' in self.protocol_config:
+            coordinator_executable = self.protocol_config['coordinatorExecutable']
+            coordinator_args = self.protocol_config['coordinatorConfig']
+
         for i in range(number_of_repetitions):
             for idx2 in range(len(configurations)):
                 for idx in range(len(executables)):
-                    os.system(f'fab -f Execution/fabfile.py run_protocol:{self.protocol_config_path},'
-                              f'{configurations[idx2]},{executables[idx]},{working_directory[idx]} --parallel | '
-                              f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+                    if 'coordinatorExecutable' in self.protocol_config:
+                        os.system(f'fab -f Execution/fabfile.py run_protocol:{number_of_regions},'
+                                  f'{configurations[idx2]},{executables[idx]},{working_directory[idx]}, '
+                                  f'{coordinator_executable}, {coordinator_args} --parallel | '
+                                  f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+                    else:
+                        os.system(f'fab -f Execution/fabfile.py run_protocol:{number_of_regions},'
+                                  f'{configurations[idx2]},{executables[idx]},{working_directory[idx]},  --parallel | '
+                                  f' tee WebApp/ExecutionLogs/{protocol_name}.log')
 
     def execute_experiment_callgrind(self):
         """

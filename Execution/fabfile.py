@@ -11,7 +11,7 @@ env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
 # Set this to point to where the AWS key is put by MATRIX (possibly ~/Keys/[KEYNAME])
-env.key_filename = [f'{Path.home()}/Desktop/Avishay.pem']
+env.key_filename = [f'{Path.home()}/Keys/Matrixuseast1.pem']
 # Set this to point to where you put the MATRIX root
 path_to_matrix = 'YOU PATH TO MATRIX'
 
@@ -53,35 +53,25 @@ def update_libscapi():
 
 
 @task
-def run_protocol(config_file, args, executable_name, working_directory):
+def run_protocol(number_of_regions, args, executable_name, working_directory, external_protocol,
+                 coordinator_executable=None, coordinator_config=None):
     """
     Execute the protocol on remote servers
-    :type config_file str
-    :param config_file: configuration file directory
+    :type number_of_regions int
+    :param number_of_regions: number of regions
     :type args str
     :param args: the arguments for the protocol, separated by `@`
     :type executable_name str
     :param executable_name: the executable file name
     :type working_directory str
     :param working_directory: the executable file dir
+    :type external_protocol str
+    :param working_directory: the executable file dir
+    :type coordinator_executable str
+    :param coordinator_executable: coordinator executable name
+    :type coordinator_config str
+    :param coordinator_config: coordinator args
     """
-    try:
-        # read CP
-        with open(config_file) as data_file:
-            data = json.load(data_file, object_pairs_hook=OrderedDict)
-            external_protocol = json.loads(data['isExternal'].lower())
-            if 'aws' in data['CloudProviders']:
-                regions = data['CloudProviders']['aws']['regions']
-            elif 'azure' in data['CloudProviders']:
-                regions = data['CloudProviders']['azure']['regions']
-            elif len(data['CloudProviders']) > 1:
-                regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
-            elif 'servers' in data['CloudProviders']:
-                regions = data['CloudProviders']['servers']['regions']
-            else:
-                regions = []
-    except EnvironmentError:
-        print(f'Cannot open config at: {config_file}')
 
     vals = args.split('@')
     values_str = ''
@@ -94,7 +84,7 @@ def run_protocol(config_file, args, executable_name, working_directory):
             values_str += f'{val} '
 
     # local execution
-    if len(regions) == 0:
+    if number_of_regions == 0:
         number_of_parties = len(env.hosts)
         local(f'cp InstancesConfigurations/parties.conf {working_directory}/MATRIX')
         for idx in range(number_of_parties):
@@ -115,15 +105,14 @@ def run_protocol(config_file, args, executable_name, working_directory):
         with cd(working_directory):
             # run external protocols
             with cd('MATRIX'):
-                if 'coordinatorConfig' in data:
+                if coordinator_executable is not None:
                     # run protocols  with coordinator
                     put('InstancesConfigurations/parties.conf', working_directory)
                     # public ips are required for SCALE-MAMBA
                     put('InstancesConfigurations/public_ips', working_directory)
 
                     if env.hosts.index(env.host) == 0:
-                        coordinator_executable = data['coordinatorExecutable']
-                        coordinator_args = data['coordinatorConfig'].split('@')
+                        coordinator_args = coordinator_config['coordinatorConfig'].split('@')
                         coordinator_values_str = ''
 
                         for coordinator_val in coordinator_args:
@@ -141,7 +130,7 @@ def run_protocol(config_file, args, executable_name, working_directory):
                         except EnvironmentError:
                             print('Cannot write data to execution log file')
                     else:
-                        if len(regions) > 1:
+                        if number_of_regions > 1:
                             put(f'InstancesConfigurations/parties{party_id}.conf', working_directory)
                             run(f'mv {working_directory}/parties{party_id}.conf {working_directory}/parties.conf')
 
@@ -153,7 +142,7 @@ def run_protocol(config_file, args, executable_name, working_directory):
                             print('Cannot write data to execution log file')
                 else:
                     # run external protocols with no coordinator
-                    if len(regions) > 1:
+                    if int(number_of_regions) > 1:
                         put(f'InstancesConfigurations/parties{party_id}.conf', working_directory)
                         run(f'mv {working_directory}/parties{party_id}.conf {working_directory}/parties.conf')
                     else:
@@ -168,12 +157,12 @@ def run_protocol(config_file, args, executable_name, working_directory):
 
 
 @task
-def run_protocol_profiler(config_file, args, executable_name, working_directory):
+def run_protocol_profiler(number_of_regions, args, executable_name, working_directory):
     """
     Execute the protocol on remote servers with profiler.
     The first party is executed with profiler, the other executed normally
-    :type config_file str
-    :param config_file: configuration file directory
+    :type number_of_regions int
+    :param number_of_regions: number of regions
     :type args str
     :param args: the arguments for the protocol, separated by `@`
     :type executable_name str
@@ -181,18 +170,6 @@ def run_protocol_profiler(config_file, args, executable_name, working_directory)
     :type working_directory str
     :param working_directory: the executable file dir
     """
-    try:
-        with open(config_file) as data_file:
-            data = json.load(data_file, object_pairs_hook=OrderedDict)
-            external_protocol = json.loads(data['isExternal'].lower())
-            if 'aws' in data['CloudProviders']:
-                regions = data['CloudProviders']['aws']['regions']
-            elif 'azure' in data['CloudProviders']:
-                regions = data['CloudProviders']['azure']['regions']
-            else:
-                regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
-    except EnvironmentError:
-        print(f'Cannot open config at: {config_file}')
 
     vals = args.split('@')
     values_str = ''
@@ -214,7 +191,7 @@ def run_protocol_profiler(config_file, args, executable_name, working_directory)
             values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
 
         if not external_protocol:
-            if len(regions) > 1:
+            if number_of_regions > 1:
                 put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
                 run(f'mv parties{party_id}s.conf parties.conf')
             else:
@@ -244,18 +221,6 @@ def run_protocol_with_latency(config_file, args, executable_name, working_direct
     :type working_directory str
     :param working_directory: the executable file dir
     """
-    try:
-        with open(config_file) as data_file:
-            data = json.load(data_file, object_pairs_hook=OrderedDict)
-            external_protocol = json.loads(data['isExternal'].lower())
-            if 'aws' in data['CloudProviders']:
-                regions = data['CloudProviders']['aws']['regions']
-            elif 'azure' in data['CloudProviders']:
-                regions = data['CloudProviders']['azure']['regions']
-            else:
-                regions = data['CloudProviders']['aws']['regions'] + data['CloudProviders']['azure']['regions']
-    except EnvironmentError:
-        print(f'Cannot open config at: {config_file}')
 
     vals = args.split('@')
     values_str = ''
