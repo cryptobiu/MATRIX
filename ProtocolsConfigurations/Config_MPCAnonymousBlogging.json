@@ -6,22 +6,20 @@
     {
       "numOfParties":21,
       "instanceType":"m5.12xlarge",
-      "regions": ["us-east-1c"],
+      "regions": ["us-east-1c", "ap-southeast-2c"],
       "git":
       {
         "gitBranch": ["cpu"],
         "gitAddress": ["https://{}:{}@github.com/cryptobiu/MPCAnonymousBloging.git"]
       },
-      "networkType": "LAN",
+      "networkType": "WAN2",
       "profileName": "vmware"
     }
   },
   "executableName": ["run.sh"],
   "configurations":
   [
-    "3@10000@9@8",
-    "13@10000@9@1",
-    "21@10000@9@1"
+    "-numServers@3@-numClients@10000@-fieldType@ZpMersenne31@-l@9@-partiesFile@parties.conf@-internalIterationsNumber@1@-numThreads@8@-T@1"
   ],
   "numOfRepetitions":1,
   "numOfInternalRepetitions":1,
@@ -29,7 +27,7 @@
   "isExternal": "false",
   "workingDirectory": ["~/MPCAnonymousBloging"],
   "logDirectory": [],
-  "resultsDirectory": "~/MATRIX/ResultsExp3LANDebugging",
+  "resultsDirectory": "~/MATRIX/GPUMcorrupt",
   "emails": ["liork.cryptobiu@gmail.com"],
   "institute":"Bar Ilan Cyber Center"
 }
