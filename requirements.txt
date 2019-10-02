@@ -31,7 +31,7 @@ requests==2.20.0
 s3transfer==0.1.13
 six==1.11.0
 slumber==0.7.1
-urllib3>=1.24.2
+urllib3==1.24.2
 Flask==1.0.2
 Flask-Cors==3.0.7
 pymongo==3.7.1
