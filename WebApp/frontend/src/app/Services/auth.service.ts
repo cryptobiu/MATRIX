@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import * as auth0 from 'auth0-js';
-import auth0Tokens from './../../assets/auth0Tokens.json';
+import auth0Tokens from 'assets/auth0Tokens.json';
 
 (window as any).global = window;
 
@@ -13,7 +13,7 @@ export class AuthService {
   private _idToken: string;
   private _accessToken: string;
   private _expiresAt: number;
-  private _auth0 : auth0.WebAuth;
+  private _auth0: auth0.WebAuth;
   private _authenticated: boolean;
   private _userProfile: any;
 
