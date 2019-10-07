@@ -23,8 +23,10 @@ import { ReportingComponent } from './Components/reporting/reporting.component';
 import { ExecutionResultComponent } from './Components/execution-result/execution-result.component';
 import { CompetitionsRegistrationComponent } from './Components/competitions-registration/competitions-registration.component';
 import { ReportingResultComponent } from './Components/reporting-result/reporting-result.component';
-import {AuthService} from "./Services/auth.service";
+import {AuthService} from './Services/auth.service';
 import { CallbackComponent } from './Components/callback/callback.component';
+import { DeploymentUpdateComponent } from './Components/deployment-update/deployment-update.component';
+import {ExecutionUpdateComponent} from './Components/execution-update/execution-update.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +47,9 @@ import { CallbackComponent } from './Components/callback/callback.component';
     ExecutionResultComponent,
     CompetitionsRegistrationComponent,
     ReportingResultComponent,
-    CallbackComponent
+    CallbackComponent,
+    DeploymentUpdateComponent,
+    ExecutionUpdateComponent
   ],
   imports: [
     BrowserModule,

@@ -53,7 +53,7 @@ def update_libscapi():
 
 
 @task
-def run_protocol(number_of_regions, args, executable_name, working_directory, external_protocol,
+def run_protocol(number_of_regions, args, executable_name, working_directory,
                  coordinator_executable=None, coordinator_config=None):
     """
     Execute the protocol on remote servers
@@ -64,8 +64,6 @@ def run_protocol(number_of_regions, args, executable_name, working_directory, ex
     :type executable_name str
     :param executable_name: the executable file name
     :type working_directory str
-    :param working_directory: the executable file dir
-    :type external_protocol str
     :param working_directory: the executable file dir
     :type coordinator_executable str
     :param coordinator_executable: coordinator executable name
@@ -88,10 +86,7 @@ def run_protocol(number_of_regions, args, executable_name, working_directory, ex
         number_of_parties = len(env.hosts)
         local(f'cp InstancesConfigurations/parties.conf {working_directory}/MATRIX')
         for idx in range(number_of_parties):
-            if external_protocol:
-                local(f'cd {working_directory}/MATRIX && ./{executable_name} {idx} {values_str} &')
-            else:
-                local(f'cd {working_directory} && ./{executable_name} partyID {idx} {values_str} &')
+            local(f'cd {working_directory}/MATRIX && ./{executable_name} {idx} {values_str} &')
 
     else:
         party_id = env.hosts.index(env.host)
@@ -190,30 +185,29 @@ def run_protocol_profiler(number_of_regions, args, executable_name, working_dire
         if 'inputs0' in values_str:
             values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
 
-        if not external_protocol:
-            if number_of_regions > 1:
-                put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
-                run(f'mv parties{party_id}s.conf parties.conf')
-            else:
-                put('InstancesConfigurations/parties.conf', run('pwd'))
-            if party_id == 0:
-                run(f'valgrind --tool=callgrind ./{executable_name} partyID {party_id} {values_str}')
-                get('callgrind.out.*', os.getcwd())
-            else:
-                run(f'./{executable_name} partyID {party_id} {values_str}')
-                try:
-                    with open('Execution/execution_log.log', 'a+') as log_file:
-                        log_file.write(f'{values_str}\n')
-                except EnvironmentError:
-                    print('Cannot write data to execution log file')
+        if number_of_regions > 1:
+            put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
+            run(f'mv parties{party_id}s.conf parties.conf')
+        else:
+            put('InstancesConfigurations/parties.conf', run('pwd'))
+        if party_id == 0:
+            run(f'valgrind --tool=callgrind ./{executable_name} partyID {party_id} {values_str}')
+            get('callgrind.out.*', os.getcwd())
+        else:
+            run(f'./{executable_name} partyID {party_id} {values_str}')
+            try:
+                with open('Execution/execution_log.log', 'a+') as log_file:
+                    log_file.write(f'{values_str}\n')
+            except EnvironmentError:
+                print('Cannot write data to execution log file')
 
 
 @task
-def run_protocol_with_latency(config_file, args, executable_name, working_directory):
+def run_protocol_with_latency(number_of_regions, args, executable_name, working_directory):
     """
     Execute the protocol on remote servers with network latency
-    :type config_file str
-    :param config_file: configuration file directory
+    :type number_of_regions int
+    :param number_of_regions: number of regions
     :type args str
     :param args: the arguments for the protocol, separated by `@`
     :type executable_name str
@@ -246,19 +240,18 @@ def run_protocol_with_latency(config_file, args, executable_name, working_direct
         if 'inputs0' in values_str:
             values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
 
-        if not external_protocol:
-            if len(regions) > 1:
-                put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
-                run(f'mv parties{party_id}.conf parties.conf')
-            else:
-                put('InstancesConfigurations/parties.conf', run('pwd'))
+        if len(number_of_regions) > 1:
+            put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
+            run(f'mv parties{party_id}.conf parties.conf')
+        else:
+            put('InstancesConfigurations/parties.conf', run('pwd'))
 
-            run(f'./{executable_name} partyID {party_id} {values_str}')
-            try:
-                with open('Execution/execution_log.log', 'a+') as log_file:
-                    log_file.write(f'{values_str}\n')
-            except EnvironmentError:
-                print('Cannot write data to execution log file')
+        run(f'./{executable_name} partyID {party_id} {values_str}')
+        try:
+            with open('Execution/execution_log.log', 'a+') as log_file:
+                log_file.write(f'{values_str}\n')
+        except EnvironmentError:
+            print('Cannot write data to execution log file')
 
 
 @task

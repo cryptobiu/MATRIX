@@ -1,7 +1,7 @@
 <div class="info">
   <p>
     Please choose the requested protocol and the requested action for the protocol. <br>
-    Afterwards the requested results will be presented.
+    If you like to update the existing execution configuration, press the update button near the protocol name.
   </p>
 </div>
 
@@ -9,7 +9,7 @@
   <mat-table [dataSource]="dataSource">
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef> Protocol Name </mat-header-cell>
-      <mat-cell *matCellDef="let protocol">  {{protocol.name}} </mat-cell>
+      <mat-cell *matCellDef="let protocol">  {{protocol.protocolName}} </mat-cell>
     </ng-container>
     <ng-container matColumnDef="action">
       <mat-header-cell *matHeaderCellDef> Action </mat-header-cell>
@@ -21,6 +21,14 @@
           </mat-select>
       </mat-cell>
     </ng-container>
+
+    <ng-container matColumnDef="update">
+      <mat-header-cell *matHeaderCellDef> Update </mat-header-cell>
+      <mat-cell *matCellDef="let protocol">
+        <a href="execution/update/{{protocol.protocolName}}" class="badge badge-primary" >Update configuration</a>
+      </mat-cell>
+    </ng-container>
+
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
   </mat-table>

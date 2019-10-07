@@ -7,15 +7,12 @@ class E2E:
     The class enables to execute protocols in the cloud or on premise
     Each server represents a different party
     """
-    def __init__(self, protocol_config, protocol_config_path):
+    def __init__(self, protocol_config):
         """
         :type protocol_config str
         :param protocol_config: the configuration of the protocol we want to execute
-        :type protocol_config_path str
-        :param protocol_config_path: the path of the configuration file. Needed for Fabric
         """
         self.protocol_config = protocol_config
-        self.protocol_config_path = protocol_config_path
 
     def install_experiment(self):
         """
@@ -79,10 +76,11 @@ class E2E:
         configurations = self.protocol_config['configurations']
         working_directory = self.protocol_config['workingDirectory']
         executables = self.protocol_config['executableName']
+        number_of_regions = len(self.protocol_config['CloudProviders'])
         for i in range(number_of_repetitions):
             for idx2 in range(len(configurations)):
                 for idx in range(len(executables)):
-                    os.system(f'fab -f Execution/fabfile.py run_protocol_profiler:{self.protocol_config_path},'
+                    os.system(f'fab -f Execution/fabfile.py run_protocol_profiler:{number_of_regions},'
                               f'{configurations[idx2]},{executables[idx]},{working_directory[idx]} --parallel | '
                               f' tee WebApp/ExecutionLogs/{protocol_name}.log')
 
@@ -95,10 +93,11 @@ class E2E:
         configurations = self.protocol_config['configurations']
         working_directory = self.protocol_config['workingDirectory']
         executables = self.protocol_config['executableName']
+        number_of_regions = len(self.protocol_config['CloudProviders'])
         for i in range(number_of_repetitions):
             for idx2 in range(len(configurations)):
                 for idx in range(len(executables)):
-                    os.system(f'fab -f Execution/fabfile.py run_protocol_with_latency:{self.protocol_config_path},'
+                    os.system(f'fab -f Execution/fabfile.py run_protocol_with_latency::{number_of_regions},'
                               f'{configurations[idx2]},{executables[idx]},{working_directory[idx]} --parallel | '
                               f' tee WebApp/ExecutionLogs/{protocol_name}.log')
 

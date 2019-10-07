@@ -1,0 +1,107 @@
+<div class="container-fluid mb-5">
+  <div class="alert alert-danger" *ngIf="errmsg">
+    {{ errmsg }}
+  </div>
+  <form #userForm="ngForm" *ngIf="!submitted" target="/protocols" novalidate (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <h5>Cloud Providers</h5><br>
+      <label>
+        Cloud Provider Name <br> <br>
+        <mat-radio-group class="tp-radio-group" [(ngModel)]="selectedCP" name="cloudProviderName"
+                         #cloudProviderName="ngModel" required
+                         [class.isInvalid]="cloudProviderName.invalid && cloudProviderName.touched">
+          <mat-radio-button class="tp-radio-button" *ngFor="let cp of cloudProvidersName" [value]="cp">
+            {{cp}} <br>
+          </mat-radio-button>
+        </mat-radio-group>
+      </label>
+      <br>
+
+      <!--TODO validators for checkbox-->
+
+      <ng-container *ngIf="cloudProviderName.value === 'AWS'; else azure">
+        Regions<br><br>
+        <ng-container *ngFor="let r of awsRegions">
+           <mat-checkbox (change)="onCheckBoxChange($event, r)">{{r}}</mat-checkbox><br>
+        </ng-container>
+      </ng-container>
+
+      <ng-template #azure>
+        <ng-container *ngIf="cloudProviderName.value === 'Azure'">
+          Regions<br><br>
+          <ng-container *ngFor="let r of azureRegions">
+           <mat-checkbox (change)="onCheckBoxChange($event, r)">{{r}}</mat-checkbox><br>
+          </ng-container>
+        </ng-container>
+      </ng-template>
+      <br>
+
+      <ng-container *ngIf="cloudProviderName.value === 'AWS'; else azInstances">
+        Instance Type <br><br>
+        <mat-radio-group class="tp-radio-group" [(ngModel)]="instanceType" name="awsInstanceType"
+                         #awsInstanceType="ngModel" required
+                         [class.isInvalid]="awsInstanceType.invalid && awsInstanceType.touched">
+          <mat-radio-button class="tp-radio-button" *ngFor="let ai of awsInstances" [value]="ai">
+            {{ai}} <br>
+          </mat-radio-button>
+        </mat-radio-group>
+      </ng-container>
+
+      <ng-template #azInstances>
+        <ng-container *ngIf="cloudProviderName.value === 'Azure'">
+          Instance Type <br><br>
+        <mat-radio-group class="tp-radio-group" [(ngModel)]="instanceType" name="azureInstanceType"
+                         #azureInstanceType="ngModel" required
+                         [class.isInvalid]="azureInstanceType.invalid && azureInstanceType.touched">
+          <mat-radio-button class="tp-radio-button" *ngFor="let ai of azureInstances" [value]="ai">
+            {{ai}} <br>
+          </mat-radio-button>
+        </mat-radio-group>
+        </ng-container>
+      </ng-template>
+      <br>
+      <br>
+
+      <label>
+        Number Of Parties<br>
+        <input type="number" required #numberOfParties="ngModel"
+               [class.is-invalid]="numberOfParties.invalid && numberOfParties.touched" class="form-control"
+               name="numberOfParties" [(ngModel)]="numOfParties">
+         <small class="text-danger" [class.d-none]="numberOfParties.valid || numberOfParties.untouched"></small>
+        <!--TODO Numbers validation-->
+      </label>
+      <br>
+
+
+      <label>
+        Git Address
+        <input type="url" required (blur)="validateAddress(repoAddress.value)"
+        (change)="validateAddress(repoAddress.value)" #repoAddress="ngModel"
+               [class.is-invalid]="repoAddress.invalid && repoAddress.touched"
+               class="form-control" name="repoAddress" [(ngModel)]="gitAddress">
+        <small class="text-danger" [class.d-none]="repoAddress.valid || repoAddress.untouched">
+          Git Address is required and must be valid http/https address</small>
+      </label>
+      <br>
+
+      <label>
+        Git Branch
+        <input type="text" required #branch="ngModel" class="form-control"
+               [class.is-invalid]="branch.invalid && branch.touched"
+               class="form-control" name="branch" [(ngModel)]="gitBranch">
+        <small class="text-danger" [class.d-none]="branch.valid || branch.untouched">
+          Git branch is required </small>
+      </label>
+      <br>
+    </div>
+    <br>
+
+    <!--End of cloud providers-->
+
+    <button [disabled]="userForm.form.invalid " class="btn btn-primary" type="submit">
+      Update Configuration
+    </button>
+
+  </form>
+</div>

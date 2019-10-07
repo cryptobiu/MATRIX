@@ -1,17 +1,17 @@
 export interface ICompetition
 {
-  name: string,
-  startDate: Date,
-  endDate: Date,
+  name: string;
+  startDate: Date;
+  endDate: Date;
   description: string;
   participants: [];
 }
 
 export interface IProtocol {
-  name: string,
-  repoAddress: string,
-  securityLevel: string,
-  securityThreshold: string
+  protocolName: string;
+  repoAddress: string;
+  securityLevel: string;
+  thresholdLevel: string;
 }
 
 export interface IReportingData {

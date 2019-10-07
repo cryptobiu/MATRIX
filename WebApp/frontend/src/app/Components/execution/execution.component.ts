@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/';
 import {DataSource} from '@angular/cdk/collections';
-import {DbService} from "../../Services/db.service";
-import {IProtocol} from "../../interfaces";
-import {Router} from "@angular/router";
+import {DbService} from '../../Services/db.service';
+import {IProtocol} from '../../interfaces';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-execution',
@@ -13,33 +13,35 @@ import {Router} from "@angular/router";
 export class ExecutionComponent implements OnInit {
 
   dataSource = new ProtocolDataSource(this.dbService);
-  displayedColumns = ['name', 'action'];
+  displayedColumns = ['name', 'action', 'update'];
   actions = ['Install Experiment', 'Execute Experiment', 'Execute Experiment with profiler',
     'Get Logs', 'Update libscapi'];
 
-  constructor(private dbService:DbService, private router: Router)
-  {
-    if (!localStorage.getItem('isLoggedIn'))
+  constructor(private dbService: DbService, private router: Router) {
+    if (!localStorage.getItem('isLoggedIn')) {
       this.router.navigate(['/login']).catch(function (err) {
-      if(err)
+      if (err) {
         console.error(err);
-    });
+      }
+      });
+    }
   }
 
   ngOnInit() {
   }
 
-  onChange(operation, protocol){
+  onChange(operation, protocol) {
     this.router.navigate(['/execution/' + protocol + '/' + operation]).catch(function (err) {
-      if(err)
+      if (err) {
         console.error(err);
+      }
     });
   }
 
 }
 
 export class ProtocolDataSource extends DataSource<any> {
-  constructor(private dbService:DbService) {
+  constructor(private dbService: DbService) {
     super();
   }
 

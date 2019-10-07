@@ -9,7 +9,7 @@
   <mat-table [dataSource]="dataSource">
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef> Protocol Name </mat-header-cell>
-      <mat-cell *matCellDef="let protocol">  {{protocol.name}} </mat-cell>
+      <mat-cell *matCellDef="let protocol">  {{protocol.protocolName}} </mat-cell>
     </ng-container>
     <ng-container matColumnDef="action">
       <mat-header-cell *matHeaderCellDef> Action </mat-header-cell>

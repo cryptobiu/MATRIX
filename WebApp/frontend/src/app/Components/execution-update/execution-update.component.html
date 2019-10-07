@@ -1,0 +1,56 @@
+<div class="container-fluid mb-5">
+  <div class="alert alert-danger" *ngIf="errmsg">
+    {{ errmsg }}
+  </div>
+  <form #userForm="ngForm" *ngIf="!submitted" target="/protocols" novalidate (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label>Executable Name</label>
+      <input type="text" required #executableName="ngModel"
+             [class.is-invalid]="executableName.invalid && executableName.touched" class="form-control"
+             name="executableName" [(ngModel)]="protocolModel.executableName">
+      <small class="text-danger" [class.d-none]="executableName.valid || executableName.untouched">
+        Executable name is required</small>
+    </div>
+
+    <div class="form-group">
+      <label>Configurations</label>
+      <input type="text" required #configurations="ngModel"
+             [class.is-invalid]="configurations.invalid && configurations.touched" class="form-control"
+             name="configurations" [(ngModel)]="protocolModel.configurations">
+      <small class="text-danger" [class.d-none]="configurations.valid || configurations.untouched">
+        Configurations are the parameters for execution. Please fill them</small>
+    </div>
+
+    <div class="form-group">
+      <label>Number Of Repetitions</label>
+        <input type="number" required #numberOfRepetitions="ngModel"
+               [class.is-invalid]="numberOfRepetitions.invalid && numberOfRepetitions.touched" class="form-control"
+               name="numberOfRepetitions" [(ngModel)]="protocolModel.numOfIterations">
+         <small class="text-danger" [class.d-none]="numberOfRepetitions.valid || numberOfRepetitions.untouched"></small>
+        <!--TODO Numbers validation-->
+    </div>
+
+    <div class="form-group">
+      <label>Working Directory</label>
+      <input type="text" required #workDir="ngModel"
+             [class.is-invalid]="workDir.invalid && workDir.touched" class="form-control"
+             name="workDir" [(ngModel)]="protocolModel.workingDirectory">
+      <small class="text-danger" [class.d-none]="workDir.valid || workDir.untouched">
+        Working directory is the directory where the protocol is installed end executed. Please fill it</small>
+    </div>
+
+    <div class="form-group">
+      <label>Results Directory</label>
+      <input type="text" required #resultsDir="ngModel"
+             [class.is-invalid]="resultsDir.invalid && resultsDir.touched" class="form-control"
+             name="resultsDir" [(ngModel)]="protocolModel.resultsDirectory">
+      <small class="text-danger" [class.d-none]="resultsDir.valid || resultsDir.untouched">
+        Results directory is the directory where the protocol results are downloaded. Please fill it</small>
+    </div>
+
+    <button [disabled]="userForm.form.invalid " class="btn btn-primary" type="submit">
+      Update Configuration
+    </button>
+
+  </form>
+</div>
