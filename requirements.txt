@@ -35,3 +35,4 @@ urllib3==1.23.0
 Flask==1.0.2
 Flask-Cors==3.0.7
 pymongo==3.7.1
+bson
