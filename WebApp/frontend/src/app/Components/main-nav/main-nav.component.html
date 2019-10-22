@@ -26,7 +26,7 @@
       </button>
       <span>MATRIX</span>
       <span class="spacer"></span>
-      <ng-container *ngIf="isLoggedIn; else logout_div">
+      <ng-container *ngIf="!isLoggedIn; else logout_div">
         <a routerLink="/login">Login</a>
       </ng-container>
 
