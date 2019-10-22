@@ -24,7 +24,9 @@ class AmazonCP(DeployCP):
         :param protocol_config: the configuration of the protocol we want to deploy
         """
         super(AmazonCP, self).__init__(protocol_config)
-        profile_name = self.protocol_config['CloudProviders']['aws']['profileName']
+        profile_name = 'default'
+        if 'profileName' in self.protocol_config['CloudProviders']['aws']:
+            profile_name = self.protocol_config['CloudProviders']['aws']['profileName']
         self.session = boto3.session.Session(profile_name=profile_name)
 
     def create_key_pair(self):
