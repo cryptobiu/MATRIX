@@ -1,7 +1,7 @@
 {
   "us-east-1":
   {
-    "ami": "ami-00867f149c135038a",
+    "ami": "ami-0d7d302f424943b8c",
     "key": "Matrixuseast1",
     "securityGroup": "MatrixSGuseast1",
     "name": "N.Virginia"
