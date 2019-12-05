@@ -1,56 +1,56 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Observable, throwError} from "rxjs";
-import {ICompetition, IProtocol} from "../interfaces";
-import {catchError} from "rxjs/operators";
+import {Observable, throwError} from 'rxjs';
+import {ICompetition, IProtocol} from '../interfaces';
+import {catchError} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DbService {
 
-  private _urlApi: string = 'http://localhost:5000/api/';
+  private _urlApi = 'http://localhost:5000/api/';
 
-  constructor(private _http:HttpClient) { }
+  constructor(private _http: HttpClient) { }
 
   getCompetitions(): Observable<ICompetition[]> {
-    let url = this._urlApi + 'competitions';
+    const url = this._urlApi + 'competitions';
     return this._http.get<ICompetition[]>(url).pipe(catchError(this.handleError));
   }
 
   getCompetition(competitionName: string)
   {
-    let url = this._urlApi + 'competitions/' + competitionName;
+    const url = this._urlApi + 'competitions/' + competitionName;
     return this._http.get<ICompetition>(url).pipe(catchError(this.handleError));
   }
 
   getProtocols(): Observable<IProtocol[]> {
-    let url = this._urlApi + 'protocols';
+    const url = this._urlApi + 'protocols';
     return this._http.get<IProtocol[]>(url).pipe(catchError(this.handleError));
   }
 
-  executeDeployOperation(protocolName: string, operation:string) {
-    let url = this._urlApi + 'deploy/' + protocolName + '/' + operation;
+  executeDeployOperation(protocolName: string, operation: string) {
+    const url = this._urlApi + 'deployment/' + protocolName + '/' + operation;
     return this._http.get(url).pipe(catchError(this.handleError));
   }
 
-  executeExecutionOperation(protocolName: string, operation:string) {
-    let url = this._urlApi + 'execute/' + protocolName + '/' + operation;
+  executeExecutionOperation(protocolName: string, operation: string) {
+    const url = this._urlApi + 'execution/' + protocolName + '/' + operation;
     return this._http.get(url).pipe(catchError(this.handleError));
   }
 
-  executeReportingOperation(protocolName: string, operation:string) {
-    let url = this._urlApi + 'reporting/' + protocolName + '/' + operation;
+  executeReportingOperation(protocolName: string, operation: string) {
+    const url = this._urlApi + 'reporting/' + protocolName + '/' + operation;
     return this._http.get(url).pipe(catchError(this.handleError));
   }
 
   getDeploymentData(protocolName: string) {
-    let url = this._urlApi+'deployment/getData/' + protocolName;
-    return this._http.get(url).pipe(catchError(this.handleError))
+    const url = this._urlApi + 'deployment/getData/' + protocolName;
+    return this._http.get(url).pipe(catchError(this.handleError));
   }
 
   getExecutionData(protocolName: string) {
-    let url = this._urlApi+'execution/getData/' + protocolName;
+    const url = this._urlApi + 'execution/getData/' + protocolName;
     return this._http.get(url).pipe(catchError(this.handleError))
   }
 

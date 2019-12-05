@@ -12,7 +12,7 @@ class DeployCP:
         :param protocol_config: the configuration of the protocol we want to deploy
         """
         self.protocol_config = protocol_config
-        self.protocol_name = self.protocol_config['protocol']
+        self.protocol_name = self.protocol_config['protocolName']
 
     def create_key_pair(self):
         """
@@ -143,15 +143,15 @@ class DeployCP:
         :param number_of_regions: number of regions the protocol executed
         """
         regions = []
-        if len(self.protocol_config['CloudProviders']) > 1:
+        if len(self.protocol_config['cloudProviders']) > 1:
             mode = 'a+'
         else:
             mode = 'w+'
 
-        if 'aws' in self.protocol_config['CloudProviders']:
-            regions += self.protocol_config['CloudProviders']['aws']['regions']
-        elif 'azure' in self.protocol_config['CloudProviders']:
-            regions += self.protocol_config['CloudProviders']['azure']['regions']
+        if 'AWS' in self.protocol_config['cloudProviders']:
+            regions += self.protocol_config['cloudProviders']['AWS']['regions']
+        elif 'Azure' in self.protocol_config['cloudProviders']:
+            regions += self.protocol_config['cloudProviders']['Azure']['regions']
         else:
             print('Cloud provider did not found. Program will exit now')
             return
@@ -192,7 +192,7 @@ class DeployCP:
         :type new_format bool
         :param new_format: using the new format or not
         """
-        cp = self.protocol_config['CloudProviders']
+        cp = self.protocol_config['cloudProviders']
         if 'local' in cp:
             number_of_parties = cp['local']['numOfParties']
             public_ip_address = []

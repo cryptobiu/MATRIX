@@ -13,8 +13,8 @@ export class ExecutionUpdateComponent implements OnInit {
   submitted = false;
   addressHasError = true;
   errmsg = '';
-  protocolModel = new Protocol('', {}, '', [], 1,
-    '', '', '', '', '');
+  protocolModel = new Protocol('', {}, '', 0, [],
+    1,    '', '', '', '', '');
 
   constructor(private _formService: FormSubmissionService, private router: Router, private acRouter: ActivatedRoute) {
     this.protocolModel.protocolName = this.acRouter.snapshot.paramMap.get('protocolName');
@@ -25,7 +25,7 @@ export class ExecutionUpdateComponent implements OnInit {
 
   onSubmit() {
     this._formService.submitUpdateExecutionForm(this.protocolModel).subscribe(
-      data => this.router.navigate(['/deployment']),
+      data => this.router.navigate(['/execution']),
       error => this.errmsg = error.statuesText);
   }
 

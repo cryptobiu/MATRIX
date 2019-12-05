@@ -15,8 +15,8 @@ import { Router } from '@angular/router';
 export class DeploymentComponent implements OnInit {
   dataSource = new ProtocolDataSource(this.dbService);
   displayedColumns = ['name', 'action', 'update'];
-  actions = ['Deploy Instance(s)', 'Create key pair(s)', 'Create security group', 'Update network details', 'Terminate machines',
-    'Change machines types', 'Start instances', 'Stop instances'];
+  actions = ['Deploy Instance(s)', 'Create key pair(s)', 'Create security group',
+    'Update network details', 'Terminate machines', 'Change machines types', 'Start instances', 'Stop instances'];
 
   constructor(private dbService: DbService, private auth: AuthService, private router: Router) {
     if (!localStorage.getItem('isLoggedIn')) {

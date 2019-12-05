@@ -13,6 +13,15 @@
     </div>
 
     <div class="form-group">
+      <label>Number of conifurations</label>
+      <input type="text" required #numConfigurations="ngModel"
+             [class.is-invalid]="numConfigurations.invalid && numConfigurations.touched" class="form-control"
+             name="configurations" [(ngModel)]="protocolModel.numConfigurations">
+      <small class="text-danger" [class.d-none]="numConfigurations.valid || numConfigurations.untouched">
+        Please fill the numbers of desired configurations for your protocol</small>
+    </div>
+
+    <div class="form-group">
       <label>Configurations</label>
       <input type="text" required #configurations="ngModel"
              [class.is-invalid]="configurations.invalid && configurations.touched" class="form-control"

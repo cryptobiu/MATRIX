@@ -20,8 +20,8 @@ export class ProtocolsUploadComponent implements OnInit {
 
   securityLevel = ['Semi Honest', 'Malicious'];
   securityThreshold = ['None', 'Honest Majority', '2/3 Majority'];
-  protocolModel = new Protocol('', {}, '', [], 1,
-    '', '', '', '', '');
+  protocolModel = new Protocol('', {}, '', 0, [],
+    1, '', '', '', '', '');
   slHasError = true;
   stHasError = true;
   submitted = false;

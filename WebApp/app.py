@@ -1,8 +1,10 @@
+import os
 import datetime
 import threading
 
 import bson
 import json
+import botocore
 
 from pymongo import errors
 from pymongo import MongoClient
@@ -105,9 +107,8 @@ def register_new_protocol():
     form = request.data
     form_data = json.loads(form.decode('utf-8'))
 
-    collection = db['protocols']
-
     try:
+        collection = db['protocols']
         collection.insert_one(form_data)
     except errors.OperationFailure:
         return jsonify('writing failed', 500)
@@ -138,10 +139,10 @@ def execute_deployment_operation(protocol_name, operation):
 
     try:
         collection = db['protocols']
-        doc = collection.find_one({'protocolName': protocol_name})
-        protocol_data = json.loads(doc)
+        doc = collection.find_one({'protocolName': protocol_name}, {'_id': 0})
+        protocol_data = json.loads(json.dumps(doc))
 
-        if 'aws' in protocol_data['CloudProviders']:
+        if 'AWS' in protocol_data['cloudProviders']:
             deploy = AmazonCP(protocol_data)
         else:
             deploy = DeployCP(protocol_data)
@@ -169,6 +170,8 @@ def execute_deployment_operation(protocol_name, operation):
         return jsonify(f'Failed to retrieve data for {protocol_name}', 500)
     except errors.OperationFailure:
         return jsonify(f'Update deploy configuration for {protocol_name} failed', 500)
+    except botocore.exceptions.ClientError as e:
+        return jsonify('Error occurred during instance creation', 500)
 
 
 @app.route('/api/execution/update/<string:protocol_name>', methods=['POST'])
@@ -177,36 +180,27 @@ def update_execution_protocol_data(protocol_name):
     form_data = json.loads(form.decode('utf-8'))
 
     raw_configurations = form_data['configurations'].split(' ')
-    conf_dict = {}
-    for idx in range(0, len(raw_configurations), 2):
-        key = raw_configurations[idx]
-        value = raw_configurations[idx + 1]
-        if key not in conf_dict.keys():
-            conf_dict[key] = []
-        conf_dict[key].append(value)
-
-    # get the length of the values by retrieve the last key
-    numbers_of_configurations = len(conf_dict[raw_configurations[-2]])
+    numbers_of_configurations = int(form_data['numConfigurations'])
+    numbers_of_parameters = len(raw_configurations) // numbers_of_configurations
     configurations = []
 
     for idx in range(numbers_of_configurations):
-        configuration = ''
-        for key, value in conf_dict.items():
-            configuration += f'{key} {value[idx]} '
-        configurations.append(configuration)
-
-    configurations = [c[:-1] for c in configurations]
+        # configuration = ''
+        # for key, value in conf_dict.items():
+        #     configuration += f'{key} {value[idx]} '
+        configurations.append('@'.join(raw_configurations[idx * numbers_of_parameters:
+                                                 (idx * numbers_of_parameters) + numbers_of_parameters]))
 
     form_data['configurations'] = configurations
 
     try:
         collection = db['protocols']
         doc = collection.find_one({'protocolName': protocol_name})
-        doc['executableName'] = form_data['executableName']
+        doc['executableName'] = form_data['executableName'].strip()
         doc['configurations'] = form_data['configurations']
         doc['numOfIterations'] = form_data['numOfIterations']
-        doc['workingDirectory'] = form_data['workingDirectory']
-        doc['resultsDirectory'] = form_data['resultsDirectory']
+        doc['workingDirectory'] = form_data['workingDirectory'].strip()
+        doc['resultsDirectory'] = form_data['resultsDirectory'].strip()
         collection.save(doc)
 
     except errors.InvalidDocument:
@@ -217,12 +211,12 @@ def update_execution_protocol_data(protocol_name):
     return jsonify('execution update works')
 
 
-@app.route('/api/execute/<string:protocol_name>/<string:operation>')
+@app.route('/api/execution/<string:protocol_name>/<string:operation>')
 def execute_execution_operation(protocol_name, operation):
     try:
         collection = db['protocols']
-        doc = collection.find_one({'protocolName': protocol_name})
-        protocol_data = json.loads(doc)
+        doc = collection.find_one({'protocolName': protocol_name}, {'_id': 0})
+        protocol_data = json.loads(json.dumps(doc))
 
         ee = E2E(protocol_data)
 
@@ -267,18 +261,27 @@ def execute_reporting_operation(protocol_name, operation):
     except errors.OperationFailure:
         return jsonify(f'Update deploy configuration for {protocol_name} failed', 500)
 
+
 @app.route('/api/deployment/getData/<string:protocol_name>')
 def get_deployment_data(protocol_name):
-    with open(f'WebApp/DeploymentLogs/{protocol_name}.log') as df:
-        deployment_data = [line.rstrip('\n') for line in df.readlines()]
-        return jsonify(str(deployment_data[:20]))
+    try:
+        with open(f'WebApp/DeploymentLogs/{protocol_name}.log') as df:
+            deployment_data = [line.rstrip('\n') for line in df.readlines()]
+            return jsonify(str(deployment_data[:20]))
+    except FileNotFoundError as e:
+        print(str(e))
+        return jsonify(f'file DeploymentLogs/{protocol_name}.log not created yet or operation failed')
 
 
 @app.route('/api/execution/getData/<string:protocol_name>')
 def get_execution_data(protocol_name):
-    with open(f'WebApp/ExecutionLogs/{protocol_name}.log') as df:
-        execution_data = [line.rstrip('\n') for line in df.readlines()]
-        return jsonify(str(execution_data[-20:]))
+    try:
+        with open(f'WebApp/ExecutionLogs/{protocol_name}.log') as df:
+            execution_data = [line.rstrip('\n') for line in df.readlines()]
+            return jsonify(str(execution_data[-20:]))
+    except FileNotFoundError as e:
+        print(str(e))
+        return jsonify(f'file ExecutionLogs/{protocol_name}.log not created yet or operation failed')
 
 
 if __name__ == '__main__':

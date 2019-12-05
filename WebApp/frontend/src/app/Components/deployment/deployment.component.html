@@ -15,8 +15,8 @@
       <mat-header-cell *matHeaderCellDef> Action </mat-header-cell>
       <mat-cell *matCellDef="let protocol">
       <mat-select #actionSelected >
-      <mat-option *ngFor="let action of actions" [(value)]="action" (onSelectionChange)=
-        "onChange(action, protocol.protocolName)">
+      <mat-option *ngFor="let action of actions" [(value)]="action"
+                  (onSelectionChange)="onChange(protocol.protocolName, action)">
       {{action}}
       </mat-option>
       </mat-select>

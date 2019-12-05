@@ -25,8 +25,8 @@ class AmazonCP(DeployCP):
         """
         super(AmazonCP, self).__init__(protocol_config)
         profile_name = 'default'
-        if 'profileName' in self.protocol_config['CloudProviders']['aws']:
-            profile_name = self.protocol_config['CloudProviders']['aws']['profileName']
+        if 'profileName' in self.protocol_config['cloudProviders']['AWS']:
+            profile_name = self.protocol_config['cloudProviders']['AWS']['profileName']
         self.session = boto3.session.Session(profile_name=profile_name)
 
     def create_key_pair(self):
@@ -34,7 +34,7 @@ class AmazonCP(DeployCP):
         Creates private key file
         :return:
         """
-        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        regions = self.protocol_config['cloudProviders']['AWS']['regions']
 
         with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
             print('Creating key pairs', file=output_file)
@@ -64,7 +64,7 @@ class AmazonCP(DeployCP):
         Creates firewall rules
         :return:
         """
-        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        regions = self.protocol_config['cloudProviders']['AWS']['regions']
 
         with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
             print('Creating security groups', file=output_file)
@@ -91,8 +91,7 @@ class AmazonCP(DeployCP):
                   file=output_file)
             time.sleep(5)
 
-    @staticmethod
-    def check_latest_price(instance_type, region):
+    def check_latest_price(self, instance_type, region):
         """
         Check what is the latest winning price for spot requests
         :type instance_type str
@@ -108,7 +107,7 @@ class AmazonCP(DeployCP):
         return float(prices['SpotPriceHistory'][0]['SpotPrice'])
 
     def cancel_spot_requests(self):
-        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        regions = self.protocol_config['cloudProviders']['AWS']['regions']
         for region in regions:
             instances = self.describe_instances(region[:-1], self.protocol_name)
             client = self.session.client('ec2', region_name=region[:-1])
@@ -117,8 +116,7 @@ class AmazonCP(DeployCP):
             except botocore.exceptions.ClientError as e:
                 print(e.response['Error']['Message'].upper())
 
-    @staticmethod
-    def get_ami_disk_size(region_name):
+    def get_ami_disk_size(self, region_name):
         """
         :type region_name str
         :param region_name: the region that the instances are located
@@ -141,14 +139,14 @@ class AmazonCP(DeployCP):
         Deploy instances at the requested cloud provider (CP) as configured by self.protocol_config
         :return:
         """
-        regions = self.protocol_config['CloudProviders']['aws']['regions']
-        machine_type = self.protocol_config['CloudProviders']['aws']['instanceType']
-        if 'spotPrice' in self.protocol_config['CloudProviders']['aws']:
+        regions = self.protocol_config['cloudProviders']['AWS']['regions']
+        machine_type = self.protocol_config['cloudProviders']['AWS']['instanceType']
+        if 'spotPrice' in self.protocol_config['cloudProviders']['AWS']:
             spot_request = True
-            price_bids = self.protocol_config['CloudProviders']['aws']['spotPrice']
+            price_bids = self.protocol_config['cloudProviders']['AWS']['spotPrice']
         else:
             spot_request = False
-        number_of_parties = self.protocol_config['CloudProviders']['aws']['numOfParties']
+        number_of_parties = self.protocol_config['cloudProviders']['AWS']['numOfParties']
         number_duplicated_servers = 0
         try:
             with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
@@ -156,6 +154,7 @@ class AmazonCP(DeployCP):
         except EnvironmentError:
             print('Cannot open Global Configurations')
 
+        os.makedirs('WebApp/DeploymentLogs', exist_ok=True)
         with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
             print(f'Starting deploy servers for {self.protocol_name} protocol', file=output_file)
             if len(regions) > 1:
@@ -170,7 +169,7 @@ class AmazonCP(DeployCP):
             for idx in range(len(regions)):
                 region_name = regions[idx][:-1]
                 client = self.session.client('ec2', region_name=region_name)
-                # disk_size = self.get_ami_disk_size(region_name)
+                disk_size = self.get_ami_disk_size(region_name)
 
                 number_of_instances_to_deploy = self.check_running_instances(region_name, machine_type)
                 if idx < number_duplicated_servers:
@@ -227,7 +226,7 @@ class AmazonCP(DeployCP):
                                     'Ebs':
                                         {
                                             'DeleteOnTermination': True,
-                                            'VolumeSize': 400
+                                            'VolumeSize': disk_size
                                         }
                                 },
                                     {
@@ -257,7 +256,7 @@ class AmazonCP(DeployCP):
                                     'Ebs':
                                         {
                                             'DeleteOnTermination': True,
-                                            'VolumeSize': 400
+                                            'VolumeSize': disk_size
                                         }
                                 },
                                     {
@@ -297,10 +296,10 @@ class AmazonCP(DeployCP):
         :type new_format bool
         :param new_format: using the new format or not
         """
-        regions = self.protocol_config['CloudProviders']['aws']['regions']
-        is_spot_request = 'spotPrice' in self.protocol_config['CloudProviders']['aws']
+        regions = self.protocol_config['cloudProviders']['AWS']['regions']
+        is_spot_request = 'spotPrice' in self.protocol_config['cloudProviders']['AWS']
         coordinator_exists = 'coordinatorConfig' in self.protocol_config
-        instance_type = self.protocol_config['CloudProviders']['aws']['instanceType']
+        instance_type = self.protocol_config['cloudProviders']['AWS']['instanceType']
 
         with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'a+') as output_file:
             print(f'Fetching network topology for {self.protocol_name}', file=output_file)
@@ -344,13 +343,13 @@ class AmazonCP(DeployCP):
         if len(regions) > 1:
             shuffle(public_ip_address)
             self.create_parties_file(public_ip_address, port_number, file_name, new_format, len(regions))
-        elif len(self.protocol_config['CloudProviders']) > 1:
+        elif len(self.protocol_config['cloudProviders']) > 1:
             self.create_parties_file(public_ip_address, port_number, file_name, new_format, len(regions))
         else:
             self.create_parties_file(private_ip_address, port_number, file_name,  new_format, len(regions))
 
         # write public ips to file for fabric
-        if len(self.protocol_config['CloudProviders']) > 1:
+        if len(self.protocol_config['cloudProviders']) > 1:
             mode = 'a+'
         else:
             mode = 'w+'
@@ -374,7 +373,7 @@ class AmazonCP(DeployCP):
         :return list of instances
         """
         client = self.session.client('ec2', region_name=region_name)
-        is_spot_request = 'spotPrice' in self.protocol_config['CloudProviders']['aws']
+        is_spot_request = 'spotPrice' in self.protocol_config['cloudProviders']['AWS']
         if is_spot_request:
             response = client.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [machines_name]},
                                                           {'Name': 'instance-lifecycle', 'Values': ['spot']}])
@@ -420,7 +419,7 @@ class AmazonCP(DeployCP):
         """
         with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
             print(f'Starting {self.protocol_name} instances', file=output_file)
-        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        regions = self.protocol_config['cloudProviders']['AWS']['regions']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
@@ -437,7 +436,7 @@ class AmazonCP(DeployCP):
         """
         with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
             print(f'Shut down {self.protocol_name} instances', file=output_file)
-        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        regions = self.protocol_config['cloudProviders']['AWS']['regions']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
@@ -452,7 +451,7 @@ class AmazonCP(DeployCP):
         """
         with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
             print(f'Rebooting {self.protocol_name} instances', file=output_file)
-        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        regions = self.protocol_config['cloudProviders']['AWS']['regions']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]
@@ -465,8 +464,8 @@ class AmazonCP(DeployCP):
         Change the type of the instance the protocol uses.
         The new type should be specified at the protocol configuration file.
         """
-        regions = self.protocol_config['CloudProviders']['aws']['regions']
-        instance_type = self.protocol_config['CloudProviders']['aws']['instanceType']
+        regions = self.protocol_config['cloudProviders']['AWS']['regions']
+        instance_type = self.protocol_config['cloudProviders']['AWS']['instanceType']
 
         with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
             print(f'Changing {self.protocol_name} instances to {instance_type}', file=output_file)
@@ -496,7 +495,7 @@ class AmazonCP(DeployCP):
 
         with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
             print(f'Terminate {self.protocol_name} instances ', file=output_file)
-        regions = self.protocol_config['CloudProviders']['aws']['regions']
+        regions = self.protocol_config['cloudProviders']['AWS']['regions']
 
         for idx in range(len(regions)):
             region_name = regions[idx][:-1]

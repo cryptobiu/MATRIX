@@ -1,7 +1,5 @@
 import os
-import json
 from pathlib import Path
-from collections import OrderedDict
 from fabric.api import *
 from fabric.contrib.files import exists
 
@@ -37,8 +35,7 @@ def install_git_project(username, password, git_branch, git_address, working_dir
     with cd(working_directory):
         run('git pull')
         run(f'git checkout {git_branch}')
-        with cd(f'{working_directory}'):
-            run('./MATRIX/build.sh')
+        run('./MATRIX/build.sh')
 
 
 @task
@@ -50,6 +47,41 @@ def update_libscapi():
         run('git checkout dev')
         run('git pull')
         run('make')
+
+
+def prepare_for_execution(number_of_regions, args, executable_name, working_directory):
+    """
+    Prepare the arguments for execution for all execution modes('normal', profiler and latency)
+    :param number_of_regions:
+    :param args:
+    :param executable_name:
+    :param working_directory:
+    :return: string of values for execution and party id for each host
+    """
+    values = args.split('@')
+    values_str = ''
+    party_id = env.hosts.index(env.host)
+
+    for val in values:
+        # for external protocols
+        if val == 'partyid':
+            values_str += f'{str(env.hosts.index(env.host) - 1)} '
+        else:
+            values_str += f'{val} '
+
+    with warn_only():
+        sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
+
+    if 'inputs0' in values_str:
+        values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
+
+    if int(number_of_regions) > 1:
+        put(f'InstancesConfigurations/parties{party_id}.conf', working_directory)
+        run(f'mv {working_directory}/parties{party_id}.conf {working_directory}/parties.conf')
+    else:
+        put('InstancesConfigurations/parties.conf', working_directory)
+
+    return values_str, party_id
 
 
 @task
@@ -71,84 +103,59 @@ def run_protocol(number_of_regions, args, executable_name, working_directory,
     :param coordinator_config: coordinator args
     """
 
-    vals = args.split('@')
-    values_str = ''
-
-    for val in vals:
-        # for external protocols
-        if val == 'partyid':
-            values_str += f'{str(env.hosts.index(env.host) - 1)} '
-        else:
-            values_str += f'{val} '
+    values_for_execution, party_id = prepare_for_execution(number_of_regions, args, executable_name, working_directory)
 
     # local execution
     if number_of_regions == 0:
         number_of_parties = len(env.hosts)
         local(f'cp InstancesConfigurations/parties.conf {working_directory}/MATRIX')
         for idx in range(number_of_parties):
-            local(f'cd {working_directory}/MATRIX && ./{executable_name} {idx} {values_str} &')
+            local(f'cd {working_directory}/MATRIX && ./{executable_name} {idx} {values_for_execution} &')
 
+    # remote execution (servers or cloud)
     else:
-        party_id = env.hosts.index(env.host)
-
-        with warn_only():
-            sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
-
-        if 'inputs0' in values_str:
-            values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
-
         with cd(working_directory):
-            # run external protocols
-            with cd('MATRIX'):
-                if coordinator_executable is not None:
-                    # run protocols  with coordinator
-                    put('InstancesConfigurations/parties.conf', working_directory)
-                    # public ips are required for SCALE-MAMBA
-                    put('InstancesConfigurations/public_ips', working_directory)
+            # public ips are required for SCALE-MAMBA
+            put('InstancesConfigurations/public_ips', working_directory)
+            # required for SCALE-MAMBA to rsync between AWS instances
+            put(env.key_filename[0], run('pwd'))
 
-                    if env.hosts.index(env.host) == 0:
-                        coordinator_args = coordinator_config['coordinatorConfig'].split('@')
-                        coordinator_values_str = ''
+            with warn_only():
+                sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
 
-                        for coordinator_val in coordinator_args:
-                            coordinator_values_str += f'{coordinator_val} '
+            # run protocols with coordinator
+            if coordinator_executable is not None:
+                if env.hosts.index(env.host) == 0:
+                    coordinator_args = coordinator_config['coordinatorConfig'].split('@')
+                    coordinator_values_str = ''
 
-                        with warn_only():
-                            sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
-                            # required for SCALE-MAMBA to rsync between AWS instances
-                            put(env.key_filename[0], run('pwd'))
+                    for coordinator_val in coordinator_args:
+                        coordinator_values_str += f'{coordinator_val} '
 
-                        run(f'{coordinator_executable} {coordinator_values_str}')
-                        try:
-                            with open('Execution/execution_log.log', 'a+') as log_file:
-                                log_file.write(f'{values_str}\n' % values_str)
-                        except EnvironmentError:
-                            print('Cannot write data to execution log file')
-                    else:
-                        if number_of_regions > 1:
-                            put(f'InstancesConfigurations/parties{party_id}.conf', working_directory)
-                            run(f'mv {working_directory}/parties{party_id}.conf {working_directory}/parties.conf')
-
-                        run(f'./{executable_name} {party_id - 1} {values_str}')
-                        try:
-                            with open('Execution/execution_log.log', 'a+') as log_file:
-                                log_file.write(f'{values_str}\n')
-                        except EnvironmentError:
-                            print('Cannot write data to execution log file')
-                else:
-                    # run external protocols with no coordinator
-                    if int(number_of_regions) > 1:
-                        put(f'InstancesConfigurations/parties{party_id}.conf', working_directory)
-                        run(f'mv {working_directory}/parties{party_id}.conf {working_directory}/parties.conf')
-                    else:
-                        put('InstancesConfigurations/parties.conf', working_directory)
-                    run('mkdir -p logs')
-                    run(f'./{executable_name} {party_id} {values_str}')
+                    run(f'{coordinator_executable} {coordinator_values_str}')
                     try:
                         with open('Execution/execution_log.log', 'a+') as log_file:
-                            log_file.write(f'{values_str}\n')
+                            log_file.write(f'{values_for_execution}\n')
                     except EnvironmentError:
                         print('Cannot write data to execution log file')
+                else:
+                    run(f'./{executable_name} {party_id - 1} {values_for_execution}')
+                    try:
+                        with open('Execution/execution_log.log', 'a+') as log_file:
+                            log_file.write(f'{values_for_execution}\n')
+                    except EnvironmentError:
+                        print('Cannot write data to execution log file')
+
+            # run protocols with no coordinator
+            else:
+                run('mkdir -p logs')
+                with cd('MATRIX'):
+                    run(f'./run.sh {party_id} {values_for_execution}')
+                try:
+                    with open('Execution/execution_log.log', 'a+') as log_file:
+                        log_file.write(f'{values_for_execution}\n')
+                except EnvironmentError:
+                    print('Cannot write data to execution log file')
 
 
 @task
@@ -166,40 +173,19 @@ def run_protocol_profiler(number_of_regions, args, executable_name, working_dire
     :param working_directory: the executable file dir
     """
 
-    vals = args.split('@')
-    values_str = ''
+    values_for_execution, party_id = prepare_for_execution(number_of_regions, args, executable_name, working_directory)
 
-    for val in vals:
-        # for external protocols
-        if val == 'partyid':
-            values_str += f'{str(env.hosts.index(env.host) - 1)} '
-        else:
-            values_str += f'{val} '
+    if party_id == 0:
+        run(f'valgrind --tool=callgrind ./{executable_name} partyID {party_id} {values_for_execution}')
+        get('callgrind.out.*', os.getcwd())
 
-    with cd(working_directory):
-        party_id = env.hosts.index(env.host)
-
-        with warn_only():
-            sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
-
-        if 'inputs0' in values_str:
-            values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
-
-        if number_of_regions > 1:
-            put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
-            run(f'mv parties{party_id}s.conf parties.conf')
-        else:
-            put('InstancesConfigurations/parties.conf', run('pwd'))
-        if party_id == 0:
-            run(f'valgrind --tool=callgrind ./{executable_name} partyID {party_id} {values_str}')
-            get('callgrind.out.*', os.getcwd())
-        else:
-            run(f'./{executable_name} partyID {party_id} {values_str}')
-            try:
-                with open('Execution/execution_log.log', 'a+') as log_file:
-                    log_file.write(f'{values_str}\n')
-            except EnvironmentError:
-                print('Cannot write data to execution log file')
+    else:
+        run(f'./{executable_name} partyID {party_id} {values_for_execution}')
+        try:
+            with open('Execution/execution_log.log', 'a+') as log_file:
+                log_file.write(f'{values_for_execution}\n')
+        except EnvironmentError:
+            print('Cannot write data to execution log file')
 
 
 @task
@@ -216,40 +202,17 @@ def run_protocol_with_latency(number_of_regions, args, executable_name, working_
     :param working_directory: the executable file dir
     """
 
-    vals = args.split('@')
-    values_str = ''
-
-    for val in vals:
-        # for external protocols
-        if val == 'partyid':
-            values_str += f'{str(env.hosts.index(env.host) - 1)} '
-        else:
-            values_str += f'{val} '
-
+    values_for_execution, party_id = prepare_for_execution(number_of_regions, args, executable_name, working_directory)
     with cd(working_directory):
         # the warning required for multi executions.
         # If you delete this line it will failed if you don't reboot the servers
         with warn_only():
             sudo('tc qdisc add dev ens5 root netem delay 300ms')
 
-        party_id = env.hosts.index(env.host)
-
-        with warn_only():
-            sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
-
-        if 'inputs0' in values_str:
-            values_str = values_str.replace('input_0.txt', f'input_{str(party_id)}.txt')
-
-        if len(number_of_regions) > 1:
-            put(f'InstancesConfigurations/parties{party_id}.conf', run('pwd'))
-            run(f'mv parties{party_id}.conf parties.conf')
-        else:
-            put('InstancesConfigurations/parties.conf', run('pwd'))
-
-        run(f'./{executable_name} partyID {party_id} {values_str}')
+        run(f'./{executable_name} partyID {party_id} {values_for_execution}')
         try:
             with open('Execution/execution_log.log', 'a+') as log_file:
-                log_file.write(f'{values_str}\n')
+                log_file.write(f'{values_for_execution}\n')
         except EnvironmentError:
             print('Cannot write data to execution log file')
 

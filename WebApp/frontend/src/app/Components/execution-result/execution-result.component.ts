@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute} from '@angular/router';
 import {timer} from 'rxjs';
-import {DbService} from "../../Services/db.service";
+import {DbService} from '../../Services/db.service';
 
 @Component({
   selector: 'app-execution-result',
@@ -28,7 +28,7 @@ export class ExecutionResultComponent implements OnInit {
   }
 
   readData(){
-    let timeObservable = timer(1000,10000);
+    const timeObservable = timer(1000, 10000);
     timeObservable.subscribe(value => this.dbService.getExecutionData(this.protocolName).subscribe(
       response => {
         this.executionData = response.toString().split(',');

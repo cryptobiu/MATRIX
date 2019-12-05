@@ -31,7 +31,7 @@ export class DeploymentResultComponent implements OnInit {
   }
 
    readData(){
-    let timeObservable = timer(1000,10000);
+    const timeObservable = timer(1000, 10000);
     timeObservable.subscribe(value => this.dbService.getDeploymentData(this.protocolName).subscribe(
       response => {
         this.deploymentData = response.toString().split(',');

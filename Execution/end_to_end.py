@@ -28,55 +28,57 @@ class E2E:
         except EnvironmentError:
             print('Cannot open tokens file')
 
-        protocol_name = self.protocol_config['protocol']
+        protocol_name = self.protocol_config['protocolName']
         working_directory = self.protocol_config['workingDirectory']
-        cp = list(self.protocol_config['CloudProviders'].keys())
-        git_address = self.protocol_config['CloudProviders'][cp[0]]['git']['gitAddress']
-        git_branch = self.protocol_config['CloudProviders'][cp[0]]['git']['gitBranch']
+        cp = list(self.protocol_config['cloudProviders'].keys())
+        git_address = self.protocol_config['cloudProviders'][cp[0]]['git']['gitAddress']
+        git_branch = self.protocol_config['cloudProviders'][cp[0]]['git']['gitBranch']
 
-        for idx in range(len(working_directory)):
-            os.system(f'fab -f Execution/fabfile.py install_git_project:{username},{password},{git_branch[idx]},'
-                      f'{git_address[idx]},{working_directory[idx]} --parallel | '
-                      f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+        os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
+        os.system(f'fab -f Execution/fabfile.py install_git_project:{username},{password},{git_branch},'
+                  f'{git_address},{working_directory} --parallel | '
+                  f' tee WebApp/ExecutionLogs/{protocol_name}.log')
 
     def execute_experiment(self):
         """
         Execute the protocol on remote servers
         """
-        protocol_name = self.protocol_config['protocol']
-        number_of_repetitions = self.protocol_config['numOfRepetitions']
+        protocol_name = self.protocol_config['protocolName']
+        number_of_repetitions = int(self.protocol_config['numOfIterations'])
         configurations = self.protocol_config['configurations']
         working_directory = self.protocol_config['workingDirectory']
         executables = self.protocol_config['executableName']
-        number_of_regions = len(self.protocol_config['CloudProviders'])
+        number_of_regions = len(self.protocol_config['cloudProviders'])
         if 'coordinatorExecutable' in self.protocol_config:
             coordinator_executable = self.protocol_config['coordinatorExecutable']
             coordinator_args = self.protocol_config['coordinatorConfig']
 
+        os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
         for i in range(number_of_repetitions):
-            for idx2 in range(len(configurations)):
-                for idx in range(len(executables)):
-                    if 'coordinatorExecutable' in self.protocol_config:
-                        os.system(f'fab -f Execution/fabfile.py run_protocol:{number_of_regions},'
-                                  f'{configurations[idx2]},{executables[idx]},{working_directory[idx]}, '
-                                  f'{coordinator_executable}, {coordinator_args} --parallel | '
-                                  f' tee WebApp/ExecutionLogs/{protocol_name}.log')
-                    else:
-                        os.system(f'fab -f Execution/fabfile.py run_protocol:{number_of_regions},'
-                                  f'{configurations[idx2]},{executables[idx]},{working_directory[idx]},  --parallel | '
-                                  f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+            for idx in range(len(configurations)):
+                if 'coordinatorExecutable' in self.protocol_config:
+                    os.system(f'fab -f Execution/fabfile.py run_protocol:{number_of_regions},'
+                              f'{configurations[idx]},{executables},{working_directory}, '
+                              f'{coordinator_executable},{coordinator_args} --parallel | '
+                              f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+                else:
+                    os.system(f'fab -f Execution/fabfile.py run_protocol:{number_of_regions},'
+                              f'{configurations[idx]},{executables},{working_directory} --parallel | '
+                              f' tee WebApp/ExecutionLogs/{protocol_name}.log')
 
     def execute_experiment_callgrind(self):
         """
         Execute the protocol on remote servers with profiler.
         The first party is executed with profiler, the other executed normally
         """
-        protocol_name = self.protocol_config['protocol']
-        number_of_repetitions = self.protocol_config['numOfRepetitions']
+        protocol_name = self.protocol_config['protocolName']
+        number_of_repetitions = int(self.protocol_config['numOfRepetitions'])
         configurations = self.protocol_config['configurations']
         working_directory = self.protocol_config['workingDirectory']
         executables = self.protocol_config['executableName']
-        number_of_regions = len(self.protocol_config['CloudProviders'])
+        number_of_regions = len(self.protocol_config['cloudProviders'])
+        os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
+
         for i in range(number_of_repetitions):
             for idx2 in range(len(configurations)):
                 for idx in range(len(executables)):
@@ -88,12 +90,14 @@ class E2E:
         """
         Execute the protocol on remote servers with network latency
         """
-        protocol_name = self.protocol_config['protocol']
-        number_of_repetitions = self.protocol_config['numOfRepetitions']
+        protocol_name = self.protocol_config['protocolName']
+        number_of_repetitions = int(self.protocol_config['numOfRepetitions'])
         configurations = self.protocol_config['configurations']
         working_directory = self.protocol_config['workingDirectory']
         executables = self.protocol_config['executableName']
-        number_of_regions = len(self.protocol_config['CloudProviders'])
+        number_of_regions = len(self.protocol_config['cloudProviders'])
+
+        os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
         for i in range(number_of_repetitions):
             for idx2 in range(len(configurations)):
                 for idx in range(len(executables)):
@@ -105,7 +109,7 @@ class E2E:
         """
         Update libscapi library on the remote servers from dev branch
         """
-        protocol_name = self.protocol_config['protocol']
+        protocol_name = self.protocol_config['protocolName']
         os.system('fab -f Execution/fabfile.py update_libscapi --parallel | '
                   f' tee WebApp/ExecutionLogs/{protocol_name}.log')
 
@@ -114,12 +118,12 @@ class E2E:
         Copy logs file from remote servers
         """
         logs_directory = self.protocol_config['logs']
-        protocol_name = self.protocol_config['protocol']
+        protocol_name = self.protocol_config['protocolName']
         os.system(f'fab -f Execution/fabfile.py get_logs:{logs_directory} --parallel | '
                   f'tee WebApp/ExecutionLogs/{protocol_name}.log')
 
     def delete_old_experiment(self):
-        protocol_name = self.protocol_config['protocol']
+        protocol_name = self.protocol_config['protocolName']
         working_directory = self.protocol_config['workingDirectory']
         for idx in range(len(working_directory)):
             os.system(f'fab -f Execution/fabfile.py delete_old_experiment:{working_directory[idx]} --parallel | '
