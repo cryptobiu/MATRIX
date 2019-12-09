@@ -12,10 +12,17 @@ import {Protocol} from '../../classes';
 export class ProtocolsComponent implements OnInit {
 
   dataSource = new ProtocolDataSource(this.dbService);
-  displayedColumns = ['name', 'security', 'threshold', 'relatedArticle', 'update'];
+  displayedColumns = ['name', 'security', 'threshold', 'relatedArticle', 'update', 'delete'];
   constructor(private dbService: DbService) { }
 
   ngOnInit() {
+  }
+
+  deleteProtocol(protocolName: string): void {
+    const res = this.dbService.deleteProtocol(protocolName).subscribe(
+      value =>  alert('Protocol " + protocolName + " deleted from the system'),
+      error => console.log('error')
+    );
   }
 
 }

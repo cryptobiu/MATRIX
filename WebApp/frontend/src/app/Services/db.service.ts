@@ -30,6 +30,11 @@ export class DbService {
     return this._http.get<Protocol>(url).pipe(catchError(this.handleError));
   }
 
+  deleteProtocol(protocolName: string): Observable<any> {
+    const url = this._urlApi + 'protocols/delete/' + protocolName;
+    return this._http.get(url).pipe(catchError(this.handleError));
+  }
+
   getProtocols(): Observable<Protocol[]> {
     const url = this._urlApi + 'protocols';
     return this._http.get<Protocol[]>(url).pipe(catchError(this.handleError));

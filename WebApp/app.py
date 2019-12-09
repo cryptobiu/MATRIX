@@ -143,7 +143,19 @@ def update_protocol(protocol_name):
     except errors.OperationFailure:
         return jsonify('writing failed', 500)
 
-    return jsonify('protocol registered')
+    return jsonify('protocol updated')
+
+
+@app.route('/api/protocols/delete/<string:protocol_name>')
+def delete_protocol(protocol_name):
+    try:
+        collection = db['protocols']
+        collection.delete_one({'protocolName': protocol_name})
+
+    except errors.OperationFailure:
+        return jsonify('writing failed', 500)
+
+    return jsonify('protocol deleted')
 
 
 @app.route('/api/deployment/update/<string:protocol_name>', methods=['POST'])
