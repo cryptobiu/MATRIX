@@ -1,0 +1,61 @@
+<div class="container-fluid mb-5">
+  <div class="alert alert-danger" *ngIf="errmsg">
+    {{ errmsg }}
+  </div>
+  <form #userForm="ngForm" *ngIf="!submitted" target="/protocols" novalidate (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label>Protocol Name</label>
+      <input type="text" required #name="ngModel"
+             [class.is-invalid]="name.invalid && name.touched" class="form-control"
+             name="protocolName" [(ngModel)]="protocolModel.protocolName">
+      <small class="text-danger" [class.d-none]="name.valid || name.untouched">Protocol name is required</small>
+    </div>
+
+    <div class="form-group">
+      <label>Institute</label>
+      <input type="text" required #institute="ngModel"
+             [class.is-invalid]="institute.invalid && institute.touched" class="form-control"
+             name="institute" [(ngModel)]="protocolModel.institute">
+      <small class="text-danger" [class.d-none]="institute.valid || institute.untouched">
+        Please fill your institute</small>
+    </div>
+
+    <div class="form-group">
+      <label>Security Level</label>
+      <select required (blur)="validateSl(security.value)" (change)="validateSl(security.value)"
+              #security="ngModel"
+              [class.is-invalid]="security.invalid && security.touched"
+              class="custom-select" name="securityLevel" [(ngModel)]="protocolModel.securityLevel">
+        <option *ngFor="let sl of securityLevel">{{ sl }}</option>
+      </select>
+      <small class="text-danger" [class.d-none]="!slHasError || security.untouched">
+        Please select value from the list</small>
+    </div>
+
+    <div class="form-group">
+      <label>Security Threshold</label>
+      <select required (blur)="validateSt(thresholdLevel.value)" (change)="validateSt(thresholdLevel.value)"
+              #thresholdLevel="ngModel"
+              [class.is-invalid]="thresholdLevel.invalid && thresholdLevel.touched"
+              class="custom-select" name="thresholdLevel" [(ngModel)]="protocolModel.thresholdLevel">
+        <option *ngFor="let st of securityThreshold">{{ st }}</option>
+      </select>
+      <small class="text-danger" [class.d-none]="!stHasError || thresholdLevel.untouched">
+        Please select value from the list</small>
+    </div>
+
+    <div class="form-group">
+      <label>Related Article</label> <br>
+      <small>An article about the paper</small>
+      <input type="text" #article="ngModel" [class.is-invalid]="article.invalid && article.touched" class="form-control"
+             name="article" [(ngModel)]="protocolModel.relatedArticle">
+    </div>
+
+    <br>
+    <button [disabled]="userForm.form.invalid || slHasError" class="btn btn-primary" type="submit">
+      Upload Protocol
+    </button>
+
+  </form>
+</div>

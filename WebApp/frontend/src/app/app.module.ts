@@ -27,6 +27,7 @@ import {AuthService} from './Services/auth.service';
 import { CallbackComponent } from './Components/callback/callback.component';
 import { DeploymentUpdateComponent } from './Components/deployment-update/deployment-update.component';
 import {ExecutionUpdateComponent} from './Components/execution-update/execution-update.component';
+import { ProtocolsUpdateComponent } from './Components/protocols-update/protocols-update.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import {ExecutionUpdateComponent} from './Components/execution-update/execution-
     ReportingResultComponent,
     CallbackComponent,
     DeploymentUpdateComponent,
-    ExecutionUpdateComponent
+    ExecutionUpdateComponent,
+    ProtocolsUpdateComponent
   ],
   imports: [
     BrowserModule,

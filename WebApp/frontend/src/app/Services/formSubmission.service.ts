@@ -17,6 +17,12 @@ export class FormSubmissionService {
     pipe(catchError(this.handleError));
   }
 
+  submitUpdateProtocolForm(protocol: Protocol) {
+    const _url = 'http://localhost:5000/api/protocols/update/' + protocol.protocolName;
+    return this._http.post<any>(_url, protocol).
+    pipe(catchError(this.handleError));
+  }
+
   submitUpdateDeployForm(protocol: Protocol) {
     const _url = 'http://localhost:5000/api/deployment/update/' + protocol.protocolName;
     return this._http.post<any>(_url, protocol).

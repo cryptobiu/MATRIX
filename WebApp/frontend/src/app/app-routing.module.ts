@@ -18,6 +18,7 @@ import {ReportingResultComponent} from './Components/reporting-result/reporting-
 import {CallbackComponent} from './Components/callback/callback.component';
 import {DeploymentUpdateComponent} from './Components/deployment-update/deployment-update.component';
 import {ExecutionUpdateComponent} from './Components/execution-update/execution-update.component';
+import {ProtocolsUpdateComponent} from './Components/protocols-update/protocols-update.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full'},
@@ -26,6 +27,7 @@ const routes: Routes = [
   { path: 'competitions/registration/:name', component: CompetitionsRegistrationComponent},
   { path: 'protocols', component: ProtocolsComponent, pathMatch: 'full'},
   { path: 'protocols/upload', component: ProtocolsUploadComponent, pathMatch: 'full'},
+  { path: 'protocols/update/:protocolName', component: ProtocolsUpdateComponent, pathMatch:  'full'},
   { path: 'deployment', component:  DeploymentComponent, pathMatch:  'full'},
   { path: 'deployment/update/:protocolName', component:  DeploymentUpdateComponent, pathMatch:  'full'},
   { path: 'deployment/:action/:protocolName', component:  DeploymentResultComponent, pathMatch:  'full'},

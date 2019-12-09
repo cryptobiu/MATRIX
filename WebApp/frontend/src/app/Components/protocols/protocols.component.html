@@ -23,6 +23,18 @@
       <mat-header-cell *matHeaderCellDef> Threshold Level </mat-header-cell>
       <mat-cell *matCellDef="let protocol"> {{protocol.thresholdLevel}} </mat-cell>
     </ng-container>
+    <ng-container matColumnDef="relatedArticle">
+      <mat-header-cell *matHeaderCellDef> Related Article </mat-header-cell>
+      <mat-cell *matCellDef="let protocol">
+        <a href="{{protocol.relatedArticle}}" target="_blank">{{protocol.relatedArticle}}</a>
+      </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="update">
+      <mat-header-cell *matHeaderCellDef> Update </mat-header-cell>
+      <mat-cell *matCellDef="let protocol">
+        <a href="protocols/update/{{protocol.protocolName}}" class="badge badge-primary" >Update configuration</a>
+      </mat-cell>
+    </ng-container>
       <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
       <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
   </mat-table>
