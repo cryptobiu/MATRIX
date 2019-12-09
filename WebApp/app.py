@@ -102,6 +102,16 @@ def get_protocols():
     return json.dumps(protocols_list)
 
 
+@app.route('/api/protocols/<string:protocol_name>')
+def get_protocol(protocol_name):
+    collection = db['protocols']
+    try:
+        protocol = collection.find({'protocolName': protocol_name}, {'_id': 0})
+    except errors.OperationFailure:
+        return jsonify('reading failed', 500)
+    return json.dumps(protocol[0])
+
+
 @app.route('/api/protocols/createProtocol', methods=['POST'])
 def register_new_protocol():
     form = request.data
@@ -110,6 +120,26 @@ def register_new_protocol():
     try:
         collection = db['protocols']
         collection.insert_one(form_data)
+    except errors.OperationFailure:
+        return jsonify('writing failed', 500)
+
+    return jsonify('protocol registered')
+
+
+@app.route('/api/protocols/update/<string:protocol_name>', methods=['POST'])
+def update_protocol(protocol_name):
+    form = request.data
+    form_data = json.loads(form.decode('utf-8'))
+    try:
+        collection = db['protocols']
+        doc = collection.find_one({'protocolName': protocol_name})
+        doc['protocolName'] = form_data['protocolName']
+        doc['institute'] = form_data['institute']
+        doc['securityLevel'] = form_data['securityLevel']
+        doc['thresholdLevel'] = form_data['thresholdLevel']
+        doc['relatedArticle'] = form_data['relatedArticle']
+        collection.save(doc)
+
     except errors.OperationFailure:
         return jsonify('writing failed', 500)
 
@@ -185,9 +215,6 @@ def update_execution_protocol_data(protocol_name):
     configurations = []
 
     for idx in range(numbers_of_configurations):
-        # configuration = ''
-        # for key, value in conf_dict.items():
-        #     configuration += f'{key} {value[idx]} '
         configurations.append('@'.join(raw_configurations[idx * numbers_of_parameters:
                                                  (idx * numbers_of_parameters) + numbers_of_parameters]))
 

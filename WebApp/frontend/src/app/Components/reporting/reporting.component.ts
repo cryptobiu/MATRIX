@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import {DataSource} from "@angular/cdk//collections";
-import {DbService} from "../../Services/db.service";
-import {Observable} from "rxjs";
-import {IProtocol} from "../../interfaces";
-import {Router} from "@angular/router";
+import {DataSource} from '@angular/cdk//collections';
+import {DbService} from '../../Services/db.service';
+import {Observable} from 'rxjs';
+import {Router} from '@angular/router';
+import {Protocol} from '../../classes';
 
 @Component({
   selector: 'app-reporting',
@@ -41,7 +41,7 @@ export class ReportingDataSource extends DataSource<any> {
     super()
   }
 
-  connect(): Observable<IProtocol[]> {
+  connect(): Observable<Protocol[]> {
     return this.dbService.getProtocols();
   }
 

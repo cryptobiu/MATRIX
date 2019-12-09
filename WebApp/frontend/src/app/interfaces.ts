@@ -7,13 +7,6 @@ export interface ICompetition
   participants: [];
 }
 
-export interface IProtocol {
-  protocolName: string;
-  repoAddress: string;
-  securityLevel: string;
-  thresholdLevel: string;
-}
-
 export interface IReportingData {
   protocolName: string;
   message: string;

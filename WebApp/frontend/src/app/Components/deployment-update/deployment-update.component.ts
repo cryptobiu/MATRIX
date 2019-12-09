@@ -55,8 +55,7 @@ export class DeploymentUpdateComponent implements OnInit {
   submitted = false;
   addressHasError = true;
   errmsg = '';
-  protocolModel = new Protocol('', {}, '', 0, [],
-    1, '', '', '', '', '');
+  private protocolModel: Protocol;
 
   constructor(private _formService: FormSubmissionService, private router: Router, private acRouter: ActivatedRoute) {
     this.protocolModel.protocolName = this.acRouter.snapshot.paramMap.get('protocolName');

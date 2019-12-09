@@ -3,8 +3,8 @@ import { Observable } from 'rxjs/';
 import { DataSource } from '@angular/cdk/collections';
 import { DbService } from '../../Services/db.service';
 import { AuthService } from '../../Services/auth.service';
-import { IProtocol } from '../../interfaces';
 import { Router } from '@angular/router';
+import {Protocol} from '../../classes';
 
 
 @Component({
@@ -46,7 +46,7 @@ export class ProtocolDataSource extends DataSource<any> {
     super();
   }
 
-  connect(): Observable<IProtocol[]> {
+  connect(): Observable<Protocol[]> {
     return this.dbService.getProtocols();
   }
 

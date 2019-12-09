@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Observable, throwError} from 'rxjs';
-import {ICompetition, IProtocol} from '../interfaces';
+import {ICompetition} from '../interfaces';
 import {catchError} from 'rxjs/operators';
+import {Protocol} from '../classes';
 
 @Injectable({
   providedIn: 'root'
@@ -24,9 +25,14 @@ export class DbService {
     return this._http.get<ICompetition>(url).pipe(catchError(this.handleError));
   }
 
-  getProtocols(): Observable<IProtocol[]> {
+  getProtocol(protocolName: string): Observable<Protocol> {
+    const url = this._urlApi + 'protocols/' + protocolName;
+    return this._http.get<Protocol>(url).pipe(catchError(this.handleError));
+  }
+
+  getProtocols(): Observable<Protocol[]> {
     const url = this._urlApi + 'protocols';
-    return this._http.get<IProtocol[]>(url).pipe(catchError(this.handleError));
+    return this._http.get<Protocol[]>(url).pipe(catchError(this.handleError));
   }
 
   executeDeployOperation(protocolName: string, operation: string) {
