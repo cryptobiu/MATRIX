@@ -19,6 +19,7 @@ import {CallbackComponent} from './Components/callback/callback.component';
 import {DeploymentUpdateComponent} from './Components/deployment-update/deployment-update.component';
 import {ExecutionUpdateComponent} from './Components/execution-update/execution-update.component';
 import {ProtocolsUpdateComponent} from './Components/protocols-update/protocols-update.component';
+import {ErrorComponent} from './Components/error/error.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full'},
@@ -39,6 +40,7 @@ const routes: Routes = [
   { path: 'circuits', component: CircuitsComponent, pathMatch: 'full'},
   { path: 'login', component: LoginComponent, pathMatch: 'full'},
   { path: 'callback', component: CallbackComponent, pathMatch: 'full'},
+  { path: 'error', component: ErrorComponent, pathMatch: 'full'},
   { path: '**', component: PageNotFoundComponent, pathMatch: 'full'},
 ];
 

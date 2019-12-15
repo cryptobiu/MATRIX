@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {ErrorHandler, NgModule} from '@angular/core';
 
 import { AppRoutingModule, routingComponents } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -10,7 +10,7 @@ import { LoginComponent } from './Components/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ProtocolsComponent } from './Components/protocols/protocols.component';
 import { ProtocolsUploadComponent } from './Components/protocols-upload/protocols-upload.component'
-import {FormsModule} from "@angular/forms";
+import {FormsModule} from '@angular/forms';
 import { MainNavComponent } from './Components/main-nav/main-nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTableModule,
@@ -28,6 +28,8 @@ import { CallbackComponent } from './Components/callback/callback.component';
 import { DeploymentUpdateComponent } from './Components/deployment-update/deployment-update.component';
 import {ExecutionUpdateComponent} from './Components/execution-update/execution-update.component';
 import { ProtocolsUpdateComponent } from './Components/protocols-update/protocols-update.component';
+import {ErrorComponent} from './Components/error/error.component';
+import {GlobalErrorHandlerService} from './Services/global-error-handler.service';
 
 @NgModule({
   declarations: [
@@ -51,7 +53,8 @@ import { ProtocolsUpdateComponent } from './Components/protocols-update/protocol
     CallbackComponent,
     DeploymentUpdateComponent,
     ExecutionUpdateComponent,
-    ProtocolsUpdateComponent
+    ProtocolsUpdateComponent,
+    ErrorComponent
   ],
   imports: [
     BrowserModule,
@@ -72,7 +75,7 @@ import { ProtocolsUpdateComponent } from './Components/protocols-update/protocol
     MatRadioModule,
     MatCheckboxModule
   ],
-  providers: [AuthService],
+  providers: [AuthService, GlobalErrorHandlerService, {provide: ErrorHandler, useClass: GlobalErrorHandlerService}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

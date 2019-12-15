@@ -3,6 +3,8 @@ import { Observable } from 'rxjs/';
 import {DataSource} from '@angular/cdk/collections';
 import {DbService} from '../../Services/db.service';
 import {Protocol} from '../../classes';
+import {ActivatedRoute, Router} from '@angular/router';
+import {error} from "util";
 
 @Component({
   selector: 'app-protocols',
@@ -13,16 +15,14 @@ export class ProtocolsComponent implements OnInit {
 
   dataSource = new ProtocolDataSource(this.dbService);
   displayedColumns = ['name', 'security', 'threshold', 'relatedArticle', 'update', 'delete'];
-  constructor(private dbService: DbService) { }
+  constructor(private dbService: DbService, private router: Router) { }
 
   ngOnInit() {
   }
 
   deleteProtocol(protocolName: string): void {
     const res = this.dbService.deleteProtocol(protocolName).subscribe(
-      value =>  alert('Protocol " + protocolName + " deleted from the system'),
-      error => console.log('error')
-    );
+      value =>  alert('Protocol " + protocolName + " deleted from the system'));
   }
 
 }

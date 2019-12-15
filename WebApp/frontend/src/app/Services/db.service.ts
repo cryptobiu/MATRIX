@@ -62,7 +62,7 @@ export class DbService {
 
   getExecutionData(protocolName: string) {
     const url = this._urlApi + 'execution/getData/' + protocolName;
-    return this._http.get(url).pipe(catchError(this.handleError))
+    return this._http.get(url).pipe(catchError(this.handleError));
   }
 
   private handleError(error: HttpErrorResponse) {
