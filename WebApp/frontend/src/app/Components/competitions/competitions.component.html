@@ -28,7 +28,7 @@
     <ng-container matColumnDef="competition details">
       <mat-header-cell *matHeaderCellDef> Competition Details </mat-header-cell>
       <mat-cell *matCellDef="let competition">
-        <a href="/competitions/{{competition.competitionName}}"
+        <a routerLink="/competitions/{{competition.competitionName}}"
            class="badge badge-info">View</a>
       </mat-cell>
     </ng-container>

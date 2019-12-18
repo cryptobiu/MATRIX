@@ -3,8 +3,7 @@ import { Observable } from 'rxjs/';
 import {DataSource} from '@angular/cdk/collections';
 import {DbService} from '../../Services/db.service';
 import {Protocol} from '../../classes';
-import {ActivatedRoute, Router} from '@angular/router';
-import {error} from "util";
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-protocols',

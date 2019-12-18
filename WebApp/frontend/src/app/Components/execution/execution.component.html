@@ -26,7 +26,7 @@
     <ng-container matColumnDef="update">
       <mat-header-cell *matHeaderCellDef> Update </mat-header-cell>
       <mat-cell *matCellDef="let protocol">
-        <a href="execution/update/{{protocol.protocolName}}" class="badge badge-primary" >Update configuration</a>
+        <a routerLink="execution/update/{{protocol.protocolName}}" class="badge badge-primary" >Update configuration</a>
       </mat-cell>
     </ng-container>
 

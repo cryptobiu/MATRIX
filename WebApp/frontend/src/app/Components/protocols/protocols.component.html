@@ -4,7 +4,7 @@
   <b>NOTE</b>: the institute name that specified below is the institute that was responsible for the implementation.
   The article itself can be written by others institute(s)
   <br><br>
-  <a href="protocols/upload" class="badge badge-primary" >Upload new protocol</a>
+  <a routerLink="upload" class="badge badge-primary" >Upload new protocol</a>
 </div>
 <br>
 <br>
@@ -32,7 +32,7 @@
     <ng-container matColumnDef="update">
       <mat-header-cell *matHeaderCellDef> Update </mat-header-cell>
       <mat-cell *matCellDef="let protocol">
-        <a href="protocols/update/{{protocol.protocolName}}" class="badge badge-primary" >Update configuration</a>
+        <a routerLink="protocols/update/{{protocol.protocolName}}" class="badge badge-primary" >Update configuration</a>
       </mat-cell>
     </ng-container>
     <ng-container matColumnDef="delete">
