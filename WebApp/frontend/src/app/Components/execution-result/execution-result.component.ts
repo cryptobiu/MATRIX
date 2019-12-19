@@ -27,8 +27,8 @@ export class ExecutionResultComponent implements OnInit {
     this.readData();
   }
 
-  readData(){
-    const timeObservable = timer(1000, 10000);
+  readData() {
+    const timeObservable = timer(5000, 5000);
     timeObservable.subscribe(value => this.dbService.getExecutionData(this.protocolName).subscribe(
       response => {
         this.executionData = response.toString().split(',');

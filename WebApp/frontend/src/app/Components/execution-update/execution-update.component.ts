@@ -11,11 +11,11 @@ import {Protocol} from '../../classes';
 export class ExecutionUpdateComponent implements OnInit {
 
   submitted = false;
-  addressHasError = true;
   errmsg = '';
   private protocolModel: Protocol;
 
   constructor(private _formService: FormSubmissionService, private router: Router, private acRouter: ActivatedRoute) {
+    this.protocolModel = new Protocol();
     this.protocolModel.protocolName = this.acRouter.snapshot.paramMap.get('protocolName');
   }
 

@@ -58,6 +58,7 @@ export class DeploymentUpdateComponent implements OnInit {
   private protocolModel: Protocol;
 
   constructor(private _formService: FormSubmissionService, private router: Router, private acRouter: ActivatedRoute) {
+    this.protocolModel = new Protocol();
     this.protocolModel.protocolName = this.acRouter.snapshot.paramMap.get('protocolName');
   }
 

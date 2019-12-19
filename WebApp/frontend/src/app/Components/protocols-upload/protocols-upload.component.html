@@ -8,7 +8,8 @@
       <label>Protocol Name</label>
       <input type="text" required #name="ngModel"
              [class.is-invalid]="name.invalid && name.touched" class="form-control"
-             name="protocolName" [(ngModel)]="protocolModel.protocolName">
+             name="protocolName" [ngModel]="protocolModel?.protocolName"
+             (ngModelChange)="protocolModel.protocolName=$event">
       <small class="text-danger" [class.d-none]="name.valid || name.untouched">Protocol name is required</small>
     </div>
 
@@ -16,7 +17,8 @@
       <label>Institute</label>
       <input type="text" required #institute="ngModel"
              [class.is-invalid]="institute.invalid && institute.touched" class="form-control"
-             name="institute" [(ngModel)]="protocolModel.institute">
+             name="institute" [ngModel]="protocolModel?.institute"
+             (ngModelChange)="protocolModel.institute=$event">
       <small class="text-danger" [class.d-none]="institute.valid || institute.untouched">
         Please fill your institute</small>
     </div>
@@ -26,7 +28,8 @@
       <select required (blur)="validateSl(security.value)" (change)="validateSl(security.value)"
               #security="ngModel"
               [class.is-invalid]="security.invalid && security.touched"
-              class="custom-select" name="securityLevel" [(ngModel)]="protocolModel.securityLevel">
+              class="custom-select" name="securityLevel" [ngModel]="protocolModel?.securityLevel"
+              (ngModelChange)="protocolModel.securityLevel=$event">
         <option *ngFor="let sl of securityLevel">{{ sl }}</option>
       </select>
       <small class="text-danger" [class.d-none]="!slHasError || security.untouched">
@@ -38,7 +41,8 @@
       <select required (blur)="validateSt(thresholdLevel.value)" (change)="validateSt(thresholdLevel.value)"
               #thresholdLevel="ngModel"
               [class.is-invalid]="thresholdLevel.invalid && thresholdLevel.touched"
-              class="custom-select" name="thresholdLevel" [(ngModel)]="protocolModel.thresholdLevel">
+              class="custom-select" name="thresholdLevel" [ngModel]="protocolModel?.thresholdLevel"
+              (ngModelChange)="protocolModel.thresholdLevel=$event">
         <option *ngFor="let st of securityThreshold">{{ st }}</option>
       </select>
       <small class="text-danger" [class.d-none]="!stHasError || thresholdLevel.untouched">

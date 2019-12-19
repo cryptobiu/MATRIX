@@ -9,28 +9,24 @@ env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
 # Set this to point to where the AWS key is put by MATRIX (possibly ~/Keys/[KEYNAME])
-env.key_filename = [f'{Path.home()}/Keys/Matrixuseast1.pem']
+env.key_filename = [f'{Path.home()}/Keys/AWSKeys/Matrixuseast1.pem']
 # Set this to point to where you put the MATRIX root
 path_to_matrix = 'YOU PATH TO MATRIX'
 
 
 @task
-def install_git_project(username, password, git_branch, git_address, working_directory):
+def install_git_project(git_address, git_branch, working_directory):
     """
     Install the protocol at the working directory with the GitHub credentials
-    :type username str
-    :param username: GitHub username
-    :type password str
-    :param password: GitHub password
-    :type git_branch str
-    :param git_branch: GitHub project branch
     :type git_address str
     :param git_address: GitHub project address
+    :type git_branch str
+    :param git_branch: GitHub project branch
     :type working_directory str
     :param working_directory: directory to clone the GitHub repository to
     """
     if not exists(working_directory):
-        run(f'git clone {git_address.format(username, password)} {working_directory}')
+        run(f'git clone {git_address} {working_directory}')
 
     with cd(working_directory):
         run('git pull')
@@ -149,8 +145,7 @@ def run_protocol(number_of_regions, args, executable_name, working_directory,
             # run protocols with no coordinator
             else:
                 run('mkdir -p logs')
-                with cd('MATRIX'):
-                    run(f'./run.sh {party_id} {values_for_execution}')
+                run(f'./MATRIX/run.sh {party_id} {values_for_execution}')
                 try:
                     with open('Execution/execution_log.log', 'a+') as log_file:
                         log_file.write(f'{values_for_execution}\n')

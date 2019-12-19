@@ -24,6 +24,7 @@ export class ProtocolsUpdateComponent implements OnInit {
               private router: Router, private acRouter: ActivatedRoute) {
 
     const protocolName = this.acRouter.snapshot.paramMap.get('protocolName');
+
     this.dbService.getProtocol(protocolName).
     subscribe(val => {
       this.protocolModel = new Protocol(val);
@@ -31,6 +32,7 @@ export class ProtocolsUpdateComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.protocolModel = new Protocol();
   }
 
    validateSl(value) {

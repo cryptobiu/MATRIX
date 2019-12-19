@@ -17,28 +17,28 @@
     </ng-container>
     <ng-container matColumnDef="security">
       <mat-header-cell *matHeaderCellDef> Security Level </mat-header-cell>
-      <mat-cell *matCellDef="let protocol"> {{protocol.securityLevel}} </mat-cell>
+      <mat-cell *matCellDef="let protocol"> {{protocol?.securityLevel}} </mat-cell>
     </ng-container>
     <ng-container matColumnDef="threshold">
       <mat-header-cell *matHeaderCellDef> Threshold Level </mat-header-cell>
-      <mat-cell *matCellDef="let protocol"> {{protocol.thresholdLevel}} </mat-cell>
+      <mat-cell *matCellDef="let protocol"> {{protocol?.thresholdLevel}} </mat-cell>
     </ng-container>
     <ng-container matColumnDef="relatedArticle">
       <mat-header-cell *matHeaderCellDef> Related Article </mat-header-cell>
       <mat-cell *matCellDef="let protocol">
-        <a href="{{protocol.relatedArticle}}" target="_blank">{{protocol.relatedArticle}}</a>
+        <a href="{{protocol?.relatedArticle}}" target="_blank">{{protocol?.relatedArticle}}</a>
       </mat-cell>
     </ng-container>
     <ng-container matColumnDef="update">
       <mat-header-cell *matHeaderCellDef> Update </mat-header-cell>
       <mat-cell *matCellDef="let protocol">
-        <a routerLink="protocols/update/{{protocol.protocolName}}" class="badge badge-primary" >Update configuration</a>
+        <a routerLink="update/{{protocol.protocolName}}" class="badge badge-primary" >Update configuration</a>
       </mat-cell>
     </ng-container>
     <ng-container matColumnDef="delete">
       <mat-header-cell *matHeaderCellDef> Delete </mat-header-cell>
       <mat-cell *matCellDef="let protocol">
-        <button class="alert-danger" (click)="deleteProtocol(protocol.protocolName)">Delete</button>
+        <button class="alert-danger" (click)="deleteProtocol(protocol?.protocolName)">Delete</button>
       </mat-cell>
     </ng-container>
       <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

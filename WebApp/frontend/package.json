@@ -30,7 +30,6 @@
     "fstream": "^1.0.12",
     "hammerjs": "^2.0.8",
     "jquery": "^3.4.0",
-    "lodash": "^4.17.14",
     "lodash.mergewith": "^4.6.2",
     "mongoose": "^5.7.5",
     "popper.js": "^1.14.6",

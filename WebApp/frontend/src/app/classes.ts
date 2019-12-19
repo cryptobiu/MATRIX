@@ -5,7 +5,7 @@ export class Protocol {
   public cloudProviders: {};
   public executableName: string;
   public numConfigurations: number;
-  public configurations: [];
+  public configurations: Array<string>;
   public numOfIterations: number;
   public workingDirectory: string;
   public resultsDirectory: string;
@@ -14,18 +14,31 @@ export class Protocol {
   public thresholdLevel: string;
   public relatedArticle: string;
 
-  constructor(p: Protocol) {
-    this.protocolName = p.protocolName;
-    this.cloudProviders = p.cloudProviders;
-    this.executableName = p.executableName;
-    this.configurations = p.configurations;
-    this.numConfigurations = p.numConfigurations;
-    this.workingDirectory = p.workingDirectory;
-    this.resultsDirectory = p.resultsDirectory;
-    this.institute = p.institute;
-    this.securityLevel = p.securityLevel;
-    this.thresholdLevel = p.thresholdLevel;
-    this.relatedArticle = p.relatedArticle;
+  constructor(params: Protocol = {} as Protocol) {
+    const {
+      protocolName = '',
+      cloudProviders = {},
+      executableName = '',
+      configurations = [],
+      numConfigurations = 0,
+      workingDirectory = '',
+      resultsDirectory = '',
+      institute = '',
+      securityLevel = '',
+      thresholdLevel = '',
+      relatedArticle = ''
+         } = params;
+    this.protocolName = protocolName;
+    this.cloudProviders = cloudProviders;
+    this.executableName = executableName;
+    this.configurations =  [...configurations];
+    this.numConfigurations = numConfigurations;
+    this.workingDirectory = workingDirectory;
+    this.resultsDirectory = resultsDirectory;
+    this.institute = institute;
+    this.securityLevel = securityLevel;
+    this.thresholdLevel = thresholdLevel;
+    this.relatedArticle = relatedArticle;
   }
 
 }

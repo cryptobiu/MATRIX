@@ -26,7 +26,10 @@ export class ProtocolsUploadComponent implements OnInit {
   submitted = false;
   errmsg = '';
 
-  constructor(private _formService: FormSubmissionService, private router: Router) { }
+  constructor(private _formService: FormSubmissionService, private router: Router)
+  {
+    this.protocolModel = new Protocol();
+  }
 
   ngOnInit() {}
 

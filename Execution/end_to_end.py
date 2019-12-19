@@ -33,10 +33,11 @@ class E2E:
         cp = list(self.protocol_config['cloudProviders'].keys())
         git_address = self.protocol_config['cloudProviders'][cp[0]]['git']['gitAddress']
         git_branch = self.protocol_config['cloudProviders'][cp[0]]['git']['gitBranch']
+        git_address = git_address[0:8] + username + ':' + password + '@' + git_address[8:]
 
         os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
-        os.system(f'fab -f Execution/fabfile.py install_git_project:{username},{password},{git_branch},'
-                  f'{git_address},{working_directory} --parallel | '
+        os.system(f'fab -f Execution/fabfile.py install_git_project:{git_address},{git_branch},'
+                  f'{working_directory} --parallel | '
                   f' tee WebApp/ExecutionLogs/{protocol_name}.log')
 
     def execute_experiment(self):
