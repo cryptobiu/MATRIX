@@ -23,17 +23,25 @@
     </ng-container>
 
     <ng-container matColumnDef="update">
-      <mat-header-cell *matHeaderCellDef> Update </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
       <mat-cell *matCellDef="let protocol">
         <a routerLink="update/{{protocol.protocolName}}" class="badge badge-primary" >Update configuration</a>
       </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="downloadLog">
-      <mat-header-cell *matHeaderCellDef> Download Log File </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
       <mat-cell *matCellDef="let protocol">
         <button class="badge badge-primary" value="Download log"
                 (click)="getLogFile(protocol.protocolName)">Download Log File</button>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="downloadConf">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let protocol">
+        <button class="badge badge-primary"
+                (click)="getConfFile(protocol.protocolName)">Download Deployment Configuration</button>
       </mat-cell>
     </ng-container>
 

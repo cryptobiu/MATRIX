@@ -237,6 +237,7 @@ def update_execution_protocol_data(protocol_name):
         doc = collection.find_one({'protocolName': protocol_name})
         doc['executableName'] = form_data['executableName'].strip()
         doc['configurations'] = form_data['configurations']
+        doc['numConfigurations'] = form_data['numConfigurations']
         doc['numOfIterations'] = form_data['numOfIterations']
         doc['workingDirectory'] = form_data['workingDirectory'].strip()
         doc['resultsDirectory'] = form_data['resultsDirectory'].strip()
@@ -331,6 +332,32 @@ def get_deployment_log_file(protocol_name):
 @app.route('/api/execution/downloadLog/<string:protocol_name>')
 def get_execution_log_file(protocol_name):
     return send_file(f'ExecutionLogs/{protocol_name}.log', attachment_filename=f'execution_{protocol_name}.log')
+
+
+@app.route('/api/deployment/downloadConf/<string:protocol_name>')
+def get_deployment_conf_file(protocol_name):
+    try:
+        collection = db['protocols']
+        doc = collection.find_one({'protocolName': protocol_name}, {'_id': 0, 'cloudProviders': 1})
+        return jsonify(doc)
+    except errors.InvalidDocument:
+        return jsonify(f'Failed to retrieve data for {protocol_name}', 500)
+    except errors.OperationFailure:
+        return jsonify(f'Update deploy configuration for {protocol_name} failed', 500)
+
+
+@app.route('/api/execution/downloadConf/<string:protocol_name>')
+def get_execution_conf_file(protocol_name):
+    try:
+        collection = db['protocols']
+        doc = collection.find_one({'protocolName': protocol_name}, {'_id': 0, 'executableName': 1, 'configurations': 1,
+                                                                    'numConfigurations': 1, 'numOfIterations': 1,
+                                                                    'workingDirectory': 1, 'resultsDirectory': 1})
+        return jsonify(doc)
+    except errors.InvalidDocument:
+        return jsonify(f'Failed to retrieve data for {protocol_name}', 500)
+    except errors.OperationFailure:
+        return jsonify(f'Update deploy configuration for {protocol_name} failed', 500)
 
 
 if __name__ == '__main__':

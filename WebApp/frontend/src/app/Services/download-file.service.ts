@@ -17,8 +17,20 @@ export class DownloadFileService {
     return this._http.get<Blob>(url, httpOptions);
   }
 
+  getDeploymentConf(protocolName: string): Observable<Blob> {
+    const url = this._urlApi + 'deployment/downloadConf/' + protocolName;
+    const httpOptions = { responseType: 'blob' as 'json'};
+    return this._http.get<Blob>(url, httpOptions);
+  }
+
   getExecutionLogs(protocolName: string): Observable<Blob> {
     const url = this._urlApi + 'execution/downloadLog/' + protocolName;
+    const httpOptions = { responseType: 'blob' as 'json'};
+    return this._http.get<Blob>(url, httpOptions);
+  }
+
+   getExecutionConf(protocolName: string): Observable<Blob> {
+    const url = this._urlApi + 'execution/downloadConf/' + protocolName;
     const httpOptions = { responseType: 'blob' as 'json'};
     return this._http.get<Blob>(url, httpOptions);
   }
