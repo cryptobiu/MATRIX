@@ -4,6 +4,7 @@ import {DataSource} from '@angular/cdk/collections';
 import {DbService} from '../../Services/db.service';
 import {Router} from '@angular/router';
 import {Protocol} from '../../classes';
+import {DownloadFileService} from '../../Services/download-file.service';
 
 @Component({
   selector: 'app-execution',
@@ -13,11 +14,12 @@ import {Protocol} from '../../classes';
 export class ExecutionComponent implements OnInit {
 
   dataSource = new ProtocolDataSource(this.dbService);
-  displayedColumns = ['name', 'action', 'update'];
+  displayedColumns = ['name', 'action', 'update', 'downloadLog'];
   actions = ['Install Experiment', 'Execute Experiment', 'Execute Experiment with profiler',
     'Get Logs', 'Update libscapi'];
 
-  constructor(private dbService: DbService, private router: Router) {
+  constructor(private dbService: DbService, private router: Router,
+              private fileDownloadService: DownloadFileService) {
     if (!localStorage.getItem('isLoggedIn')) {
       this.router.navigate(['/login']).catch(function (err) {
       if (err) {
@@ -36,6 +38,28 @@ export class ExecutionComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  getLogFile(protocolName: string) {
+    this.fileDownloadService.getExecutionLogs(protocolName).subscribe(
+      response => {
+        const file = new Blob([response]);
+        const data = window.URL.createObjectURL(file);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = data;
+        downloadLink.download = protocolName + '_execution.log';
+
+        // this is necessary as link.click() does not work on the latest firefox
+        downloadLink.dispatchEvent(new MouseEvent('click',
+          { bubbles: true, cancelable: true, view: window }));
+        setTimeout(function () {
+          // For Firefox it is necessary to delay revoking the ObjectURL
+          window.URL.revokeObjectURL(data);
+          downloadLink.remove();
+        });
+      },
+      error => alert('Problem during download')
+    );
   }
 
 }

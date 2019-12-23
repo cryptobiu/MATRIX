@@ -8,7 +8,7 @@ import botocore
 
 from pymongo import errors
 from pymongo import MongoClient
-from flask import Flask, request, jsonify, redirect
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
 from Deployment.deploy import DeployCP
@@ -321,6 +321,16 @@ def get_execution_data(protocol_name):
     except FileNotFoundError as e:
         print(str(e))
         return jsonify(f'file ExecutionLogs/{protocol_name}.log not created yet or operation failed')
+
+
+@app.route('/api/deployment/downloadLog/<string:protocol_name>')
+def get_deployment_log_file(protocol_name):
+    return send_file(f'DeploymentLogs/{protocol_name}.log', attachment_filename=f'deployment_{protocol_name}.log')
+
+
+@app.route('/api/execution/downloadLog/<string:protocol_name>')
+def get_execution_log_file(protocol_name):
+    return send_file(f'ExecutionLogs/{protocol_name}.log', attachment_filename=f'execution_{protocol_name}.log')
 
 
 if __name__ == '__main__':
