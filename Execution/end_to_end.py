@@ -38,7 +38,7 @@ class E2E:
         os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
         os.system(f'fab -f Execution/fabfile.py install_git_project:{git_address},{git_branch},'
                   f'{working_directory} --parallel | '
-                  f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+                  f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def execute_experiment(self):
         """
@@ -61,11 +61,11 @@ class E2E:
                     os.system(f'fab -f Execution/fabfile.py run_protocol:{number_of_regions},'
                               f'{configurations[idx]},{executables},{working_directory}, '
                               f'{coordinator_executable},{coordinator_args} --parallel | '
-                              f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+                              f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
                 else:
                     os.system(f'fab -f Execution/fabfile.py run_protocol:{number_of_regions},'
                               f'{configurations[idx]},{executables},{working_directory} --parallel | '
-                              f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+                              f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def execute_experiment_callgrind(self):
         """
@@ -85,7 +85,7 @@ class E2E:
                 for idx in range(len(executables)):
                     os.system(f'fab -f Execution/fabfile.py run_protocol_profiler:{number_of_regions},'
                               f'{configurations[idx2]},{executables[idx]},{working_directory[idx]} --parallel | '
-                              f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+                              f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def execute_experiment_with_latency(self):
         """
@@ -104,7 +104,7 @@ class E2E:
                 for idx in range(len(executables)):
                     os.system(f'fab -f Execution/fabfile.py run_protocol_with_latency::{number_of_regions},'
                               f'{configurations[idx2]},{executables[idx]},{working_directory[idx]} --parallel | '
-                              f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+                              f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def update_libscapi(self):
         """
@@ -112,7 +112,7 @@ class E2E:
         """
         protocol_name = self.protocol_config['protocolName']
         os.system('fab -f Execution/fabfile.py update_libscapi --parallel | '
-                  f' tee WebApp/ExecutionLogs/{protocol_name}.log')
+                  f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def get_logs(self):
         """
@@ -121,11 +121,11 @@ class E2E:
         logs_directory = self.protocol_config['logs']
         protocol_name = self.protocol_config['protocolName']
         os.system(f'fab -f Execution/fabfile.py get_logs:{logs_directory} --parallel | '
-                  f'tee WebApp/ExecutionLogs/{protocol_name}.log')
+                  f'tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def delete_old_experiment(self):
         protocol_name = self.protocol_config['protocolName']
         working_directory = self.protocol_config['workingDirectory']
         for idx in range(len(working_directory)):
             os.system(f'fab -f Execution/fabfile.py delete_old_experiment:{working_directory[idx]} --parallel | '
-                      f'tee WebApp/ExecutionLogs/{protocol_name}.log')
+                      f'tee -a WebApp/ExecutionLogs/{protocol_name}.log')
