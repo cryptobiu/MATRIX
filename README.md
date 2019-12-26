@@ -7,7 +7,7 @@ A [paper](https://eprint.iacr.org/2018/751) featuring MATRIX was prensented in A
 
 The system requires a management computer (Manager) - a computer that centralized all the execution.
 The Manager executes all the experiment phases, starting from install the experiment up to analyse it's results.
-The Manager is a stand alone workstation and it's not part of the workstations that participate in the experiment.
+The Manager is a stand alone workstation and it's not active member at the protocol.
 
 In order to use all MATRIX capabilities, a cloud account is required.  
 MATRIX uses two cloud providers(CP):
@@ -22,7 +22,8 @@ To create account at Azure:
 * Sign up for [Azure](https://azure.microsoft.com/en-us/)
 
 ## Installation
-MATRIX runs under python 3.6 and uses [fabric](https://github.com/fabric/fabric), [fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [openpyxl](https://openpyxl.readthedocs.io/en/stable/).  
+MATRIX runs under python 3.6 and uses [fabric](https://github.com/fabric/fabric),
+[fabric3](https://pypi.python.org/pypi/Fabric3/1.10.2) and [openpyxl](https://openpyxl.readthedocs.io/en/stable/).  
 Matrix tested on these OSs:
 * Ubuntu 16.04.3/18.04.1 LTS
 * CentOS 7.3
@@ -49,7 +50,8 @@ To fix it, run:
 1. `sudo apt-get clean && sudo apt-get update && sudo apt-get install -y locales`
 2. `locale-gen en_US.UTF-8`
 
-**NOTE[2]**: If you want to deploy your experiment at Azure, you will need to install the [Azure-CLI](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest).  
+**NOTE[2]**: If you want to deploy your experiment at Azure,
+you will need to install the [Azure-CLI](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest).  
 To install it, run: `curl -L https://aka.ms/InstallAzureCli | bash`
 
 After the modules installed, clone this repository to install MATRIX on your system.
@@ -107,7 +109,8 @@ The report module analyse the results files that was taken from the images by nu
 If you want to analyse by different parameter use the Elasticsearch option.
 
 MATRIX uses a header class logger [API](Reporting/MatrixMeasurement.h).
-The logging is done at the protocol code. The logger generate logs files that uploaded to [Elasticsearch](https://www.elastic.co/) server.
+The logging is done at the protocol code. The logger generate logs files that uploaded to
+ [Elasticsearch](https://www.elastic.co/) server.
 To use MATRIX logger class, just include `MatrixMeasurement.h` to your main class.
 
 To measure task:
@@ -158,7 +161,7 @@ The arguments are separated between them by '@'. Party ID is added automatically
 * `isExternal` - Indicate if the protocol external to libscapi library.
 * `regions` - AWS regions to execute the protocol.
 * `workingDirectory` - The directory of the protocol and the data related to the protocol.
-* `resultsDirectory` - Directory to copy to the results files from the servers. The directory is local directory at the MATRIX system computer.
+* `resultsDirectory` - Directory to copy to the results files from the servers.The directory is local directory at the MATRIX system computer.
 * `emails` - MATRIX will send notifications to this email addresses. Multiple email addresses are supported
 * `institute` - Research Group identifier
 * `coordinatorConfig` - If coordinator exists in the protocol, the configuration for him will described here.
@@ -175,19 +178,10 @@ There is no difference between the two of them in manner of functionality.
 
 The CLI allows access to the MATRIX system. To run the CLI run: `python3 main.py`
 
-#### Angular
+#### Web UI
 
-MATRIX UI developed under Angular 7 and enables simple UI.  
-
-To install Angular 7:
-1. Download Node and npm from [here](https://nodejs.org/en/)
-2. Install Nginx: `sudo apt install nginx`
-2. Install the Angular CLI: `npm install -g @angular/cli`
-3. Install the required JS packages: `cd WebApp/frontend && npm install`
-
-To use the UI, you will need to deploy two web services.  
-To deploy the Angular service use the `WebApp/matrix` file and cp it to `/etc/nginx/sites-available/`
-To deploy the backend service use `gunicorn`. To install it run: `pip3 install gunicorn --user`.
-After the installation finished run: `gunicorn  -m 007 app:app --chdir WebApp -b 0.0.0.0:5000`
+MATRIX UI developed under Angular 8 and enables simple UI. It uses [Mongodb](https://www.mongodb.com/)
+as for storing data about the protocol.  
+To install and deploy the web UI read the install [instructions](Web_INSTALL.md)
 
 For bugs/features requests open an issue or send an email to liork.cryptobiu@gmail.com
