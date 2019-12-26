@@ -41,13 +41,13 @@ export class ExecutionComponent implements OnInit {
   }
 
   getLogFile(protocolName: string) {
-    this.fileDownloadService.getExecutionConf(protocolName).subscribe(
+    this.fileDownloadService.getExecutionLogs(protocolName).subscribe(
       response => {
         const file = new Blob([response]);
         const data = window.URL.createObjectURL(file);
         const downloadLink = document.createElement('a');
         downloadLink.href = data;
-        downloadLink.download = protocolName + '_execution_conf.json';
+        downloadLink.download = protocolName + '_execution.log';
 
         // this is necessary as link.click() does not work on the latest firefox
         downloadLink.dispatchEvent(new MouseEvent('click',
