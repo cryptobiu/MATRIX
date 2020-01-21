@@ -38,27 +38,16 @@ class Elastic:
         :param results_path: list of results files location
         :return:
         """
-        # TODO add config values to auxilary data at libscapi
-        raw_configurations = self.config_file['configurations'][0].split('@')
-        # delete values, only the parameters are left
-        del raw_configurations[1::2]
-        raw_configurations = [rc[1:] for rc in raw_configurations if rc[0] == '-']
-        raw_configurations.insert(0, 'partyId')
-        raw_configurations.insert(0, 'protocolName')
-
         dts = datetime.utcnow()
         results_files = glob(expanduser(f'{results_path}/*.json'))
         for file in results_files:
-            config_values = basename(file).split('*')
-            config_values[-1] = config_values[-1][:-5]  # remove .json from the last parameter
-            del config_values[1]  # remove empty string
-
             try:
                 with open(file) as results:
                     data = json.load(results, object_pairs_hook=OrderedDict)
                     doc = OrderedDict()
-                    for idx in range(len(raw_configurations)):
-                        doc[raw_configurations[idx]] = config_values[idx]
+                    parameters = data['parameters']
+                    for key, value in parameters.items():
+                        doc[key] = value
                     number_of_tasks = len(data['times'])
                     number_of_iterations = len(data['times'][0]) - 1
                     for task_idx in range(number_of_tasks):
@@ -84,7 +73,6 @@ class Elastic:
         """
         raw_configurations = self.config_file['configurations'][0].split('@')
         del raw_configurations[1::2]
-        # raw_configurations = [rc[1:] for rc in raw_configurations]
         raw_configurations.insert(0, 'partyId')
         raw_configurations.insert(0, 'protocolName')
 
