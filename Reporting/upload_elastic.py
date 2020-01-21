@@ -38,6 +38,7 @@ class Elastic:
         :param results_path: list of results files location
         :return:
         """
+        # TODO add config values to auxilary data at libscapi
         raw_configurations = self.config_file['configurations'][0].split('@')
         # delete values, only the parameters are left
         del raw_configurations[1::2]
@@ -46,14 +47,11 @@ class Elastic:
         raw_configurations.insert(0, 'protocolName')
 
         dts = datetime.utcnow()
-        cloud_provider = 'aws' if 'aws' in self.config_file['CloudProviders'] else 'azure'
-        network_type = self.config_file['CloudProviders'][cloud_provider]['networkType']
         results_files = glob(expanduser(f'{results_path}/*.json'))
         for file in results_files:
             config_values = basename(file).split('*')
-            # remove the json extension
-            config_values[-1] = config_values[-1][:-5]
-            del config_values[1]
+            config_values[-1] = config_values[-1][:-5]  # remove .json from the last parameter
+            del config_values[1]  # remove empty string
 
             try:
                 with open(file) as results:
@@ -61,15 +59,14 @@ class Elastic:
                     doc = OrderedDict()
                     for idx in range(len(raw_configurations)):
                         doc[raw_configurations[idx]] = config_values[idx]
-                    number_of_tasks = len(data)
-                    number_of_iterations = len(data[0]) - 1
+                    number_of_tasks = len(data['times'])
+                    number_of_iterations = len(data['times'][0]) - 1
                     for task_idx in range(number_of_tasks):
                         val = 0
                         for iteration_idx in range(number_of_iterations):
-                            val += float(data[task_idx]['iteration_%s' % iteration_idx])
-                        doc[data[task_idx]['name']] = val / float(number_of_iterations)
+                            val += float(data['times'][task_idx]['iteration_%s' % iteration_idx])
+                        doc[data['times'][task_idx]['name']] = val / float(number_of_iterations)
                     doc['executionTime'] = dts
-                    doc['networkType'] = network_type
 
                     self.es.index(index=f'{analysis_type}results', doc_type=f'{analysis_type}results', body=doc)
 

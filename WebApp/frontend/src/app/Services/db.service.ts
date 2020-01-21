@@ -65,6 +65,11 @@ export class DbService {
     return this._http.get(url).pipe(catchError(this.handleError));
   }
 
+  getReportingData(protocolName: string) {
+    const url = this._urlApi + 'reporting/getData/' + protocolName;
+    return this._http.get(url).pipe(catchError(this.handleError));
+  }
+
   private handleError(error: HttpErrorResponse) {
   if (error.error instanceof ErrorEvent) {
     // A client-side or network error occurred. Handle it accordingly.

@@ -283,16 +283,18 @@ def execute_execution_operation(protocol_name, operation):
 def execute_reporting_operation(protocol_name, operation):
     try:
         collection = db['protocols']
-        doc = collection.find_one({'protocolName': protocol_name})
-        protocol_data = json.loads(doc)
-
-        if operation == 'Analyze Results using Excel':
-            reporting = Analyze(protocol_data)
+        doc = collection.find_one({'protocolName': protocol_name}, {'_id': 0})
+        protocol_data = json.loads(json.dumps(doc))
+        reporting = Analyze(protocol_data)
+        if operation == 'Download Results':
+            reporting.download_data()
+        elif operation == 'Analyze Results using Excel':
             reporting.download_data()
             reporting.analyze_results()
         elif operation == 'Analyze Results using Elasticsearch':
             e = Elastic(protocol_data)
-            e.upload_all_data()
+            results_dir = doc['resultsDirectory']
+            e.upload_json_data('cpu', results_dir)
 
         return jsonify('reporting operation %s succeeded' % operation)
 
@@ -322,6 +324,17 @@ def get_execution_data(protocol_name):
     except FileNotFoundError as e:
         print(str(e))
         return jsonify(f'file ExecutionLogs/{protocol_name}.log not created yet or operation failed')
+
+
+@app.route('/api/reporting/getData/<string:protocol_name>')
+def get_reporting_data(protocol_name):
+    try:
+        with open(f'WebApp/ReportingLogs/{protocol_name}.log') as df:
+            execution_data = [line.rstrip('\n') for line in df.readlines()]
+            return jsonify(str(execution_data[-20:]))
+    except FileNotFoundError as e:
+        print(str(e))
+        return jsonify(f'file ReportingLogs/{protocol_name}.log not created yet or operation failed')
 
 
 @app.route('/api/deployment/downloadLog/<string:protocol_name>')

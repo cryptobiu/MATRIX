@@ -36,14 +36,11 @@ class Analyze:
         Download data from the remote servers
         """
         remote_directory = self.protocol_config['workingDirectory']
-        is_external = json.loads(self.protocol_config['isExternal'].lower())
-
-        for dir in remote_directory:
-            results_path = self.protocol_config['resultsDirectory']
-            os.system('fab -f Execution/fabfile.py collect_results:%s,%s,%s --no-pty --parallel'
-                      % (dir, results_path, is_external))
-            # wait for all clients to download data
-            time.sleep(10)
+        results_path = self.protocol_config['resultsDirectory']
+        os.system('fab -f Execution/fabfile.py collect_results:%s,%s --no-pty --parallel'
+                  % (remote_directory, results_path))
+        # wait for all clients to download data
+        time.sleep(10)
 
     def send_email(self):
         """

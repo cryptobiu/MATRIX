@@ -213,21 +213,15 @@ def run_protocol_with_latency(number_of_regions, args, executable_name, working_
 
 
 @task
-def collect_results(results_server_directory, results_local_directory, is_external):
+def collect_results(results_server_directory, results_local_directory):
     """
     :type results_server_directory str
     :param results_server_directory: the remote directory of the JSON results files
     :type results_local_directory str
-    :param results_local_directory: the directory that the results are copied too
-    :type is_external str
-    :param is_external: indicate if libscapi protocol or not
+    :param results_local_directory: the directory that the results are copied
     """
     local(f'mkdir -p {results_local_directory}')
-    is_external = eval(is_external)
-    if not is_external:
-        get(f'{results_server_directory}/*.json', results_local_directory)
-    else:
-        get(f'{results_server_directory}/MATRIX/logs/*.log', results_local_directory)
+    get(f'{results_server_directory}/*.json', results_local_directory)
 
 
 @task

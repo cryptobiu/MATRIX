@@ -13,32 +13,34 @@ import {Protocol} from '../../classes';
 export class ReportingComponent implements OnInit {
   dataSource = new ReportingDataSource(this.dbService);
   displayedColumns = ['name', 'action'];
-  actions = ['Analyze Results using Excel', 'Analyze Results using Elasticsearch'];
+  actions = ['Download Results', 'Analyze Results using Excel', 'Analyze Results using Elasticsearch'];
 
-  constructor(private dbService:DbService, private router:Router)
-  {
-    if (!localStorage.getItem('isLoggedIn'))
+  constructor(private dbService: DbService, private router: Router) {
+    if (!localStorage.getItem('isLoggedIn')) {
       this.router.navigate(['/login']).catch(function (err) {
-      if(err)
-        console.error(err);
-    });
+        if (err) {
+          console.error(err);
+        }
+      });
+    }
   }
 
   ngOnInit() {
   }
 
-  onChange(operation, protocol){
+  onChange(operation, protocol) {
     this.router.navigate(['/reporting/' + protocol + '/' + operation]).catch(function (err) {
-      if(err)
+      if (err) {
         console.error(err);
+      }
     });
   }
 
 }
 
 export class ReportingDataSource extends DataSource<any> {
-  constructor(private dbService:DbService) {
-    super()
+  constructor(private dbService: DbService) {
+    super();
   }
 
   connect(): Observable<Protocol[]> {
