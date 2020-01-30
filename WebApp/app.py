@@ -213,7 +213,7 @@ def execute_deployment_operation(protocol_name, operation):
     except errors.OperationFailure:
         return jsonify(f'Update deploy configuration for {protocol_name} failed', 500)
     except botocore.exceptions.ClientError as e:
-        return jsonify('Error occurred during instance creation', 500)
+        return jsonify(f'{str(e)}', 500)
 
 
 @app.route('/api/execution/update/<string:protocol_name>', methods=['POST'])
