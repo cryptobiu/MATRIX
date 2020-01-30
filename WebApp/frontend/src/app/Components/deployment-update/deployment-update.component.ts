@@ -32,11 +32,17 @@ export class DeploymentUpdateComponent implements OnInit {
      ['sa-east-1', ['sa-east-1a', 'sa-east-1b', 'sa-east-1c']]
 ]);
 
-   selectedZone = ''
+   selectedZone = '';
 
 
   awsArch = ['x86_64', 'ARM'];
-  awsX64Instances = ['c5.large', 'c5.xlarge', 'c2.2xlarge', 'c5.4xlarge', 'c5.9xlarge', 'c5.18xlarge'];
+  // awsX64Instances = ['c5.large', 'c5.xlarge', 'c5.2xlarge', 'c5.4xlarge', 'c5.9xlarge', 'c5.18xlarge',
+  //   'm5.large', 'm5.xlarge', 'm5.2xlarge', 'm5.4xlarge', 'm5.12xlarge', 'm5.24xlarge', 'p3.16xlarge', 'p3dn.24xlarge'];
+  awsX64Instances: Map<string, Array<string>> = new Map( [
+    ['M5', ['m5.large', 'm5.xlarge', 'm5.2xlarge', 'm5.4xlarge', 'm5.8xlarge', 'm5.12xlarge', 'm5.16xlarge', 'm5.24xlarge']],
+    ['C5', ['c5.large', 'c5.xlarge', 'c5.2xlarge', 'c5.4xlarge', 'c5.9xlarge', 'c5.12xlarge', 'c5.18xlarge', 'c5.24xlarge']],
+    ['P3', ['p3.2xlarge', 'p3.8xlarge', 'p3.16xlarge', 'p3dn.24xlarge']]
+  ]);
   awsArmInstances = ['a1.medium', 'a1.large', 'a1.xlarge', 'a1.2xlarge', 'a1.4xlarge', 'a1.metal'];
 
   azureRegions = ['Central US', 'East US 2', 'East US', 'North Central US', 'South Central US', 'West US 2',

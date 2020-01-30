@@ -57,9 +57,13 @@
                            #awsInstanceType="ngModel" required
                            [class.isInvalid]="awsInstanceType.invalid && awsInstanceType.touched">
             Instance Type <br><br>
-            <mat-radio-button class="tp-radio-button" *ngFor="let ai of awsX64Instances" [value]="ai">
-              {{ai}} <br>
-            </mat-radio-button>
+            <ng-container class="tp-radio-button" *ngFor="let ai of awsX64Instances | keyvalue">
+              <span><b>{{ ai.key }}</b>: </span>
+                <mat-radio-button *ngFor="let i of ai.value" [value]="i">
+                  {{i}} <br>
+                </mat-radio-button>
+              <br>
+            </ng-container>
           </mat-radio-group>
         </ng-container>
         <ng-template #ArmInstances>
