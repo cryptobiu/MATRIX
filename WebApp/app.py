@@ -197,14 +197,16 @@ def execute_deployment_operation(protocol_name, operation):
             deploy.create_security_group()
         elif operation == 'Update network details':
             deploy.get_network_details()
-        elif operation == 'Terminate machines':
-            deploy.terminate_instances()
         elif operation == 'Change machines types':
             deploy.change_instance_types()
         elif operation == 'Start instances':
             deploy.start_instances()
+        elif operation == 'Reboot instances':
+            deploy.reboot_instances()
         elif operation == 'Stop instances':
             deploy.stop_instances()
+        elif operation == 'Terminate machines':
+            deploy.terminate_instances()
 
         return jsonify('deployment operation %s succeeded' % operation)
 

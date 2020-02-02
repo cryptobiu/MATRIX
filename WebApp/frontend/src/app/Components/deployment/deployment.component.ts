@@ -17,7 +17,7 @@ export class DeploymentComponent implements OnInit {
   dataSource = new ProtocolDataSource(this.dbService);
   displayedColumns = ['name', 'action', 'update', 'downloadLog', 'downloadConf'];
   actions = ['Deploy Instance(s)', 'Create key pair(s)', 'Create security group',
-    'Update network details', 'Terminate machines', 'Change machines types', 'Start instances', 'Stop instances'];
+    'Update network details', 'Change machines types', 'Start instances', 'Reboot instances', 'Stop instances', 'Terminate machines'];
 
   constructor(private dbService: DbService, private auth: AuthService, private router: Router,
               private fileDownloadService: DownloadFileService) {
