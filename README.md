@@ -138,6 +138,9 @@ For each region in AWS you need to create an entry in the global configuration f
 Sample configuration file can be found [here](GlobalConfigurations/awsRegions.json)
 
 ### ProtocolsConfigurations
+
+**NOTE**: This section relevant only when using the CLI.
+
 MATRIX uses configuration file to set it execution. The configuration file is written in [json](https://en.wikipedia.org/wiki/JSON) format.
 Each configuration file has the following fields:
 * `protocol` - Name of protocol

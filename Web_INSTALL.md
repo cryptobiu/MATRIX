@@ -4,10 +4,10 @@ In order to use the UI of MATRIX, you will need to install and deploy it on a ma
 The installation instructions are are an addition to the MATRIX installation instructions.
 
 ### Installation
-To install Angular 8:
+To install Angular 9:
 1. install Nodejs and npm: `curl -sL https://deb.nodesource.com/setup_12.x | sudo bash - && 
 sudo apt-get install -y nodejs`
-2. Install the Angular CLI: `npm install -g @angular/cli`
+2. Install the Angular CLI: `npm install -g @angular/cli@9`
 3. Install the required JS packages: `cd WebApp/frontend && npm install`
 
 #### Mongodb
