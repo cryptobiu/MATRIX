@@ -9,7 +9,7 @@ env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
 # Set this to point to where the AWS key is put by MATRIX (possibly ~/Keys/[KEYNAME])
-env.key_filename = [f'{Path.home()}/Keys/AWSKeys/Matrixuseast1.pem']
+env.key_filename = [f'{Path.home()}/Keys/VMWareKeys/useast1.pem']
 # Set this to point to where you put the MATRIX root
 path_to_matrix = 'YOU PATH TO MATRIX'
 
@@ -155,6 +155,36 @@ def run_protocol(number_of_regions, args, executable_name, working_directory,
 
 @task
 def run_protocol_profiler(number_of_regions, args, executable_name, working_directory):
+    """
+    Execute the protocol on remote servers with profiler.
+    The first party is executed with profiler, the other executed normally
+    :type number_of_regions int
+    :param number_of_regions: number of regions
+    :type args str
+    :param args: the arguments for the protocol, separated by `@`
+    :type executable_name str
+    :param executable_name: the executable file name
+    :type working_directory str
+    :param working_directory: the executable file dir
+    """
+
+    values_for_execution, party_id = prepare_for_execution(number_of_regions, args, executable_name, working_directory)
+
+    if party_id == 0:
+        run(f'valgrind --tool=callgrind ./{executable_name} partyID {party_id} {values_for_execution}')
+        get('callgrind.out.*', os.getcwd())
+
+    else:
+        run(f'./{executable_name} partyID {party_id} {values_for_execution}')
+        try:
+            with open('Execution/execution_log.log', 'a+') as log_file:
+                log_file.write(f'{values_for_execution}\n')
+        except EnvironmentError:
+            print('Cannot write data to execution log file')
+
+
+@task
+def run_protocol_memory_profiler(number_of_regions, args, executable_name, working_directory):
     """
     Execute the protocol on remote servers with profiler.
     The first party is executed with profiler, the other executed normally
