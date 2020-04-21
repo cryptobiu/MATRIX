@@ -201,8 +201,8 @@ def run_protocol_memory_profiler(number_of_regions, args, executable_name, worki
     values_for_execution, party_id = prepare_for_execution(number_of_regions, args, executable_name, working_directory)
 
     if party_id == 0:
-        run(f'valgrind --tool=callgrind ./{executable_name} partyID {party_id} {values_for_execution}')
-        get('callgrind.out.*', os.getcwd())
+        run(f'valgrind --tool=massif ./{executable_name} partyID {party_id} {values_for_execution}')
+        get('massif.out.*', os.getcwd())
 
     else:
         run(f'./{executable_name} partyID {party_id} {values_for_execution}')
