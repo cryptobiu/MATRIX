@@ -1,7 +1,7 @@
 {
   "us-east-1":
   {
-    "ami": "ami-016421ab131b5b2f3",
+    "ami": "ami-035d5beace4829fbd",
     "key": "useast1",
     "securityGroup": "default",
     "name": "N.Virginia"
@@ -22,9 +22,9 @@
   },
   "us-west-2":
   {
-    "ami": "ami-083cfd994201fe185",
-    "key": "Matrixuswest2-2",
-    "securityGroup": "MatrixSGuswest2",
+    "ami": "ami-0fc236181b4a13fbb",
+    "key": "uswest2",
+    "securityGroup": "default",
     "name": "Oregon"
   },
   "ap-south-1":
