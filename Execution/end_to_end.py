@@ -73,7 +73,7 @@ class E2E:
         The first party is executed with profiler, the other executed normally
         """
         protocol_name = self.protocol_config['protocolName']
-        number_of_repetitions = int(self.protocol_config['numOfRepetitions'])
+        number_of_repetitions = int(self.protocol_config['numOfIterations'])
         configurations = self.protocol_config['configurations']
         working_directory = self.protocol_config['workingDirectory']
         executables = self.protocol_config['executableName']
@@ -81,11 +81,10 @@ class E2E:
         os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
 
         for i in range(number_of_repetitions):
-            for idx2 in range(len(configurations)):
-                for idx in range(len(executables)):
-                    os.system(f'fab -f Execution/fabfile.py run_protocol_profiler:{number_of_regions},'
-                              f'{configurations[idx2]},{executables[idx]},{working_directory[idx]} --parallel | '
-                              f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
+            for idx in range(len(configurations)):
+                os.system(f'fab -f Execution/fabfile.py run_protocol_profiler:{number_of_regions},'
+                          f'{configurations[idx]},{executables[idx]},{working_directory} --parallel | '
+                          f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def execute_experiment_memory_callgrind(self):
         """
@@ -93,19 +92,17 @@ class E2E:
         The first party is executed with profiler, the other executed normally
         """
         protocol_name = self.protocol_config['protocolName']
-        number_of_repetitions = int(self.protocol_config['numOfRepetitions'])
+        number_of_repetitions = int(self.protocol_config['numOfIterations'])
         configurations = self.protocol_config['configurations']
         working_directory = self.protocol_config['workingDirectory']
         executables = self.protocol_config['executableName']
         number_of_regions = len(self.protocol_config['cloudProviders'])
-        os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
 
         for i in range(number_of_repetitions):
-            for idx2 in range(len(configurations)):
-                for idx in range(len(executables)):
-                    os.system(f'fab -f Execution/fabfile.py run_protocol_memory_profiler:{number_of_regions},'
-                              f'{configurations[idx2]},{executables[idx]},{working_directory[idx]} --parallel | '
-                              f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
+            for idx in range(len(configurations)):
+                os.system(f'fab -f Execution/fabfile.py run_protocol_memory_profiler:{number_of_regions},'
+                          f'{configurations[idx]},{executables[idx]},{working_directory} --parallel | '
+                          f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def execute_experiment_with_latency(self):
         """
