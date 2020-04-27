@@ -5,6 +5,7 @@ __pycache__/
 *$py.class
 .idea/
 *.xlsx
+*.json
 InstancesConfigurations/instances_ids_*
 InstancesConfigurations/public_ips
 InstancesConfigurations/parties*.conf
