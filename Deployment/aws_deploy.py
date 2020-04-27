@@ -422,11 +422,14 @@ class AmazonCP(DeployCP):
         regions = self.protocol_config['cloudProviders']['AWS']['regions']
 
         for idx in range(len(regions)):
-            region_name = regions[idx][:-1]
-            instances = self.describe_instances(region_name, self.protocol_name)
+            try:
+                region_name = regions[idx][:-1]
+                instances = self.describe_instances(region_name, self.protocol_name)
 
-            client = self.session.client('ec2', region_name=region_name)
-            client.start_instances(InstanceIds=instances)
+                client = self.session.client('ec2', region_name=region_name)
+                response = client.start_instances(InstanceIds=instances)
+            except Exception as e:
+                print(f'Problem starting instances: {str(e)}')
         time.sleep(20)
         self.get_network_details()
 
