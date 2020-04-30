@@ -6,17 +6,17 @@ __pycache__/
 .idea/
 *.xlsx
 *.json
+*.log
+
 InstancesConfigurations/instances_ids_*
 InstancesConfigurations/public_ips
 InstancesConfigurations/parties*.conf
 InstancesConfigurations/Parties_gf2n.txt
 InstancesConfigurations/Parties_gfp.txt
 
-Execution/execution_log.log
 GlobalConfigurations/tokens.json
 GlobalConfigurations/azureTokens.json
 
 WebApp/frontend/assets
 WebApp/node_modules
-WebApp/DeploymentLogs
-WebApp/ExecutionLogs
+*Logs
