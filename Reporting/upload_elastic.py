@@ -82,15 +82,18 @@ class Elastic:
                 doc = OrderedDict()
                 doc['executionTime'] = dts
                 doc['protocolName'] = protocol_name
-                number_of_parties = data['number_of_parties']
-                doc['numberOfParties'] = number_of_parties
+                number_of_parties = int(data['metaData']['numberOfParties'])
+
                 bytes_received = bytes_sent = 0
-                for idx in range(number_of_parties):
-                    bytes_received += data[idx]['bytesReceived']
-                    bytes_sent += data[idx]['bytesSent']
+                statistics_data = data['data']
+                for idx in range(number_of_parties - 1):
+                    bytes_received += statistics_data[idx]['bytesReceived']
+                    bytes_sent += statistics_data[idx]['bytesSent']
+
                 doc['bytesReceived'] = bytes_received / number_of_parties
                 doc['bytesSent'] = bytes_sent / number_of_parties
-                doc['partyId'] = data['partyId']
+                doc['partyId'] = data['metaData']['partyId']
+                doc['numberOfParties'] = number_of_parties
                 self.es.index(index='commresults', doc_type='commresults', body=doc)
 
     def upload_log_data(self, results_path):
@@ -138,7 +141,7 @@ class Elastic:
         """
         comm_base_path = f'{results_dir}/commData'
         comm_files = glob(expanduser(f'{results_dir}/*Comm*.json'))
-        # os.makedirs(comm_base_path, exist_ok=True)
+        os.makedirs(comm_base_path, exist_ok=True)
 
         for file in comm_files:
             shutil.move(file, comm_base_path)
@@ -150,9 +153,8 @@ class Elastic:
         # with open(f'WebApp/ReportingLogs/{protocol_name}.log', 'w+') as output_file:
         #     print('Upload log files to the DB', file=output_file)
 
-        # self.upload_cpu_data(cpu_files)
+        self.upload_cpu_data(cpu_files)
         self.upload_comm_data(comm_files, protocol_name)
-        #
         # with open(f'WebApp/ReportingLogs/{protocol_name}.log', 'w+') as output_file:
         #     print('all log files uploaded to the DB', file=output_file)
 
