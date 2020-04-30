@@ -2,6 +2,7 @@ import os
 import json
 from json import JSONDecodeError
 
+import shutil
 import certifi
 from glob import glob
 from datetime import datetime
@@ -29,17 +30,14 @@ class Elastic:
         es_address = global_config['Elasticsearch']['address']
         self.es = Elasticsearch(es_address, ca_certs=certifi.where())
 
-    def upload_json_data(self, analysis_type, results_path):
+    def upload_cpu_data(self, results_files):
         """
         Upload results file in JSON format to Elasticsearch
-        :type analysis_type str
-        :param analysis_type: currently the analysis supports only CPU
-        :type results_path list
-        :param results_path: list of results files location
+        :type results_files list
+        :param results_files: list of results files
         :return:
         """
         dts = datetime.utcnow()
-        results_files = glob(expanduser(f'{results_path}/*.json'))
         for file in results_files:
             try:
                 with open(file) as results:
@@ -57,12 +55,43 @@ class Elastic:
                         doc[data['times'][task_idx]['name']] = val / float(number_of_iterations)
                     doc['executionTime'] = dts
 
-                    self.es.index(index=f'{analysis_type}results', doc_type=f'{analysis_type}results', body=doc)
+                    self.es.index(index='cpuresults', doc_type='cpuresults', body=doc)
 
             except EnvironmentError:
                 print(f'Cannot read results from {file}')
+            except KeyError:
+                print(f'Cannot read results from {file}')
             except JSONDecodeError:
-                print(f'Problem reading data from {file}')
+                print(f'Cannot read results from {file}')
+            except Exception as e:
+                print(f'Cannot read results from {file}: {str(e)}')
+
+    def upload_comm_data(self, results_files, protocol_name):
+        """
+        Upload results file in JSON format to Elasticsearch
+        :type results_files list
+        :param results_files: list of results files
+        :type protocol_name str
+        :param protocol_name: protocol name
+        :return:
+        """
+        dts = datetime.utcnow()
+        for file in results_files:
+            with open(file) as results:
+                data = json.load(results, object_pairs_hook=OrderedDict)
+                doc = OrderedDict()
+                doc['executionTime'] = dts
+                doc['protocolName'] = protocol_name
+                number_of_parties = data['number_of_parties']
+                doc['numberOfParties'] = number_of_parties
+                bytes_received = bytes_sent = 0
+                for idx in range(number_of_parties):
+                    bytes_received += data[idx]['bytesReceived']
+                    bytes_sent += data[idx]['bytesSent']
+                doc['bytesReceived'] = bytes_received / number_of_parties
+                doc['bytesSent'] = bytes_sent / number_of_parties
+                doc['partyId'] = data['partyId']
+                self.es.index(index='commresults', doc_type='commresults', body=doc)
 
     def upload_log_data(self, results_path):
         """
@@ -102,15 +131,28 @@ class Elastic:
         except EnvironmentError:
             print('Cannot read results files')
 
-    def upload_all_data(self):
+    def upload_all_data(self, results_dir, protocol_name):
         """
         Activate the relevant function according to the results files format
         :return:
         """
-        is_external = json.loads(self.config_file['isExternal'].lower())
-        results_path = self.config_file['resultsDirectory']
-        if not is_external:
-            self.upload_json_data('cpu', results_path)
-        else:
-            self.upload_log_data(results_path)
+        comm_base_path = f'{results_dir}/commData'
+        comm_files = glob(expanduser(f'{results_dir}/*Comm*.json'))
+        # os.makedirs(comm_base_path, exist_ok=True)
+
+        for file in comm_files:
+            shutil.move(file, comm_base_path)
+
+        cpu_files = glob(expanduser(f'{results_dir}/*.json'))
+        comm_files = glob(expanduser(f'{comm_base_path}/*.json'))
+
+        # os.makedirs(f'WebApp/ReportingLogs/', exist_ok=True)
+        # with open(f'WebApp/ReportingLogs/{protocol_name}.log', 'w+') as output_file:
+        #     print('Upload log files to the DB', file=output_file)
+
+        # self.upload_cpu_data(cpu_files)
+        self.upload_comm_data(comm_files, protocol_name)
+        #
+        # with open(f'WebApp/ReportingLogs/{protocol_name}.log', 'w+') as output_file:
+        #     print('all log files uploaded to the DB', file=output_file)
 

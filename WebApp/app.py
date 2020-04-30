@@ -298,7 +298,7 @@ def execute_reporting_operation(protocol_name, operation):
         elif operation == 'Analyze Results using Elasticsearch':
             e = Elastic(protocol_data)
             results_dir = doc['resultsDirectory']
-            e.upload_json_data('cpu', results_dir)
+            e.upload_all_data(results_dir, protocol_name)
 
         return jsonify('reporting operation %s succeeded' % operation)
 
@@ -379,4 +379,4 @@ def get_execution_conf_file(protocol_name):
 
 if __name__ == '__main__':
     app.secret_key = 'secret'
-    app.run(debug=True, threaded=True)
+    app.run(threaded=True)
