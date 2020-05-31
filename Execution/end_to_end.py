@@ -115,7 +115,7 @@ class E2E:
             for idx2 in range(len(configurations)):
                 for idx in range(len(executables)):
                     os.system(f'fab -f Execution/fabfile.py run_protocol_with_latency::{number_of_regions},'
-                              f'{configurations[idx2]},{executables[idx]},{working_directory[idx]} --parallel | '
+                              f'{configurations[idx2]},{executables[idx]},{working_directory} --parallel | '
                               f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def update_libscapi(self):
@@ -138,6 +138,12 @@ class E2E:
     def delete_old_experiment(self):
         protocol_name = self.protocol_config['protocolName']
         working_directory = self.protocol_config['workingDirectory']
-        for idx in range(len(working_directory)):
-            os.system(f'fab -f Execution/fabfile.py delete_old_experiment:{working_directory[idx]} --parallel | '
-                      f'tee -a WebApp/ExecutionLogs/{protocol_name}.log')
+        os.system(f'fab -f Execution/fabfile.py delete_old_experiment:{working_directory} --parallel | '
+                  f'tee -a WebApp/ExecutionLogs/{protocol_name}.log')
+
+    def copy_circuits_from_db(self):
+        protocol_name = self.protocol_config['protocolName']
+        working_directory = self.protocol_config['workingDirectory']
+        os.system(f'fab -f Execution/fabfile.py copy_circuits_from_db:{working_directory} --parallel | '
+                  f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
+

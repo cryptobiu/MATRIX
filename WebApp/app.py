@@ -262,16 +262,18 @@ def execute_execution_operation(protocol_name, operation):
 
         ee = E2E(protocol_data)
 
-        if operation == 'Install Experiment':
+        if operation == 'Install experiment':
             ee.install_experiment()
-        elif operation == 'Execute Experiment':
+        elif operation == 'Execute experiment':
             ee.execute_experiment()
-        elif operation == 'Execute Experiment with cpu profiler':
+        elif operation == 'Execute experiment with cpu profiler':
             ee.execute_experiment_with_cpu_profiler()
-        elif operation == 'Execute Experiment with memory profiler':
+        elif operation == 'Execute experiment with memory profiler':
             ee.execute_experiment_with_memory_profiler()
-        elif operation == 'Get Logs':
+        elif operation == 'Get logs':
             ee.get_logs()
+        elif operation == 'Copy circuits from db':
+            ee.copy_circuits_from_db()
         elif operation == 'Update libscapi':
             ee.update_libscapi()
 

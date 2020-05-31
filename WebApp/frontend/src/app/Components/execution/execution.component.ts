@@ -15,8 +15,8 @@ export class ExecutionComponent implements OnInit {
 
   dataSource = new ProtocolDataSource(this.dbService);
   displayedColumns = ['name', 'action', 'update', 'downloadLog', 'downloadConf'];
-  actions = ['Install Experiment', 'Execute Experiment', 'Execute Experiment with profiler', 'Execute Experiment with memory profiler',
-    'Get Logs', 'Update libscapi'];
+  actions = ['Install experiment', 'Execute experiment', 'Execute experiment with profiler', 'Execute experiment with memory profiler',
+    'Get logs', 'Copy circuits from db', 'Update libscapi'];
 
   constructor(private dbService: DbService, private router: Router,
               private fileDownloadService: DownloadFileService) {

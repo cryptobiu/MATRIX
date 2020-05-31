@@ -114,7 +114,8 @@ def run_protocol(number_of_regions, args, executable_name, working_directory,
             # public ips are required for SCALE-MAMBA
             put('InstancesConfigurations/public_ips', working_directory)
             # required for SCALE-MAMBA to rsync between AWS instances
-            put(env.key_filename[0], run('pwd'))
+            with warn_only():
+                put(env.key_filename[0], run('pwd'))
 
             with warn_only():
                 sudo("kill -9 `ps aux | grep %s | awk '{print $2}'`" % executable_name)
@@ -269,3 +270,22 @@ def get_logs(logs_directory):
 def delete_old_experiment(working_directory):
     run(f'rm {working_directory}/*.json')
     run(f'rm {working_directory}/*.log')
+
+
+@task
+def copy_circuits_from_db(working_directory):
+    # add the circuits db to known hosts. Private IP is used to reduce costs.
+    run(f'ssh-keyscan -H 172.31.88.209 >> ~/.ssh/known_hosts')
+    with cd(working_directory):
+        # copy the key for scp command
+        run('rm -f *.pem')
+        put(env.key_filename[0], run('pwd'))
+        key_name = env.key_filename[0].split('/')[-1]
+        run(f'chmod 400 {key_name}')
+        run(f' scp -i {key_name} ubuntu@172.31.88.209:MPCGraph/Corona* {working_directory}/assets/')
+
+
+
+
+
+
