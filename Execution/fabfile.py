@@ -9,7 +9,7 @@ env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
 env.user = 'ubuntu'
 # env.password=''
 # Set this to point to where the AWS key is put by MATRIX (possibly ~/Keys/[KEYNAME])
-env.key_filename = [f'{Path.home()}/Keys/VMWareKeys/useast1.pem']
+env.key_filename = [f'{Path.home()}/Keys/AWSKeys/Matrixuseast1.pem']
 # Set this to point to where you put the MATRIX root
 path_to_matrix = 'YOU PATH TO MATRIX'
 

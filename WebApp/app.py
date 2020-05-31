@@ -266,10 +266,10 @@ def execute_execution_operation(protocol_name, operation):
             ee.install_experiment()
         elif operation == 'Execute Experiment':
             ee.execute_experiment()
-        elif operation == 'Execute Experiment with profiler':
-            ee.execute_experiment_callgrind()
+        elif operation == 'Execute Experiment with cpu profiler':
+            ee.execute_experiment_with_cpu_profiler()
         elif operation == 'Execute Experiment with memory profiler':
-            ee.execute_experiment_memory_callgrind()
+            ee.execute_experiment_with_memory_profiler()
         elif operation == 'Get Logs':
             ee.get_logs()
         elif operation == 'Update libscapi':

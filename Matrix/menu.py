@@ -252,7 +252,7 @@ class MatrixMenu:
         elif selection == 2:
             ee.execute_experiment()
         elif selection == 3:
-            ee.execute_experiment_callgrind()
+            ee.execute_experiment_with_cpu_profiler()
         elif selection == 4:
             ee.execute_experiment_with_latency()
         elif selection == 5:
