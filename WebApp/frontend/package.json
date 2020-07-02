@@ -30,6 +30,7 @@
     "fstream": "^1.0.12",
     "hammerjs": "^2.0.8",
     "jquery": "^3.5.0",
+    "kind-of": "^6.0.3",
     "lodash.mergewith": "^4.6.2",
     "minimist": "^1.2.3",
     "mongoose": "^5.7.5",
@@ -41,7 +42,7 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.803.25",
+    "@angular-devkit/build-angular": "^0.1000.1",
     "@angular/cli": "^8.3.25",
     "@angular/compiler-cli": "^8.2.14",
     "@angular/language-service": "~8.2.14",
