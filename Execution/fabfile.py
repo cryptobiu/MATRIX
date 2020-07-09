@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from fabric.api import *
 from fabric.contrib.files import exists
+from glob import glob
 
 
 env.hosts = open('InstancesConfigurations/public_ips', 'r').read().splitlines()
@@ -275,14 +276,10 @@ def delete_old_experiment(working_directory):
 @task
 def copy_circuits_from_db(working_directory):
     # add the circuits db to known hosts. Private IP is used to reduce costs.
-    run(f'ssh-keyscan -H 172.31.88.209 >> ~/.ssh/known_hosts')
-    with cd(working_directory):
-        # copy the key for scp command
-        run('rm -f *.pem')
-        put(env.key_filename[0], run('pwd'))
-        key_name = env.key_filename[0].split('/')[-1]
-        run(f'chmod 400 {key_name}')
-        run(f' scp -i {key_name} ubuntu@172.31.88.209:MPCGraph/Corona* {working_directory}/assets/')
+    # copy the key for scp command
+    files = glob(f'{os.getcwd()}/newCircuits/*')
+    for file in files:
+        put(file, f'{working_directory}/assets/')
 
 
 
