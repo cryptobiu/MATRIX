@@ -12,7 +12,7 @@ export class ReportingResultComponent implements OnInit {
 
   public protocolName: string;
   public operation: string;
-  private reportingData: string[];
+  public reportingData: string[];
 
   constructor(private ac_router: ActivatedRoute, private dbService: DbService) {
     this.protocolName = this.ac_router.snapshot.paramMap.get('protocolName');
