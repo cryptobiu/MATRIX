@@ -43,7 +43,7 @@ class E2E:
         cp = list(self.protocol_config['cloudProviders'].keys())
         git_address = self.protocol_config['cloudProviders'][cp[0]]['git']['gitAddress']
         git_branch = self.protocol_config['cloudProviders'][cp[0]]['git']['gitBranch']
-        git_address = git_address[0:8] + username + ':' + password + '@' + git_address[8:]
+        git_address = f'{git_address[0:8]}{username}:{password}@{git_address[8:]}'
 
         os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
         os.system(f'fab -f Execution/fabfile.py install_git_project:{git_address},{git_branch},'
