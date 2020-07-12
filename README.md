@@ -185,6 +185,6 @@ The CLI allows access to the MATRIX system. To run the CLI run: `python3 main.py
 
 MATRIX UI developed under Angular 8 and enables simple UI. It uses [Mongodb](https://www.mongodb.com/)
 as for storing data about the protocol.  
-To install and deploy the web UI read the install [instructions](Web_INSTALL.md)
+To install and deploy the web UI read the install [instructions](WebApp/Web_INSTALL.md)
 
 For bugs/features requests open an issue or send an email to liork.cryptobiu@gmail.com

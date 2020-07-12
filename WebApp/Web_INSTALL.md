@@ -22,8 +22,9 @@ Please name the database `BIU`. If you cwant to create the database in a differe
 ### Deployment
 
 To use the UI, you will need to deploy two web services. The deployment is done on
-[Nginx](https://www.nginx.com/) server.
-To install Nginx: `sudo apt install nginx`
+[Nginx](https://www.nginx.com/) server.  
+To install Nginx: `sudo apt install nginx`.
+
 To deploy the Angular service:
 
 1. Build the Angular project for production: `cd WebApp/frontend && ng build -- prod` 
@@ -32,6 +33,16 @@ To deploy the Angular service:
 4. Copy `WebApp/matrix` to `/etc/nginx/sites-available/`
 5. Restart Nginx service: `sudo systemctl restart nginx`
 
-To deploy the backend service use `gunicorn`. To install it run: `pip3 install gunicorn --user`.
-After the installation finished run inside MATRIX root directory:
-`gunicorn  -m 007 app:app --chdir WebApp -b 0.0.0.0:5000`
+To deploy the backend service:  
+
+1. Install gunicorn: `pip3 install gunicorn --user`. 
+2. Copy the service [file](matrix.service) to /etc/systemd/system (using sudo privileges).  
+3. Then start and enable the service:
+`sudo systemctl start matrix & sudo systemctl enable matrix`
+
+The instructions are taken from [1]
+
+
+#### Links
+
+[1] https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04
