@@ -15,7 +15,7 @@ sudo apt-get install -y nodejs`
 Matrix uses mongodb. In order to use MATRIX you must install and configure Mongodb.
 To install Mongodb: `sudo apt install mongodb`
 To configure the database to support authentication use this SO [answer](https://stackoverflow.com/a/55839446/4193208).
-Please name the database `BIU`. If you cwant to create the database in a different name, please change this 
+Please name the database `BIU`. If you want to create the database in a different name, please change this 
 [line](https://github.com/cryptobiu/MATRIX/blob/3298d08bcd4c4a2260f87d270d41fe2d898a3462/WebApp/app.py#L28).
 
 
