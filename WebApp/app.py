@@ -96,8 +96,8 @@ def get_protocols():
             # convert all protocols values to string since datetime cannot be jsonify
             protocols = dict((k, str(v)) for k, v in protocols.items())
             protocols_list.append(protocols)
-    except errors.OperationFailure:
-        return jsonify('reading failed', 500)
+    except errors.OperationFailure as e:
+        return jsonify(f'reading failed-{str(e)}', 500)
 
     return json.dumps(protocols_list)
 
@@ -107,8 +107,9 @@ def get_protocol(protocol_name):
     collection = db['protocols']
     try:
         protocol = collection.find({'protocolName': protocol_name}, {'_id': 0})
-    except errors.OperationFailure:
-        return jsonify('reading failed', 500)
+    except errors.OperationFailure as e:
+        return jsonify(f'reading failed-{str(e)}', 500)
+
     return json.dumps(protocol[0])
 
 
@@ -120,8 +121,8 @@ def register_new_protocol():
     try:
         collection = db['protocols']
         collection.insert_one(form_data)
-    except errors.OperationFailure:
-        return jsonify('writing failed', 500)
+    except errors.OperationFailure as e:
+        return jsonify(f'reading failed-{str(e)}', 500)
 
     return jsonify('protocol registered')
 
@@ -140,8 +141,8 @@ def update_protocol(protocol_name):
         doc['relatedArticle'] = form_data['relatedArticle']
         collection.save(doc)
 
-    except errors.OperationFailure:
-        return jsonify('writing failed', 500)
+    except errors.OperationFailure as e:
+        return jsonify(f'reading failed-{str(e)}', 500)
 
     return jsonify('protocol updated')
 
@@ -152,8 +153,8 @@ def delete_protocol(protocol_name):
         collection = db['protocols']
         collection.delete_one({'protocolName': protocol_name})
 
-    except errors.OperationFailure:
-        return jsonify('writing failed', 500)
+    except errors.OperationFailure as e:
+        return jsonify(f'reading failed-{str(e)}', 500)
 
     return jsonify('protocol deleted')
 
@@ -168,12 +169,12 @@ def update_deployment_protocol_data(protocol_name):
         doc['cloudProviders'] = form_data['cloudProviders']
         collection.save(doc)
 
-    except errors.InvalidDocument:
-        return jsonify(f'Failed to retrieve data for {protocol_name}', 500)
-    except errors.OperationFailure:
-        return jsonify(f'Update deploy configuration for {protocol_name} failed', 500)
+    except errors.InvalidDocument as e:
+        return jsonify(f'Failed to retrieve data for {protocol_name}-{str(e)}', 500)
+    except errors.OperationFailure as e:
+        return jsonify(f'Update deployment configuration for {protocol_name} failed-{str(e)}', 500)
 
-    return jsonify('deploy update works')
+    return jsonify('deployment update works')
 
 
 @app.route('/api/deployment/<string:protocol_name>/<string:operation>')
@@ -210,10 +211,10 @@ def execute_deployment_operation(protocol_name, operation):
 
         return jsonify('deployment operation %s succeeded' % operation)
 
-    except errors.InvalidDocument:
-        return jsonify(f'Failed to retrieve data for {protocol_name}', 500)
-    except errors.OperationFailure:
-        return jsonify(f'Update deploy configuration for {protocol_name} failed', 500)
+    except errors.InvalidDocument as e:
+        return jsonify(f'Failed to retrieve data for {protocol_name}-{str(e)}', 500)
+    except errors.OperationFailure as e:
+        return jsonify(f'Deployment operation for {protocol_name} failed-{str(e)}', 500)
     except botocore.exceptions.ClientError as e:
         return jsonify(f'{str(e)}', 500)
 
@@ -245,10 +246,10 @@ def update_execution_protocol_data(protocol_name):
         doc['resultsDirectory'] = form_data['resultsDirectory'].strip()
         collection.save(doc)
 
-    except errors.InvalidDocument:
-        return jsonify(f'Failed to retrieve data for {protocol_name}', 500)
-    except errors.OperationFailure:
-        return jsonify(f'Update deploy configuration for {protocol_name} failed', 500)
+    except errors.InvalidDocument as e:
+        return jsonify(f'Failed to retrieve data for {protocol_name}-{str(e)}', 500)
+    except errors.OperationFailure as e:
+        return jsonify(f'Update execution configuration for {protocol_name} failed-{str(e)}', 500)
 
     return jsonify('execution update works')
 
@@ -279,10 +280,10 @@ def execute_execution_operation(protocol_name, operation):
 
         return jsonify('execution operation %s succeeded' % operation)
 
-    except errors.InvalidDocument:
-        return jsonify(f'Failed to retrieve data for {protocol_name}', 500)
-    except errors.OperationFailure:
-        return jsonify(f'Update deploy configuration for {protocol_name} failed', 500)
+    except errors.InvalidDocument as e:
+        return jsonify(f'Failed to retrieve data for {protocol_name}-{str(e)}', 500)
+    except errors.OperationFailure as e:
+        return jsonify(f'Execution operation for {protocol_name} failed-{str(e)}', 500)
 
 
 @app.route('/api/reporting/<string:protocol_name>/<string:operation>')
@@ -304,10 +305,10 @@ def execute_reporting_operation(protocol_name, operation):
 
         return jsonify('reporting operation %s succeeded' % operation)
 
-    except errors.InvalidDocument:
-        return jsonify(f'Failed to retrieve data for {protocol_name}', 500)
-    except errors.OperationFailure:
-        return jsonify(f'Update deploy configuration for {protocol_name} failed', 500)
+    except errors.InvalidDocument as e:
+        return jsonify(f'Failed to retrieve data for {protocol_name}-{str(e)}', 500)
+    except errors.OperationFailure as e:
+        return jsonify(f'Reporting operation for {protocol_name} failed-{str(e)}', 500)
 
 
 @app.route('/api/deployment/getData/<string:protocol_name>')
