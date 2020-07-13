@@ -10,7 +10,7 @@ import {Protocol} from '../classes';
 })
 export class DbService {
 
-  private _urlApi = 'http://localhost:5000/api/';
+  private _urlApi = 'http://132.71.144.17/api/';
 
   constructor(private _http: HttpClient) { }
 
@@ -19,8 +19,7 @@ export class DbService {
     return this._http.get<ICompetition[]>(url).pipe(catchError(this.handleError));
   }
 
-  getCompetition(competitionName: string)
-  {
+  getCompetition(competitionName: string) {
     const url = this._urlApi + 'competitions/' + competitionName;
     return this._http.get<ICompetition>(url).pipe(catchError(this.handleError));
   }
@@ -68,6 +67,11 @@ export class DbService {
   getReportingData(protocolName: string) {
     const url = this._urlApi + 'reporting/getData/' + protocolName;
     return this._http.get(url).pipe(catchError(this.handleError));
+  }
+
+  getDeploymentConf(protocolName: string): Observable<Protocol> {
+    const url = this._urlApi + 'deployment/downloadConf/' + protocolName;
+    return this._http.get<Protocol>(url).pipe(catchError(this.handleError));
   }
 
   private handleError(error: HttpErrorResponse) {

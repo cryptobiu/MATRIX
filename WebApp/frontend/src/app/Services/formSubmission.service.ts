@@ -9,34 +9,36 @@ import { throwError } from 'rxjs';
 })
 export class FormSubmissionService {
 
+  private _urlApi = 'http://132.71.144.17/api/';
+
   constructor(private _http: HttpClient) { }
 
   submitCreateProtocolForm(protocol: Protocol) {
-    const _url = 'http://localhost:5000/api/protocols/createProtocol';
+    const _url = this._urlApi + 'protocols/createProtocol';
     return this._http.post<any>(_url, protocol).
     pipe(catchError(this.handleError));
   }
 
   submitUpdateProtocolForm(protocol: Protocol) {
-    const _url = 'http://localhost:5000/api/protocols/update/' + protocol.protocolName;
+    const _url = this._urlApi + 'api/protocols/update/' + protocol.protocolName;
     return this._http.post<any>(_url, protocol).
     pipe(catchError(this.handleError));
   }
 
   submitUpdateDeployForm(protocol: Protocol) {
-    const _url = 'http://localhost:5000/api/deployment/update/' + protocol.protocolName;
+    const _url = this._urlApi + 'api/deployment/update/' + protocol.protocolName;
     return this._http.post<any>(_url, protocol).
     pipe(catchError(this.handleError));
   }
 
   submitUpdateExecutionForm(protocol: Protocol) {
-    const _url = 'http://localhost:5000/api/execution/update/' + protocol.protocolName;
+    const _url = this._urlApi + 'api/execution/update/' + protocol.protocolName;
     return this._http.post<any>(_url, protocol).
     pipe(catchError(this.handleError));
   }
 
   submitCompetitionRegistrationForm(cr: CompetitionRegistration, competitionName: string) {
-    const _url = 'http://localhost:5000/api/competitions/registerCompetition/' + competitionName;
+    const _url = this._urlApi + 'api/competitions/registerCompetition/' + competitionName;
     return this._http.post<any>(_url, cr).
     pipe(catchError(this.handleError));
   }
