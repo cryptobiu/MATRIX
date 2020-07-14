@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Protocol, CompetitionRegistration} from '../classes';
+import {Protocol, CompetitionRegistration, UserProfile} from '../classes';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
@@ -20,29 +20,29 @@ export class FormSubmissionService {
   }
 
   submitUpdateProtocolForm(protocol: Protocol) {
-    const _url = this._urlApi + 'api/protocols/update/' + protocol.protocolName;
+    const _url = this._urlApi + 'protocols/update/' + protocol.protocolName;
     return this._http.post<any>(_url, protocol).
     pipe(catchError(this.handleError));
   }
 
   submitUpdateDeployForm(protocol: Protocol) {
-    const _url = this._urlApi + 'api/deployment/update/' + protocol.protocolName;
+    const _url = this._urlApi + 'deployment/update/' + protocol.protocolName;
     return this._http.post<any>(_url, protocol).
     pipe(catchError(this.handleError));
   }
 
   submitUpdateExecutionForm(protocol: Protocol) {
-    const _url = this._urlApi + 'api/execution/update/' + protocol.protocolName;
+    const _url = this._urlApi + 'execution/update/' + protocol.protocolName;
     return this._http.post<any>(_url, protocol).
     pipe(catchError(this.handleError));
   }
 
   submitCompetitionRegistrationForm(cr: CompetitionRegistration, competitionName: string) {
-    const _url = this._urlApi + 'api/competitions/registerCompetition/' + competitionName;
+    const _url = this._urlApi + 'competitions/registerCompetition/' + competitionName;
     return this._http.post<any>(_url, cr).
     pipe(catchError(this.handleError));
   }
-
+  
   private handleError(error: HttpErrorResponse) {
   if (error.error instanceof ErrorEvent) {
     // A client-side or network error occurred. Handle it accordingly.
