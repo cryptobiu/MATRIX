@@ -1,0 +1,20 @@
+<div class="container-fluid mb-5">
+  <h3> Execution configuration for {{protocolModel.protocolName}}</h3>
+<br>
+
+  <ul>
+    <li>Number of Configurations: {{numberOfConfigurations}}</li>
+    <li>Number of protocol iterations: {{numberOfIterations}}</li>
+    <li>Working directory for protocol: {{workingDirectory}}</li>
+    <li>Result directory for protocol: {{resultsDirectory}}</li>
+    <br>
+  </ul>
+
+  The protocol will run this configurations:
+  <ul>
+    <li *ngFor="let conf of configurations"> {{conf}} </li>
+  </ul>
+
+
+
+</div>
