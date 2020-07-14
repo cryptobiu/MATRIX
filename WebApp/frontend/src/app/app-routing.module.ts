@@ -20,6 +20,9 @@ import {DeploymentUpdateComponent} from './Components/deployment-update/deployme
 import {ExecutionUpdateComponent} from './Components/execution-update/execution-update.component';
 import {ProtocolsUpdateComponent} from './Components/protocols-update/protocols-update.component';
 import {ErrorComponent} from './Components/error/error.component';
+import {DeploymentConfigurationComponent} from './Components/deployment-configuration/deployment-configuration.component';
+import {NewLoginComponent} from './Components/new-login/new-login.component';
+import {ExecutionConfigurationComponent} from './Components/execution-configuration/execution-configuration.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full'},
@@ -31,14 +34,17 @@ const routes: Routes = [
   { path: 'protocols/update/:protocolName', component: ProtocolsUpdateComponent, pathMatch:  'full'},
   { path: 'deployment', component:  DeploymentComponent, pathMatch:  'full'},
   { path: 'deployment/update/:protocolName', component:  DeploymentUpdateComponent, pathMatch:  'full'},
+  { path: 'deployment/configuration/:protocolName', component:  DeploymentConfigurationComponent, pathMatch:  'full'},
   { path: 'deployment/:action/:protocolName', component:  DeploymentResultComponent, pathMatch:  'full'},
   { path: 'execution', component:  ExecutionComponent, pathMatch:  'full'},
   { path: 'execution/update/:protocolName', component:  ExecutionUpdateComponent, pathMatch:  'full'},
+  { path: 'execution/configuration/:protocolName', component:  ExecutionConfigurationComponent, pathMatch:  'full'},
   { path: 'execution/:protocolName/:action', component:  ExecutionResultComponent, pathMatch:  'full'},
   { path: 'reporting', component:  ReportingComponent, pathMatch:  'full'},
   { path: 'reporting/:protocolName/:action', component:  ReportingResultComponent, pathMatch:  'full'},
   { path: 'circuits', component: CircuitsComponent, pathMatch: 'full'},
   { path: 'login', component: LoginComponent, pathMatch: 'full'},
+  { path: 'newlogin', component: NewLoginComponent, pathMatch: 'full'},
   { path: 'callback', component: CallbackComponent, pathMatch: 'full'},
   { path: 'error', component: ErrorComponent, pathMatch: 'full'},
   { path: '**', component: PageNotFoundComponent, pathMatch: 'full'},

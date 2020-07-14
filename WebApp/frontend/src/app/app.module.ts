@@ -28,8 +28,11 @@ import { CallbackComponent } from './Components/callback/callback.component';
 import { DeploymentUpdateComponent } from './Components/deployment-update/deployment-update.component';
 import {ExecutionUpdateComponent} from './Components/execution-update/execution-update.component';
 import { ProtocolsUpdateComponent } from './Components/protocols-update/protocols-update.component';
-import {ErrorComponent} from './Components/error/error.component';
-import {GlobalErrorHandlerService} from './Services/global-error-handler.service';
+import { ErrorComponent } from './Components/error/error.component';
+import { GlobalErrorHandlerService } from './Services/global-error-handler.service';
+import { DeploymentConfigurationComponent } from './Components/deployment-configuration/deployment-configuration.component';
+import { NewLoginComponent } from './Components/new-login/new-login.component';
+import { ExecutionConfigurationComponent } from './Components/execution-configuration/execution-configuration.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +57,10 @@ import {GlobalErrorHandlerService} from './Services/global-error-handler.service
     DeploymentUpdateComponent,
     ExecutionUpdateComponent,
     ProtocolsUpdateComponent,
-    ErrorComponent
+    ErrorComponent,
+    DeploymentConfigurationComponent,
+    NewLoginComponent,
+    ExecutionConfigurationComponent
   ],
   imports: [
     BrowserModule,
