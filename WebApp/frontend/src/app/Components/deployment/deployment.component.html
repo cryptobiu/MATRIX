@@ -29,6 +29,13 @@
       </mat-cell>
     </ng-container>
 
+    <ng-container matColumnDef="viewConfiguration">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let protocol">
+        <a routerLink="configuration/{{protocol.protocolName}}" class="badge badge-primary" >View configuration</a>
+      </mat-cell>
+    </ng-container>
+
     <ng-container matColumnDef="downloadLog">
       <mat-header-cell *matHeaderCellDef></mat-header-cell>
       <mat-cell *matCellDef="let protocol">

@@ -15,7 +15,7 @@ import {DownloadFileService} from '../../Services/download-file.service';
 })
 export class DeploymentComponent implements OnInit {
   dataSource = new ProtocolDataSource(this.dbService);
-  displayedColumns = ['name', 'action', 'update', 'downloadLog', 'downloadConf'];
+  displayedColumns = ['name', 'action', 'update', 'viewConfiguration', 'downloadLog', 'downloadConf'];
   actions = ['Deploy Instance(s)', 'Create key pair(s)', 'Create security group',
     'Update network details', 'Change machines types', 'Start instances', 'Reboot instances', 'Stop instances', 'Terminate machines'];
 
