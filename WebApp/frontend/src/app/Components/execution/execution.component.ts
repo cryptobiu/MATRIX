@@ -14,7 +14,7 @@ import {DownloadFileService} from '../../Services/download-file.service';
 export class ExecutionComponent implements OnInit {
 
   dataSource = new ProtocolDataSource(this.dbService);
-  displayedColumns = ['name', 'action', 'update', 'downloadLog', 'downloadConf'];
+  displayedColumns = ['name', 'action', 'update', 'viewConfiguration', 'downloadLog', 'downloadConf'];
   actions = ['Install experiment', 'Execute experiment', 'Execute experiment with profiler', 'Execute experiment with memory profiler',
     'Get logs', 'Copy circuits from db', 'Update libscapi'];
 
