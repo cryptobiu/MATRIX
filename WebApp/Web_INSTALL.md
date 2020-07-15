@@ -29,9 +29,10 @@ To deploy the Angular service:
 
 1. Build the Angular project for production: `cd WebApp/frontend && ng build -- prod` 
 2. Create directory `mkdir -p /usr/share/nginx/html/matrix`
-3. Copy `WebApp/frontend/dist/frontend` to `/usr/share/nginx/html/matrix`
+3. Copy the content of `WebApp/frontend/dist/frontend` to `/usr/share/nginx/html/matrix`
 4. Copy `WebApp/matrix` to `/etc/nginx/sites-available/`
-5. Restart Nginx service: `sudo systemctl restart nginx`
+5. Create soft link: `sudo ln -s /etc/nginx/sites-available/matrix /etc/nginx/sites-enabled/`
+6. Restart Nginx service: `sudo systemctl restart nginx`
 
 To deploy the backend service:  
 
