@@ -18,8 +18,6 @@
       </label>
       <br>
 
-      <!--TODO validators for checkbox-->
-
       <ng-container *ngIf="cloudProviderName.value === 'AWS'; else azure">
         Regions<br><br>
         <ng-container *ngFor="let zone of awsRegions | keyvalue">
@@ -80,6 +78,39 @@
         </ng-template>
       </ng-container>
 
+      <ng-container *ngIf="cloudProviderName.value === 'AWS'">
+        <label>
+        AMI Name<br>
+        <input type="text" required #amiName="ngModel"
+               [class.is-invalid]="amiName.invalid && amiName.touched" class="form-control"
+               matTooltip="If you choose more then one region, please insert the values with comma separator"
+               name="awsAmiName" [(ngModel)]="awsAmiName">
+         <small class="text-danger" [class.d-none]="amiName.valid || amiName.untouched"></small>
+      </label>
+      <br>
+
+        <label>
+        Security Group Name<br>
+        <input type="text" required #securityGroup="ngModel"
+               [class.is-invalid]="securityGroup.invalid && securityGroup.touched" class="form-control"
+               matTooltip="If you choose more then one region, please insert the values with comma separator"
+               name="securityGroupName" [(ngModel)]="securityGroupName">
+         <small class="text-danger" [class.d-none]="securityGroup.valid || securityGroup.untouched"></small>
+      </label>
+      <br>
+
+        <label>
+        key file Name<br>
+        <input type="text" required #keyFile="ngModel"
+               [class.is-invalid]="keyFile.invalid && keyFile.touched" class="form-control"
+               matTooltip="If you choose more then one region, please insert the values with comma separator"
+               name="keyFileName" [(ngModel)]="keyFileName">
+         <small class="text-danger" [class.d-none]="keyFile.valid || keyFile.untouched"></small>
+      </label>
+      <br>
+
+      </ng-container>
+
       <ng-template #azInstances>
         <ng-container *ngIf="cloudProviderName.value === 'Azure'">
           Instance Type <br><br>
@@ -93,7 +124,6 @@
         </ng-container>
       </ng-template>
       <br>
-      <br>
 
       <label>
         Number Of Parties<br>
@@ -101,10 +131,8 @@
                [class.is-invalid]="numberOfParties.invalid && numberOfParties.touched" class="form-control"
                name="numberOfParties" [(ngModel)]="numOfParties">
          <small class="text-danger" [class.d-none]="numberOfParties.valid || numberOfParties.untouched"></small>
-        <!--TODO Numbers validation-->
       </label>
       <br>
-
 
       <label>
         Git Address

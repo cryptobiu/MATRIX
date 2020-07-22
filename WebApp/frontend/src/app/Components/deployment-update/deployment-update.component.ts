@@ -34,10 +34,7 @@ export class DeploymentUpdateComponent implements OnInit {
 
    selectedZone = '';
 
-
   awsArch = ['x86_64', 'ARM'];
-  // awsX64Instances = ['c5.large', 'c5.xlarge', 'c5.2xlarge', 'c5.4xlarge', 'c5.9xlarge', 'c5.18xlarge',
-  //   'm5.large', 'm5.xlarge', 'm5.2xlarge', 'm5.4xlarge', 'm5.12xlarge', 'm5.24xlarge', 'p3.16xlarge', 'p3dn.24xlarge'];
   awsX64Instances: Map<string, Array<string>> = new Map( [
     ['M5', ['m5.large', 'm5.xlarge', 'm5.2xlarge', 'm5.4xlarge', 'm5.8xlarge', 'm5.12xlarge', 'm5.16xlarge', 'm5.24xlarge']],
     ['C5', ['c5.large', 'c5.xlarge', 'c5.2xlarge', 'c5.4xlarge', 'c5.9xlarge', 'c5.12xlarge', 'c5.18xlarge', 'c5.24xlarge']],
@@ -52,12 +49,16 @@ export class DeploymentUpdateComponent implements OnInit {
     'China North', 'China East 2', 'China North 2', 'Central India', 'South India', 'West India', 'Japan East',
     'Japan West', 'Korea Central', 'Korea South', 'South Africa North', 'South Africa West', 'UAE Central', 'UAE North'];
   azureInstances = ['Standard_F1s', 'Standard_F2s', 'Standard_F4s', 'Standard_F8s', 'Standard_F16s'];
+
   regions = [];
-  numOfParties = 2;
+  numOfParties = 3;
   awsSelectedArch = '';
   instanceType = '';
   gitAddress = '';
   gitBranch = 'master';
+  awsAmiName = '';
+  securityGroupName = '';
+  keyFileName = '';
   submitted = false;
   addressHasError = true;
   errmsg = '';
@@ -103,6 +104,9 @@ export class DeploymentUpdateComponent implements OnInit {
     this.protocolModel.cloudProviders[this.selectedCP]['git'] = {};
     this.protocolModel.cloudProviders[this.selectedCP]['git']['gitBranch'] = this.gitBranch;
     this.protocolModel.cloudProviders[this.selectedCP]['git']['gitAddress'] = this.gitAddress;
+    this.protocolModel.cloudProviders[this.selectedCP]['imageName'] = this.awsAmiName;
+    this.protocolModel.cloudProviders[this.selectedCP]['securityGroupName'] = this.securityGroupName;
+    this.protocolModel.cloudProviders[this.selectedCP]['keyFileName'] = this.keyFileName;
     this._formService.submitUpdateDeployForm(this.protocolModel).subscribe(
       data => this.router.navigate(['/deployment']),
       error => this.errmsg = error.statuesText);

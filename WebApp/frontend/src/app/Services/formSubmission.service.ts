@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Protocol, CompetitionRegistration, UserProfile} from '../classes';
+import {Protocol, CompetitionRegistration} from '../classes';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
@@ -42,7 +42,7 @@ export class FormSubmissionService {
     return this._http.post<any>(_url, cr).
     pipe(catchError(this.handleError));
   }
-  
+
   private handleError(error: HttpErrorResponse) {
   if (error.error instanceof ErrorEvent) {
     // A client-side or network error occurred. Handle it accordingly.

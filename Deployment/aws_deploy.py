@@ -116,23 +116,29 @@ class AmazonCP(DeployCP):
             except botocore.exceptions.ClientError as e:
                 print(e.response['Error']['Message'].upper())
 
-    def get_ami_disk_size(self, region_name):
+    def get_ami_details(self, region_name, ami_name):
         """
         :type region_name str
         :param region_name: the region that the instances are located
-        :return: the size of the AMI disk
+        :type ami_name str
+        :param ami_name: name of requested AMI
+        :return: AMI id, disk size
         """
+
         client = self.session.client('ec2', region_name)
-
         try:
-            with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
-                global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
-        except EnvironmentError:
-            print('Cannot open Global Configurations')
+            images = client.describe_images(Owners=['self'])['Images']
+            image_name = ''
+            for image in images:
+                for tag in image['Tags']:
+                    if tag['Key'] == 'Name':
+                        image_name = tag['Value']
+                        break
+                if ami_name == image_name:
+                    return image['ImageId'], image['BlockDeviceMappings'][0]['Ebs']['VolumeSize']
 
-        ami_id = global_config[region_name]['ami']
-        response = client.describe_images(ImageIds=[ami_id])
-        return response['Images'][0]['BlockDeviceMappings'][0]['Ebs']['VolumeSize']
+        except botocore.exceptions.ClientError as e:
+            print(e.response['Error']['Message'].lower())
 
     def deploy_instances(self):
         """
@@ -141,6 +147,9 @@ class AmazonCP(DeployCP):
         """
         regions = self.protocol_config['cloudProviders']['AWS']['regions']
         machine_type = self.protocol_config['cloudProviders']['AWS']['instanceType']
+        image_name = self.protocol_config['cloudProviders']['AWS']['imageName']
+        security_group = self.protocol_config['cloudProviders']['AWS']['securityGroupName']
+        key_name = self.protocol_config['cloudProviders']['AWS']['keyFileName']
         if 'spotPrice' in self.protocol_config['cloudProviders']['AWS']:
             spot_request = True
             price_bids = self.protocol_config['cloudProviders']['AWS']['spotPrice']
@@ -148,11 +157,6 @@ class AmazonCP(DeployCP):
             spot_request = False
         number_of_parties = self.protocol_config['cloudProviders']['AWS']['numOfParties']
         number_duplicated_servers = 0
-        try:
-            with open(f'{os.getcwd()}/GlobalConfigurations/awsRegions.json') as gc_file:
-                global_config = json.load(gc_file, object_pairs_hook=OrderedDict)
-        except EnvironmentError:
-            print('Cannot open Global Configurations')
 
         os.makedirs('WebApp/DeploymentLogs', exist_ok=True)
         with open(f'WebApp/DeploymentLogs/{self.protocol_name}.log', 'w+') as output_file:
@@ -169,7 +173,7 @@ class AmazonCP(DeployCP):
             for idx in range(len(regions)):
                 region_name = regions[idx][:-1]
                 client = self.session.client('ec2', region_name=region_name)
-                disk_size = self.get_ami_disk_size(region_name)
+                ami_id, disk_size = self.get_ami_details(region_name, image_name)
 
                 number_of_instances_to_deploy = self.check_running_instances(region_name, machine_type)
                 if idx < number_duplicated_servers:
@@ -190,9 +194,9 @@ class AmazonCP(DeployCP):
                                     ValidUntil=new_date,
                                     LaunchSpecification=
                                     {
-                                        'ImageId': global_config[regions[idx][:-1]]['ami'],
-                                        'KeyName': global_config[regions[idx][:-1]]['key'],
-                                        'SecurityGroups': [global_config[regions[idx][:-1]]['securityGroup']],
+                                        'ImageId': ami_id,
+                                        'KeyName': key_name,
+                                        'SecurityGroups': security_group,
                                         'InstanceType': machine_type,
                                         'Placement':
                                             {
@@ -234,11 +238,11 @@ class AmazonCP(DeployCP):
                                     'NoDevice': ''
                                     }
                                 ],
-                                'ImageId': global_config[region_name]["ami"],
-                                'KeyName': global_config[region_name]["key"],
+                                'ImageId': image_name,
+                                'KeyName': key_name,
                                 'MinCount': int(number_of_instances_to_deploy),
                                 'MaxCount': int(number_of_instances_to_deploy),
-                                'SecurityGroups': [global_config[region_name]["securityGroup"]],
+                                'SecurityGroups': [security_group],
                                 'InstanceType': machine_type,
                                 'Placement': {'AvailabilityZone': regions[idx]},
                                 'TagSpecifications': [{
@@ -264,11 +268,11 @@ class AmazonCP(DeployCP):
                                         'NoDevice': ''
                                     }
                                 ],
-                                'ImageId': global_config[region_name]["ami"],
-                                'KeyName': global_config[region_name]["key"],
+                                'ImageId': image_name,
+                                'KeyName': key_name,
                                 'MinCount': int(number_of_instances_to_deploy),
                                 'MaxCount': int(number_of_instances_to_deploy),
-                                'SubnetId': [global_config[region_name]["subnetid"]],
+                                'SubnetId': security_group,
                                 'InstanceType': machine_type,
                                 'Placement': {'AvailabilityZone': regions[idx]},
                                 'TagSpecifications': [{

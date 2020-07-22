@@ -139,22 +139,22 @@ class Elastic:
         Activate the relevant function according to the results files format
         :return:
         """
-        comm_base_path = f'{results_dir}/commData'
-        comm_files = glob(expanduser(f'{results_dir}/*Comm*.json'))
+        comm_base_path = f'{protocol_name}_Results/commData'
+        comm_files = glob(expanduser(f'{protocol_name}_Results/*Comm*.json'))
         os.makedirs(comm_base_path, exist_ok=True)
 
         for file in comm_files:
             shutil.move(file, comm_base_path)
 
-        cpu_files = glob(expanduser(f'{results_dir}/*.json'))
-        comm_files = glob(expanduser(f'{comm_base_path}/*.json'))
+        cpu_files = glob(expanduser(f'{protocol_name}_Results/*.json'))
+        comm_files = glob(f'{comm_base_path}/*.json')
 
-        # os.makedirs(f'WebApp/ReportingLogs/', exist_ok=True)
-        # with open(f'WebApp/ReportingLogs/{protocol_name}.log', 'w+') as output_file:
-        #     print('Upload log files to the DB', file=output_file)
+        os.makedirs(f'WebApp/ReportingLogs/', exist_ok=True)
+        with open(f'WebApp/ReportingLogs/{protocol_name}.log', 'w+') as output_file:
+            print('Upload log files to the DB', file=output_file)
 
         self.upload_cpu_data(cpu_files)
         self.upload_comm_data(comm_files, protocol_name)
-        # with open(f'WebApp/ReportingLogs/{protocol_name}.log', 'w+') as output_file:
-        #     print('all log files uploaded to the DB', file=output_file)
+        with open(f'WebApp/ReportingLogs/{protocol_name}.log', 'w+') as output_file:
+            print('all log files uploaded to the DB', file=output_file)
 

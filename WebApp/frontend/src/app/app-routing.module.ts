@@ -21,7 +21,6 @@ import {ExecutionUpdateComponent} from './Components/execution-update/execution-
 import {ProtocolsUpdateComponent} from './Components/protocols-update/protocols-update.component';
 import {ErrorComponent} from './Components/error/error.component';
 import {DeploymentConfigurationComponent} from './Components/deployment-configuration/deployment-configuration.component';
-import {NewLoginComponent} from './Components/new-login/new-login.component';
 import {ExecutionConfigurationComponent} from './Components/execution-configuration/execution-configuration.component';
 
 const routes: Routes = [
@@ -44,7 +43,6 @@ const routes: Routes = [
   { path: 'reporting/:protocolName/:action', component:  ReportingResultComponent, pathMatch:  'full'},
   { path: 'circuits', component: CircuitsComponent, pathMatch: 'full'},
   { path: 'login', component: LoginComponent, pathMatch: 'full'},
-  { path: 'newlogin', component: NewLoginComponent, pathMatch: 'full'},
   { path: 'callback', component: CallbackComponent, pathMatch: 'full'},
   { path: 'error', component: ErrorComponent, pathMatch: 'full'},
   { path: '**', component: PageNotFoundComponent, pathMatch: 'full'},

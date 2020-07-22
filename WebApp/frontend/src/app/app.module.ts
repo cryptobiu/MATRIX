@@ -13,8 +13,10 @@ import { ProtocolsUploadComponent } from './Components/protocols-upload/protocol
 import {FormsModule} from '@angular/forms';
 import { MainNavComponent } from './Components/main-nav/main-nav.component';
 import { LayoutModule } from '@angular/cdk/layout';
-import { MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTableModule,
-  MatPaginatorModule, MatSortModule, MatSelectModule, MatRadioModule, MatCheckboxModule } from '@angular/material';
+import {
+    MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule, MatTableModule,
+    MatPaginatorModule, MatSortModule, MatSelectModule, MatRadioModule, MatCheckboxModule, MatTooltipModule
+} from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DeploymentComponent } from './Components/deployment/deployment.component';
 import { ExecutionComponent } from './Components/execution/execution.component';
@@ -31,7 +33,6 @@ import { ProtocolsUpdateComponent } from './Components/protocols-update/protocol
 import { ErrorComponent } from './Components/error/error.component';
 import { GlobalErrorHandlerService } from './Services/global-error-handler.service';
 import { DeploymentConfigurationComponent } from './Components/deployment-configuration/deployment-configuration.component';
-import { NewLoginComponent } from './Components/new-login/new-login.component';
 import { ExecutionConfigurationComponent } from './Components/execution-configuration/execution-configuration.component';
 
 @NgModule({
@@ -59,28 +60,28 @@ import { ExecutionConfigurationComponent } from './Components/execution-configur
     ProtocolsUpdateComponent,
     ErrorComponent,
     DeploymentConfigurationComponent,
-    NewLoginComponent,
     ExecutionConfigurationComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    FormsModule,
-    LayoutModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatSidenavModule,
-    MatIconModule,
-    MatListModule,
-    BrowserAnimationsModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatSortModule,
-    MatSelectModule,
-    MatRadioModule,
-    MatCheckboxModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        FormsModule,
+        LayoutModule,
+        MatToolbarModule,
+        MatButtonModule,
+        MatSidenavModule,
+        MatIconModule,
+        MatListModule,
+        BrowserAnimationsModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatSortModule,
+        MatSelectModule,
+        MatRadioModule,
+        MatCheckboxModule,
+        MatTooltipModule
+    ],
   providers: [AuthService, GlobalErrorHandlerService, {provide: ErrorHandler, useClass: GlobalErrorHandlerService}],
   bootstrap: [AppComponent]
 })
