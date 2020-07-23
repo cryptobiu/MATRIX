@@ -238,7 +238,7 @@ class AmazonCP(DeployCP):
                                     'NoDevice': ''
                                     }
                                 ],
-                                'ImageId': image_name,
+                                'ImageId': ami_id,
                                 'KeyName': key_name,
                                 'MinCount': int(number_of_instances_to_deploy),
                                 'MaxCount': int(number_of_instances_to_deploy),
@@ -268,7 +268,7 @@ class AmazonCP(DeployCP):
                                         'NoDevice': ''
                                     }
                                 ],
-                                'ImageId': image_name,
+                                'ImageId': ami_id,
                                 'KeyName': key_name,
                                 'MinCount': int(number_of_instances_to_deploy),
                                 'MaxCount': int(number_of_instances_to_deploy),
