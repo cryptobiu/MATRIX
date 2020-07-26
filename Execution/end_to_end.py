@@ -122,6 +122,7 @@ class E2E:
         """
         Update libscapi library on the remote servers from dev branch
         """
+        os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
         protocol_name = self.protocol_config['protocolName']
         os.system('fab -f Execution/fabfile.py update_libscapi --parallel | '
                   f' tee -a WebApp/ExecutionLogs/{protocol_name}.log')
@@ -130,18 +131,21 @@ class E2E:
         """
         Copy logs file from remote servers
         """
+        os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
         logs_directory = self.protocol_config['logs']
         protocol_name = self.protocol_config['protocolName']
         os.system(f'fab -f Execution/fabfile.py get_logs:{logs_directory} --parallel | '
                   f'tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def delete_old_experiment(self):
+        os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
         protocol_name = self.protocol_config['protocolName']
         working_directory = self.protocol_config['workingDirectory']
         os.system(f'fab -f Execution/fabfile.py delete_old_experiment:{working_directory} --parallel | '
                   f'tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def copy_circuits_from_db(self):
+        os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
         protocol_name = self.protocol_config['protocolName']
         working_directory = self.protocol_config['workingDirectory']
         os.system(f'fab -f Execution/fabfile.py copy_circuits_from_db:{working_directory} --parallel | '
