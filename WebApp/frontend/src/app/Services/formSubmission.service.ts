@@ -9,7 +9,7 @@ import { throwError } from 'rxjs';
 })
 export class FormSubmissionService {
 
-  private _urlApi = 'http://132.71.144.17/api/';
+  private _urlApi = 'http://mpcbenchmark.cs.biu.ac.il/api/';
 
   constructor(private _http: HttpClient) { }
 

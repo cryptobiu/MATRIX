@@ -10,7 +10,7 @@ import {Protocol} from '../classes';
 })
 export class DbService {
 
-  private _urlApi = 'http://132.71.144.17/api/';
+  private _urlApi = 'http://mpcbenchmark.cs.biu.ac.il/api/';
 
   constructor(private _http: HttpClient) { }
 
