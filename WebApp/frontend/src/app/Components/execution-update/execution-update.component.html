@@ -48,15 +48,6 @@
         Working directory is the directory where the protocol is installed end executed. Please fill it</small>
     </div>
 
-    <div class="form-group">
-      <label>Results Directory</label>
-      <input type="text" required #resultsDir="ngModel"
-             [class.is-invalid]="resultsDir.invalid && resultsDir.touched" class="form-control"
-             name="resultsDir" [(ngModel)]="protocolModel.resultsDirectory">
-      <small class="text-danger" [class.d-none]="resultsDir.valid || resultsDir.untouched">
-        Results directory is the directory where the protocol results are downloaded. Please fill it</small>
-    </div>
-
     <button [disabled]="userForm.form.invalid " class="btn btn-primary" type="submit">
       Update Configuration
     </button>

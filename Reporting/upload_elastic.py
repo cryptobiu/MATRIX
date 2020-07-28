@@ -134,7 +134,7 @@ class Elastic:
         except EnvironmentError:
             print('Cannot read results files')
 
-    def upload_all_data(self, results_dir, protocol_name):
+    def upload_all_data(self, protocol_name):
         """
         Activate the relevant function according to the results files format
         :return:

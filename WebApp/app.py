@@ -243,7 +243,6 @@ def update_execution_protocol_data(protocol_name):
         doc['numConfigurations'] = form_data['numConfigurations']
         doc['numOfIterations'] = form_data['numOfIterations']
         doc['workingDirectory'] = form_data['workingDirectory'].strip()
-        doc['resultsDirectory'] = form_data['resultsDirectory'].strip()
         collection.save(doc)
 
     except errors.InvalidDocument as e:
@@ -300,9 +299,7 @@ def execute_reporting_operation(protocol_name, operation):
             reporting.analyze_results()
         elif operation == 'Analyze Results using Elasticsearch':
             e = Elastic(protocol_data)
-            results_dir = doc['resultsDirectory']
-            e.upload_all_data(results_dir, protocol_name)
-
+            e.upload_all_data(protocol_name)
         return jsonify('reporting operation %s succeeded' % operation)
 
     except errors.InvalidDocument as e:

@@ -35,8 +35,9 @@ class Analyze:
         """
         Download data from the remote servers
         """
+        protocol_name = self.protocol_config['protocolName']
         remote_directory = self.protocol_config['workingDirectory']
-        results_path = self.protocol_config['resultsDirectory']
+        results_path = f'{protocol_name}_Results'
         os.system('fab -f Execution/fabfile.py collect_results:%s,%s --no-pty --parallel'
                   % (remote_directory, results_path))
         # wait for all clients to download data
