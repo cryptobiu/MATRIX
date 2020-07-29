@@ -147,9 +147,9 @@ class AmazonCP(DeployCP):
         """
         regions = self.protocol_config['cloudProviders']['AWS']['regions']
         machine_type = self.protocol_config['cloudProviders']['AWS']['instanceType']
-        image_name = self.protocol_config['cloudProviders']['AWS']['imageName']
-        security_group = self.protocol_config['cloudProviders']['AWS']['securityGroupName']
-        key_name = self.protocol_config['cloudProviders']['AWS']['keyFileName']
+        image_name = self.protocol_config['cloudProviders']['AWS']['imageName'].split(',')
+        security_group = self.protocol_config['cloudProviders']['AWS']['securityGroupName'].split(',')
+        key_name = self.protocol_config['cloudProviders']['AWS']['keyFileName'].split(',')
         if 'spotPrice' in self.protocol_config['cloudProviders']['AWS']:
             spot_request = True
             price_bids = self.protocol_config['cloudProviders']['AWS']['spotPrice']
@@ -173,7 +173,7 @@ class AmazonCP(DeployCP):
             for idx in range(len(regions)):
                 region_name = regions[idx][:-1]
                 client = self.session.client('ec2', region_name=region_name)
-                ami_id, disk_size = self.get_ami_details(region_name, image_name)
+                ami_id, disk_size = self.get_ami_details(region_name, image_name[idx])
 
                 number_of_instances_to_deploy = self.check_running_instances(region_name, machine_type)
                 if idx < number_duplicated_servers:
@@ -195,8 +195,8 @@ class AmazonCP(DeployCP):
                                     LaunchSpecification=
                                     {
                                         'ImageId': ami_id,
-                                        'KeyName': key_name,
-                                        'SecurityGroups': security_group,
+                                        'KeyName': key_name[idx],
+                                        'SecurityGroups': security_group[idx],
                                         'InstanceType': machine_type,
                                         'Placement':
                                             {
@@ -239,10 +239,10 @@ class AmazonCP(DeployCP):
                                     }
                                 ],
                                 'ImageId': ami_id,
-                                'KeyName': key_name,
+                                'KeyName': key_name[idx],
                                 'MinCount': int(number_of_instances_to_deploy),
                                 'MaxCount': int(number_of_instances_to_deploy),
-                                'SecurityGroups': [security_group],
+                                'SecurityGroups': [security_group[idx]],
                                 'InstanceType': machine_type,
                                 'Placement': {'AvailabilityZone': regions[idx]},
                                 'TagSpecifications': [{
@@ -269,10 +269,10 @@ class AmazonCP(DeployCP):
                                     }
                                 ],
                                 'ImageId': ami_id,
-                                'KeyName': key_name,
+                                'KeyName': key_name[idx],
                                 'MinCount': int(number_of_instances_to_deploy),
                                 'MaxCount': int(number_of_instances_to_deploy),
-                                'SubnetId': security_group,
+                                'SubnetId': security_group[idx],
                                 'InstanceType': machine_type,
                                 'Placement': {'AvailabilityZone': regions[idx]},
                                 'TagSpecifications': [{
