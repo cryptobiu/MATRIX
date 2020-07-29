@@ -257,14 +257,17 @@ def collect_results(results_server_directory, results_local_directory):
 
 
 @task
-def get_logs(logs_directory):
+def get_logs(protocol_name, working_directory):
     """
     Collect logs from the specified working directory
-    :type logs_directory str
-    :param logs_directory: logs files directory
+    :type protocol_name str
+    :param protocol_name: protocol name that logs should be received
+    :type working_directory str
+    :param working_directory: working directory for the protocol
     """
-    local('mkdir -p logs')
-    get(f'{logs_directory}/*.log', f'{Path.home()}/MATRIX/logs')
+    logs_directory = f'{protocol_name}_Logs/'
+    local(f'mkdir -p {logs_directory}')
+    get(f'{working_directory}/*.log', f'{logs_directory}')
 
 
 @task

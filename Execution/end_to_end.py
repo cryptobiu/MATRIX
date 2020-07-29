@@ -134,7 +134,8 @@ class E2E:
         os.makedirs('WebApp/ExecutionLogs', exist_ok=True)
         logs_directory = self.protocol_config['logs']
         protocol_name = self.protocol_config['protocolName']
-        os.system(f'fab -f Execution/fabfile.py get_logs:{logs_directory} --parallel | '
+        working_directory = self.protocol_config['workingDirectory']
+        os.system(f'fab -f Execution/fabfile.py get_logs:{protocol_name}, {working_directory} --parallel | '
                   f'tee -a WebApp/ExecutionLogs/{protocol_name}.log')
 
     def delete_old_experiment(self):
