@@ -7,7 +7,7 @@ import {Observable} from 'rxjs';
 })
 export class DownloadFileService {
 
-  private _urlApi = 'http://localhost:5000/api/';
+  private _urlApi = 'http://mpcbenchmark.cs.biu.ac.il/api/';
 
   constructor(private _http: HttpClient) { }
 
