@@ -33,7 +33,7 @@
     "jquery": "^3.5.0",
     "kind-of": "^6.0.3",
     "lodash.mergewith": "^4.6.2",
-    "minimist": "^1.2.3",
+    "minimist": "^1.2.6",
     "mongoose": "^5.7.5",
     "popper.js": "^1.14.6",
     "rxjs": "~6.5.3",
